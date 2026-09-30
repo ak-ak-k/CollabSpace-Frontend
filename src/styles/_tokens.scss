@@ -1,0 +1,49 @@
+@use 'tokens/foundation';
+@use 'tokens/palette';
+@use 'tokens/semantic';
+@use 'tokens/identity';
+@use 'tokens/components';
+@use 'tokens/forms';
+@use 'tokens/overlays';
+@use 'tokens/display';
+@use 'tokens/layout';
+@use 'tokens/dashboard';
+@use 'tokens/system';
+@use 'tokens/auth';
+@use 'tokens/search';
+@use 'tokens/messages';
+@use 'tokens/composer';
+@use 'tokens/conversation';
+@use 'tokens/teams';
+
+:root {
+  @include foundation.foundation;
+  @include components.component-tokens;
+  @include forms.form-tokens;
+  @include overlays.overlay-tokens;
+  @include display.display-tokens;
+  @include layout.layout-tokens;
+  @include dashboard.dashboard-tokens;
+  @include system.system-tokens;
+  @include auth.auth-tokens;
+  @include search.search-tokens;
+  @include messages.message-tokens;
+  @include composer.composer-tokens;
+  @include conversation.conversation-tokens;
+  @include teams.teams-tokens;
+}
+
+:root,
+[data-theme='light'] {
+  @include palette.light-palette;
+  @include semantic.semantic-colors;
+  @include identity.light-identity;
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  @include palette.dark-palette;
+  @include semantic.semantic-colors;
+  @include identity.dark-identity;
+  color-scheme: dark;
+}

@@ -1,0 +1,37 @@
+@mixin component-tokens {
+  --space-0-75: 3px;
+
+  --size-avatar-24: 24px;
+  --size-avatar-26: 26px;
+  --size-avatar-28: 28px;
+  --size-avatar-32: 32px;
+  --size-avatar-36: 36px;
+  --size-avatar-40: 40px;
+  --size-avatar-44: 44px;
+  --size-avatar-48: 48px;
+  --size-avatar-56: 56px;
+  --size-avatar-64: 64px;
+  --size-avatar-72: 72px;
+  --size-avatar-96: 96px;
+  --size-avatar-128: 128px;
+
+  --size-status-dot-sm: 9px;
+  --size-status-dot-md: 12px;
+  --size-status-dot-lg: 16px;
+  --status-dot-offset-sm: -2px;
+  --status-dot-offset-md: -3px;
+  --status-dot-offset-lg: -4px;
+
+  --size-badge-sm: 18px;
+  --size-badge-md: 20px;
+
+  --size-spinner-sm: 14px;
+  --size-spinner-md: 20px;
+
+  --size-brand-mark-sm: 32px;
+  --size-brand-mark-md: 40px;
+  --size-brand-mark-lg: 44px;
+
+  --button-padding-inline: calc(var(--space-3) * 1.2);
+  --avatar-group-overlap: -6px;
+}

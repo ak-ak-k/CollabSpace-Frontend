@@ -1,0 +1,34 @@
+@mixin layout-tokens {
+  --rail-width: var(--rail-width-desktop);
+  --rail-item-height: 56px;
+  --rail-control-size: var(--size-control-lg);
+  --rail-workspace-size: var(--size-control-md);
+  --rail-badge-top: var(--space-1-5);
+  --rail-badge-left: calc(50% + var(--space-1));
+  --rail-menu-gap: var(--space-2);
+  --rail-menu-edge: var(--space-3);
+
+  --bottom-nav-columns: 5;
+  --bottom-nav-badge-left: calc(50% + var(--space-1) + 1px);
+  --bottom-nav-bar-offset: calc(var(--border-width-rule) * -1);
+
+  --mobile-header-badge-right: var(--space-1);
+
+  --drawer-row-height: 52px;
+  --drawer-status-columns: 2;
+
+  --secondary-sidebar-width-desktop: 272px;
+  --secondary-sidebar-width-tablet: 220px;
+
+  --offline-banner-message-min-width: 200px;
+
+  --dialog-field-min-width-sm: 160px;
+  --dialog-field-min-width-md: 200px;
+  --dialog-segmented-max-width: 420px;
+  --conversation-row-height: 68px;
+
+  --skip-link-offset: var(--space-2);
+  --skip-link-hidden-offset: -9999px;
+
+  --toast-bottom-offset: calc(var(--bottom-nav-height) + var(--space-3-5));
+}

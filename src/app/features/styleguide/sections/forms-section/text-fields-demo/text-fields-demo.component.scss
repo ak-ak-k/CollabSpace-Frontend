@@ -1,0 +1,21 @@
+@use '../demo';
+
+:host {
+  @include demo.host;
+}
+
+.block {
+  @include demo.block;
+}
+
+.block__title {
+  @include demo.block-title;
+}
+
+.grid {
+  @include demo.grid;
+}
+
+.field-group {
+  min-width: 0;
+}

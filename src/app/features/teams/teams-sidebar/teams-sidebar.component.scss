@@ -1,0 +1,107 @@
+:host {
+  display: contents;
+}
+
+.sidebar {
+  padding: var(--space-4) var(--space-0);
+}
+
+.sidebar__all {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-0) var(--space-4) var(--space-3);
+  color: var(--text-primary);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.sidebar__label {
+  margin: var(--space-0);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-heavy);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+}
+
+.sidebar__team,
+.sidebar__channel,
+.sidebar__dm {
+  display: flex;
+  align-items: center;
+  color: var(--text-primary);
+  font-size: var(--font-size-14);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--hover);
+  }
+}
+
+.sidebar__team {
+  gap: var(--space-3);
+  min-height: var(--teams-sidebar-team-height);
+  padding: var(--space-0) var(--space-4);
+}
+
+.sidebar__team-name {
+  flex: 1;
+  font-weight: var(--font-weight-semibold);
+}
+
+.sidebar__team--open .sidebar__team-name {
+  font-weight: var(--font-weight-heavy);
+}
+
+.sidebar__chevron {
+  color: var(--text-muted);
+}
+
+.sidebar__channels {
+  margin-bottom: var(--space-2);
+}
+
+.sidebar__channel {
+  gap: var(--space-2);
+  min-height: var(--teams-sidebar-channel-height);
+  padding: var(--space-0) var(--space-4) var(--space-0) var(--teams-sidebar-channel-indent);
+  color: var(--text-muted);
+}
+
+.sidebar__channel--active {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-heavy);
+}
+
+.sidebar__row--current,
+.sidebar__row--current:hover {
+  background: var(--selected);
+}
+
+.sidebar__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar__divider {
+  height: var(--border-width-rule);
+  margin: var(--space-3) var(--space-0);
+  border: var(--space-0);
+  background: var(--border);
+}
+
+.sidebar__dm {
+  gap: var(--space-3);
+  min-height: var(--teams-sidebar-dm-height);
+  padding: var(--space-0) var(--space-4);
+}
+
+.sidebar__dm--unread {
+  font-weight: var(--font-weight-heavy);
+}

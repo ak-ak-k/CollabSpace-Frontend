@@ -1,0 +1,118 @@
+@use 'sass:math';
+
+$root-font-size: 16;
+
+@function rem($pixels) {
+  @return math.div($pixels, $root-font-size) * 1rem;
+}
+
+@mixin foundation {
+  --font-heading: 'Archivo', system-ui, sans-serif;
+  --font-body: 'Archivo', system-ui, sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-heavy: 800;
+
+  --font-size-10: #{rem(10)};
+  --font-size-11: #{rem(11)};
+  --font-size-12: #{rem(12)};
+  --font-size-13: #{rem(13)};
+  --font-size-14: #{rem(14)};
+  --font-size-15: #{rem(15)};
+  --font-size-16: #{rem(16)};
+  --font-size-17: #{rem(17)};
+  --font-size-18: #{rem(18)};
+  --font-size-20: #{rem(20)};
+  --font-size-22: #{rem(22)};
+  --font-size-24: #{rem(24)};
+  --font-size-25: #{rem(25)};
+  --font-size-28: #{rem(28)};
+  --font-size-32: #{rem(32)};
+  --font-size-42: #{rem(42)};
+
+  --font-size-display-sm: clamp(#{rem(25)}, 3vw, #{rem(32)});
+  --font-size-display-md: clamp(#{rem(28)}, 4vw, #{rem(42)});
+  --font-size-display-lg: clamp(#{rem(32)}, 5vw, #{rem(56)});
+  --font-size-display-xl: clamp(#{rem(44)}, 5vw, #{rem(76)});
+  --font-size-display-2xl: clamp(#{rem(96)}, 18vw, #{rem(220)});
+
+  --line-height-flat: 1;
+  --line-height-display: 0.98;
+  --line-height-stat: 1.05;
+  --line-height-heading: 1.12;
+  --line-height-compact: 1.2;
+  --line-height-snug: 1.25;
+  --line-height-input: 1.4;
+  --line-height-message: 1.5;
+  --line-height-body: 1.55;
+
+  --letter-spacing-display: -0.035em;
+  --letter-spacing-stat: -0.03em;
+  --letter-spacing-heading: -0.015em;
+  --letter-spacing-label: 0.02em;
+  --letter-spacing-caps: 0.08em;
+
+  --underline-offset: 3px;
+  --underline-thickness-hover: 2px;
+
+  --space-0: 0;
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-2-5: 10px;
+  --space-3: 12px;
+  --space-3-5: 14px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
+
+  --page-padding: clamp(var(--space-4), 3vw, var(--space-10));
+  --page-gap: clamp(var(--space-6), 3vw, var(--space-10));
+  --page-max-width: 1320px;
+
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-round: 50%;
+
+  --border-width-hairline: 1px;
+  --border-width-rule: 2px;
+  --border-width-bar: 3px;
+
+  --size-control-sm: 36px;
+  --size-control-md: 40px;
+  --size-control-lg: 44px;
+  --size-control-xl: 48px;
+  --size-touch-target: 44px;
+
+  --rail-width-desktop: 80px;
+  --rail-width-tablet: 64px;
+  --mobile-header-height: 56px;
+  --bottom-nav-height: 58px;
+
+  --opacity-disabled: 0.45;
+
+  --duration-fast: 150ms;
+  --duration-spin: 800ms;
+  --duration-typing: 1200ms;
+  --duration-pulse: 1400ms;
+  --duration-reduced: 0.01ms;
+
+  --z-raised: 2;
+  --z-popover: 6;
+  --z-dropdown: 30;
+  --z-drawer: 40;
+  --z-panel: 45;
+  --z-sheet: 47;
+  --z-modal: 50;
+  --z-palette: 55;
+  --z-confirm: 60;
+  --z-toast: 70;
+  --z-skip-link: 100;
+}

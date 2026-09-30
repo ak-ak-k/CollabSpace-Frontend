@@ -1,0 +1,24 @@
+<div class="auth">
+  <aside class="auth__poster" aria-label="About CollabSpace">
+    <div class="auth__brand">
+      <app-brand-mark />
+      <span class="auth__wordmark">CollabSpace</span>
+    </div>
+
+    <div class="auth__poster-body">
+      <p class="auth__headline">Conversations, tasks and files. One ruled space.</p>
+      <ol class="auth__points">
+        @for (point of points; track point.number) {
+          <li class="auth__point">
+            <span class="auth__point-number" aria-hidden="true">{{ point.number }}</span>
+            <span>{{ point.text }}</span>
+          </li>
+        }
+      </ol>
+    </div>
+  </aside>
+
+  <main class="auth__main">
+    <router-outlet />
+  </main>
+</div>

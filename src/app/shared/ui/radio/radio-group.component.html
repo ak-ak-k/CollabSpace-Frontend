@@ -1,0 +1,59 @@
+<span class="radio-group__label" [class.visually-hidden]="hideLabel()" [attr.id]="labelId">
+  {{ label() }}
+</span>
+
+<div
+  class="radio-group__options"
+  role="radiogroup"
+  [attr.aria-labelledby]="labelId"
+  [attr.aria-describedby]="describedBy()"
+  [attr.aria-required]="required() ? 'true' : null"
+  [attr.aria-invalid]="error().invalid ? 'true' : null"
+>
+  @for (option of options(); track option.value) {
+    <label
+      class="option"
+      [class.option--selected]="option.value === value()"
+      [class.option--disabled]="disabled()"
+      [attr.title]="iconOnly() ? option.label : null"
+    >
+      <input
+        #radio
+        type="radio"
+        class="option__native"
+        [name]="groupName()"
+        [value]="option.value"
+        [checked]="option.value === value()"
+        [disabled]="disabled()"
+        [attr.aria-labelledby]="optionLabelId($index)"
+        [attr.aria-describedby]="optionDescriptionId(option, $index)"
+        (change)="value.set(option.value)"
+        (blur)="touch.emit()"
+      />
+      @if (appearance() === 'list') {
+        <span class="option__dot" aria-hidden="true"></span>
+      }
+      @if (option.swatch) {
+        <span class="option__swatch" aria-hidden="true" [style.background]="option.swatch"></span>
+      }
+      @if (option.icon; as icon) {
+        <app-icon class="option__icon" [name]="icon" [size]="iconOnly() ? 16 : 14" />
+      }
+      <span class="option__text" [class.visually-hidden]="iconOnly()">
+        <span [attr.id]="optionLabelId($index)">{{ option.label }}</span>
+        @if (optionDescriptionId(option, $index); as descriptionId) {
+          <span class="option__description" [attr.id]="descriptionId">
+            {{ option.description }}
+          </span>
+        }
+      </span>
+    </label>
+  }
+</div>
+
+@if (hint()) {
+  <p class="radio-group__hint" [attr.id]="hintId">{{ hint() }}</p>
+}
+@if (error().message) {
+  <app-field-error [attr.id]="errorId" [message]="error().message" />
+}

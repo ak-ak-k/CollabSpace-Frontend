@@ -1,0 +1,27 @@
+@use '../demo';
+
+:host {
+  @include demo.host;
+}
+
+.block {
+  @include demo.block;
+}
+
+.block__title {
+  @include demo.block-title;
+}
+
+.note {
+  @include demo.note;
+}
+
+.example {
+  @include demo.stack;
+
+  max-width: var(--form-max-width);
+}
+
+.field-group {
+  min-width: 0;
+}

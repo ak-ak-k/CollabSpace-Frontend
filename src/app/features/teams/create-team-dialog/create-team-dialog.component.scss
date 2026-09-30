@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.create-team__privacy {
+  max-width: var(--create-team-privacy-max-width);
+}
+
+.create-team__help {
+  margin: var(--space-1-5) var(--space-0) var(--space-0);
+  color: var(--text-muted);
+  font-size: var(--font-size-13);
+}
+
+.create-team__note {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-0);
+  padding-top: var(--space-3);
+  border-top: var(--rule-hairline);
+  color: var(--text-muted);
+  font-size: var(--font-size-13);
+
+  app-icon {
+    flex: none;
+    margin-top: var(--space-0-5);
+  }
+}

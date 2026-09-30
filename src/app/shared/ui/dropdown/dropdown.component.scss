@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  width: var(--dropdown-width-sm);
+  max-width: var(--dropdown-max-width);
+  max-height: var(--dropdown-max-height);
+  margin-block: var(--space-1);
+  padding: var(--space-2) var(--space-0);
+  overflow-y: auto;
+  border: var(--rule-hairline);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-primary);
+}
+
+:host(.dropdown--md) {
+  width: var(--dropdown-width-md);
+}

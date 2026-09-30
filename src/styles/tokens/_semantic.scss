@@ -1,0 +1,42 @@
+@mixin semantic-colors {
+  --color-divider: color-mix(in srgb, var(--color-text) var(--divider-strength), transparent);
+
+  --brand: #ec3013;
+  --on-brand: #ffffff;
+  --primary: #dd2b0f;
+  --primary-hover: #ae1800;
+  --primary-active: #7c1405;
+  --on-primary: #ffffff;
+  --secondary: var(--color-text);
+  --on-secondary: var(--color-bg);
+
+  --background: var(--color-bg);
+  --surface: var(--color-surface);
+  --surface-secondary: var(--color-neutral-200);
+  --border: var(--color-divider);
+  --border-control: color-mix(
+    in srgb,
+    var(--color-text) var(--control-border-strength),
+    transparent
+  );
+
+  --text-primary: var(--color-text);
+  --text-muted: color-mix(in srgb, var(--color-text) 66%, transparent);
+
+  --danger: var(--color-accent-700);
+  --danger-surface: var(--color-accent-100);
+  --on-danger-surface: var(--color-accent-900);
+
+  --hover: color-mix(in srgb, var(--color-text) 6%, transparent);
+  --press: color-mix(in srgb, var(--color-text) 12%, transparent);
+  --selected: var(--color-neutral-300);
+  --rail-hover: color-mix(in srgb, var(--rail-foreground) 10%, transparent);
+  --rail-selected: color-mix(in srgb, var(--rail-foreground) 14%, transparent);
+  --focus-ring: var(--color-text);
+  --selection: color-mix(in srgb, var(--color-text) 30%, transparent);
+  --scrollbar-thumb: var(--color-neutral-400);
+  --skeleton: var(--color-neutral-200);
+
+  --rule-strong: var(--border-width-rule) solid var(--border);
+  --rule-hairline: var(--border-width-hairline) solid var(--border);
+}

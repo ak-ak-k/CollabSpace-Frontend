@@ -1,0 +1,54 @@
+<div class="dashboard">
+  <app-dashboard-welcome-card
+    role="region"
+    aria-labelledby="dashboard-title"
+    [firstName]="firstName()"
+    [unreadMentions]="unreadMentions()"
+    [tasksDueToday]="dueToday()"
+    [status]="overallStatus()"
+    (newMessage)="startConversation()"
+    (newTask)="newTask()"
+    (invitePeople)="invitePeople()"
+    (filesChosen)="upload($event)"
+  />
+
+  <section class="dashboard__stats" aria-label="Workspace at a glance">
+    @for (stat of stats(); track stat.id) {
+      <app-dashboard-stat-card
+        class="dashboard__stat"
+        [stat]="stat"
+        [availability]="statAvailability()"
+      />
+    }
+  </section>
+
+  <div class="dashboard__columns">
+    <div class="dashboard__column dashboard__column--primary">
+      <app-dashboard-recent-conversations
+        [status]="conversationStatus()"
+        [conversations]="conversations()"
+        (retry)="reloadConversations()"
+        (startConversation)="startConversation()"
+      />
+      <app-dashboard-upcoming-tasks
+        [status]="taskStatus()"
+        [tasks]="upcoming()"
+        (retry)="reloadTasks()"
+        (newTask)="newTask()"
+      />
+    </div>
+
+    <div class="dashboard__column dashboard__column--secondary">
+      <app-dashboard-team-activity
+        [status]="workspaceStatus()"
+        [teams]="teams()"
+        (retry)="reloadWorkspace()"
+      />
+      <app-dashboard-recent-activity
+        [status]="workspaceStatus()"
+        [activity]="activity()"
+        (retry)="reloadWorkspace()"
+      />
+    </div>
+  </div>
+</div>

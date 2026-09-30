@@ -1,0 +1,32 @@
+<label class="checkbox" [class.checkbox--disabled]="disabled()">
+  <span class="checkbox__control">
+    <input
+      #control
+      type="checkbox"
+      class="checkbox__native"
+      [checked]="checked()"
+      [disabled]="disabled()"
+      [attr.name]="name() || null"
+      [attr.aria-required]="required() ? 'true' : null"
+      [attr.aria-invalid]="error().invalid ? 'true' : null"
+      [attr.aria-describedby]="renderedErrorId()"
+      (change)="checked.set(control.checked)"
+      (blur)="touch.emit()"
+    />
+    <span
+      class="checkbox__box"
+      [class.checkbox__box--checked]="checked()"
+      [class.checkbox__box--invalid]="error().invalid"
+      aria-hidden="true"
+    >
+      @if (checked()) {
+        <app-icon name="check" [size]="12" />
+      }
+    </span>
+  </span>
+  <span class="checkbox__label"><ng-content /></span>
+</label>
+
+@if (error().message) {
+  <app-field-error [attr.id]="errorId" [message]="error().message" />
+}

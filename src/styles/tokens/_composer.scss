@@ -1,0 +1,20 @@
+@mixin composer-tokens {
+  --composer-max-height: 160px;
+  --composer-popover-width: 320px;
+  --composer-popover-max-width: calc(100% - var(--space-8));
+  --composer-popover-offset: var(--space-0-5);
+  --composer-chip-max-width: 260px;
+  --composer-textarea-min-height: var(--size-control-md);
+  --composer-textarea-padding-block: 9px;
+  --composer-textarea-padding-inline: var(--space-1);
+  --composer-option-height: var(--size-control-md);
+  --composer-send-width: var(--size-control-lg);
+  --composer-extras-columns: 3;
+  --size-composer-cancel-button: 32px;
+  --size-composer-chip-remove: 28px;
+  --size-emoji-button: var(--size-control-sm);
+  --size-emoji-button-touch: var(--size-touch-target);
+  --emoji-grid-columns: 8;
+  --emoji-grid-columns-touch: 6;
+  --emoji-grid-gap: var(--space-0-5);
+}

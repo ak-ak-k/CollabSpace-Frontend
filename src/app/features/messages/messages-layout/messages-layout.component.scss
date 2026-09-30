@@ -1,0 +1,38 @@
+@use 'breakpoints';
+
+:host {
+  display: block;
+  height: 100%;
+  min-width: 0;
+}
+
+.messages {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  background: var(--background);
+}
+
+.messages__list {
+  flex: none;
+  width: var(--conversation-list-width-desktop);
+  border-right: var(--rule-strong);
+
+  @include breakpoints.tablet {
+    width: var(--conversation-list-width-tablet);
+  }
+
+  @include breakpoints.mobile {
+    width: 100%;
+    border-right: var(--space-0);
+  }
+}
+
+.messages__pane {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}

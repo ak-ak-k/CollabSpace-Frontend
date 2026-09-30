@@ -1,0 +1,34 @@
+@for (attachment of attachments(); track $index) {
+  @if (attachment.kind === 'image') {
+    <figure class="attachment-image">
+      <div
+        class="attachment-image__placeholder"
+        role="img"
+        [attr.aria-label]="'Image: ' + attachment.name"
+      >
+        <app-icon name="image" [size]="imageIconSize" />
+      </div>
+      <figcaption class="attachment-image__caption">
+        <span class="truncate">{{ attachment.name }}</span>
+        <span class="attachment-image__meta">{{ attachment.dimensions || attachment.size }}</span>
+      </figcaption>
+    </figure>
+  } @else {
+    <div class="attachment-file">
+      <span class="attachment-file__tile" aria-hidden="true">
+        <app-icon [name]="attachment.icon" [size]="fileIconSize" />
+      </span>
+      <span class="attachment-file__details">
+        <span class="attachment-file__name truncate">{{ attachment.name }}</span>
+        <span class="attachment-file__meta">{{ attachment.label }} · {{ attachment.size }}</span>
+      </span>
+      <button
+        appIconButton
+        [label]="'Download ' + attachment.name"
+        (click)="download.emit(attachment.name)"
+      >
+        <app-icon name="download" [size]="downloadIconSize" />
+      </button>
+    </div>
+  }
+}

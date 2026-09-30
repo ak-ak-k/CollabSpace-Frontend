@@ -1,0 +1,13 @@
+<ng-content select="app-icon" />
+<span class="dropdown-item__label"><ng-content /></span>
+@if (showsSwitch()) {
+  <span
+    class="dropdown-item__switch"
+    [class.dropdown-item__switch--on]="selected()"
+    aria-hidden="true"
+  >
+    <span class="dropdown-item__knob"></span>
+  </span>
+} @else if (selected()) {
+  <app-icon name="check" [size]="16" />
+}

@@ -1,0 +1,30 @@
+<div class="confirm-dialog__summary">
+  <span class="confirm-dialog__tile">
+    <app-icon [name]="data.icon" [size]="18" />
+  </span>
+  <div class="confirm-dialog__text">
+    <h2 class="confirm-dialog__title" [id]="titleId">{{ data.title }}</h2>
+    <p class="confirm-dialog__body" [id]="bodyId">{{ data.body }}</p>
+  </div>
+</div>
+
+<div class="confirm-dialog__actions">
+  <button
+    appButton
+    type="button"
+    variant="secondary"
+    [attr.cdk-focus-initial]="focusesCancel ? '' : null"
+    (click)="cancel()"
+  >
+    {{ data.cancelLabel }}
+  </button>
+  <button
+    appButton
+    type="button"
+    variant="primary"
+    [attr.cdk-focus-initial]="focusesCancel ? null : ''"
+    (click)="confirm()"
+  >
+    {{ data.confirmLabel }}
+  </button>
+</div>

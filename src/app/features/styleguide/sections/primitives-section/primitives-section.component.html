@@ -1,0 +1,105 @@
+<section class="block" aria-label="Buttons">
+  <h3 class="block__title">Buttons</h3>
+  <div class="row">
+    <button appButton type="button" variant="primary">
+      <app-icon name="plus" [size]="16" />
+      Primary
+    </button>
+    <button appButton type="button">Secondary</button>
+    <button appButton type="button" variant="ghost">Ghost</button>
+    <button appButton type="button" variant="primary" disabled>Disabled</button>
+    <button appButton type="button" disabled>Disabled</button>
+    <button appButton type="button" variant="primary" busy>Saving…</button>
+  </div>
+  <div class="row">
+    <button appButton type="button" size="sm">Small 36</button>
+    <button appButton type="button" size="md">Medium 40</button>
+    <button appButton type="button" size="lg">Large 44</button>
+    <button appButton type="button" size="xl">Extra large 48</button>
+  </div>
+  <div class="stack stack--narrow">
+    <button appButton type="button" variant="primary" size="xl" block>
+      Block button
+      <app-icon name="arrow-right" [size]="16" />
+    </button>
+  </div>
+</section>
+
+<section class="block" aria-label="Icon buttons">
+  <h3 class="block__title">Icon buttons</h3>
+  <div class="row">
+    <button appIconButton type="button" size="sm" label="Search in conversation">
+      <app-icon name="search" [size]="18" />
+    </button>
+    <button appIconButton type="button" size="md" label="Conversation details">
+      <app-icon name="panel-right" [size]="18" />
+    </button>
+    <button appIconButton type="button" size="lg" label="More actions">
+      <app-icon name="ellipsis-vertical" [size]="18" />
+    </button>
+    <button
+      appIconButton
+      type="button"
+      [label]="starred() ? 'Remove from starred' : 'Add to starred'"
+      [pressed]="starred()"
+      (click)="starred.set(!starred())"
+    >
+      <app-icon name="star" [size]="18" [filled]="starred()" />
+    </button>
+    <button appIconButton type="button" label="Unavailable" disabled>
+      <app-icon name="download" [size]="18" />
+    </button>
+  </div>
+</section>
+
+<section class="block" aria-label="Avatars">
+  <h3 class="block__title">Avatars</h3>
+  <div class="row row--end">
+    @for (size of avatarSizes; track size) {
+      <app-avatar name="Aarav Shah" [seed]="0" [size]="size" status="online" />
+    }
+  </div>
+  <div class="row">
+    @for (person of people; track person.id) {
+      <app-avatar [name]="person.name" [seed]="person.seed" [status]="person.status" />
+    }
+    <app-avatar name="Launch crew" variant="inverted" />
+    <app-avatar name="Frontend" text="FE" variant="inverted" [size]="32" />
+    <app-avatar-group [members]="members" />
+  </div>
+</section>
+
+<section class="block" aria-label="Badges, tags and status">
+  <h3 class="block__title">Badges, tags and status</h3>
+  <div class="row">
+    @for (count of counts; track count) {
+      <app-badge [count]="count" [label]="count + ' unread'" />
+    }
+    @for (count of counts; track count) {
+      <app-badge size="sm" [count]="count" [label]="count + ' unread'" />
+    }
+  </div>
+  <div class="row">
+    <app-tag tone="primary">Urgent</app-tag>
+    <app-tag tone="outline">High</app-tag>
+    <app-tag tone="neutral">Medium</app-tag>
+    <app-tag tone="subtle">Low</app-tag>
+    <app-tag>
+      <app-icon name="lock" [size]="12" />
+      Private
+    </app-tag>
+  </div>
+  <div class="row">
+    @for (status of statuses; track status) {
+      <span class="status">
+        <app-status-dot [status]="status" />
+        <app-status-dot [status]="status" size="sm" announce />
+      </span>
+    }
+    <app-spinner />
+    <app-spinner size="md" />
+    <app-brand-mark size="sm" />
+    <app-brand-mark />
+    <app-brand-mark size="lg" />
+  </div>
+</section>

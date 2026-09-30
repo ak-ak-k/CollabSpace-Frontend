@@ -1,0 +1,75 @@
+<nav class="list" aria-label="Conversations">
+  <div class="list__header">
+    <div class="list__title-row">
+      <h1 class="list__title">Messages</h1>
+      <button appIconButton type="button" size="md" label="New group chat" (click)="newGroup()">
+        <app-icon name="square-pen" [size]="20" />
+      </button>
+    </div>
+    <app-search-input
+      label="Search conversations"
+      placeholder="Search conversations"
+      [(value)]="query"
+    />
+    <app-tabs
+      label="Filter conversations"
+      bleed
+      [tabs]="tabs()"
+      [active]="filter()"
+      (activeChange)="selectFilter($event)"
+    />
+  </div>
+
+  <div class="list__body">
+    @switch (status()) {
+      @case ('loading') {
+        <app-skeleton class="list__state" layout="list" compact label="Loading conversations" />
+      }
+      @case ('error') {
+        <app-empty-state
+          class="list__state"
+          kind="error"
+          compact
+          heading="Couldn’t load conversations"
+          actionLabel="Try again"
+          (action)="reload()"
+        />
+      }
+      @case ('empty') {
+        <app-empty-state
+          class="list__state"
+          compact
+          icon="messages-square"
+          heading="No conversations yet"
+          message="Start a direct message or a group chat with your team."
+          actionLabel="Start a conversation"
+          actionIcon="square-pen"
+          (action)="findPeople()"
+        />
+      }
+      @default {
+        @if (noMatch()) {
+          <app-empty-state
+            class="list__state"
+            compact
+            [icon]="emptyState().icon"
+            [heading]="emptyState().heading"
+            [message]="emptyState().message"
+          />
+        } @else {
+          <ul>
+            @for (conversation of conversations(); track conversation.id) {
+              <li>
+                <app-conversation-item
+                  density="comfortable"
+                  [conversation]="conversation"
+                  [selected]="conversation.id === selectedId()"
+                />
+              </li>
+            }
+          </ul>
+        }
+      }
+    }
+  </div>
+</nav>

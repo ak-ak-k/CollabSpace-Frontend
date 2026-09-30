@@ -1,0 +1,53 @@
+@use 'breakpoints';
+
+@mixin touch-size {
+  --icon-button-size: max(var(--icon-button-base-size), var(--size-touch-target));
+}
+
+:host {
+  --icon-button-base-size: var(--size-control-sm);
+  --icon-button-size: var(--icon-button-base-size);
+
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--icon-button-size);
+  height: var(--icon-button-size);
+  padding: var(--space-0);
+  border: var(--space-0);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+
+  @include breakpoints.tablet-and-down {
+    @include touch-size;
+  }
+
+  @include breakpoints.touch-device {
+    @include touch-size;
+  }
+}
+
+:host(.icon-button--md) {
+  --icon-button-base-size: var(--size-control-md);
+}
+
+:host(.icon-button--lg) {
+  --icon-button-base-size: var(--size-control-lg);
+}
+
+:host(:hover:not(:disabled)) {
+  background: var(--hover);
+}
+
+:host(:active:not(:disabled)),
+:host(.icon-button--pressed) {
+  background: var(--press);
+}
+
+:host(:disabled) {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}

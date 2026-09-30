@@ -1,0 +1,25 @@
+@for (reaction of reactions(); track reaction.emoji) {
+  <button
+    type="button"
+    class="reaction-bar__chip"
+    [class.reaction-bar__chip--mine]="reaction.mine"
+    [attr.aria-pressed]="reaction.mine"
+    [attr.aria-label]="reaction.description"
+    [title]="reaction.description"
+    (click)="toggle.emit(reaction.emoji)"
+  >
+    <span class="reaction-bar__emoji" aria-hidden="true">{{ reaction.emoji }}</span>
+    <span class="reaction-bar__count">{{ reaction.count }}</span>
+  </button>
+}
+@if (showAdd()) {
+  <button
+    type="button"
+    class="reaction-bar__add"
+    aria-label="Add reaction"
+    title="Add reaction"
+    (click)="add.emit()"
+  >
+    <app-icon name="smile-plus" [size]="addIconSize" />
+  </button>
+}

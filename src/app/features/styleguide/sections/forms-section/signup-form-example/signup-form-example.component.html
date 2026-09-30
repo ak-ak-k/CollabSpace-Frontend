@@ -1,0 +1,48 @@
+<section class="block" aria-label="Signal Forms example">
+  <h3 class="block__title">Signal Forms example</h3>
+  <p class="note">
+    Every control binds through the form field directive. Errors appear after the first submit.
+  </p>
+
+  <form class="example" aria-label="Create account example" [formRoot]="signupForm">
+    <app-input
+      label="Work email"
+      type="email"
+      size="lg"
+      inputmode="email"
+      autocomplete="email"
+      placeholder="you@company.com"
+      [formField]="signupForm.email"
+    />
+    <div class="field-group">
+      <app-input
+        label="Password"
+        type="password"
+        size="lg"
+        revealable
+        autocomplete="new-password"
+        placeholder="At least 8 characters"
+        [formField]="signupForm.password"
+      />
+      <app-password-strength [password]="signupForm.password().value()" />
+    </div>
+    <app-checkbox [formField]="signupForm.acceptTerms">
+      I agree to the <a href="/styleguide">Terms of Service</a>
+    </app-checkbox>
+    <button
+      appButton
+      type="submit"
+      variant="primary"
+      size="xl"
+      block
+      [busy]="signupForm().submitting()"
+    >
+      Create account
+    </button>
+    <p class="note" role="status">
+      @if (createdFor()) {
+        Account created for {{ createdFor() }}.
+      }
+    </p>
+  </form>
+</section>

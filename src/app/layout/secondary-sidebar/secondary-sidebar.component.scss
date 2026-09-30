@@ -1,0 +1,42 @@
+@use 'breakpoints';
+
+:host {
+  --secondary-sidebar-width: var(--secondary-sidebar-width-desktop);
+
+  display: block;
+  flex: none;
+  width: var(--secondary-sidebar-width);
+  height: 100%;
+  border-right: var(--rule-strong);
+  background: var(--background);
+
+  @include breakpoints.tablet {
+    --secondary-sidebar-width: var(--secondary-sidebar-width-tablet);
+  }
+
+  @include breakpoints.mobile {
+    width: 100%;
+    border-right: var(--space-0);
+  }
+}
+
+.secondary-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.secondary-sidebar__header {
+  flex: none;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.secondary-sidebar__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}

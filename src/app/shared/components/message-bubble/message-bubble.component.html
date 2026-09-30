@@ -1,0 +1,109 @@
+@let m = message();
+
+<div class="message__aside">
+  @if (m.continuation) {
+    <span class="message__side-time" aria-hidden="true">{{ sideTime() }}</span>
+  } @else {
+    <app-avatar [name]="m.authorName" [seed]="m.authorSeed" [size]="avatarSize" />
+  }
+</div>
+
+<div class="message__main">
+  @if (showsHeading()) {
+    <div class="message__heading">
+      @if (!m.continuation) {
+        <span class="message__author">{{ m.authorName }}</span>
+        <span class="message__time">{{ m.time }}</span>
+      }
+      @if (m.pinned) {
+        <span class="message__pinned">
+          <app-icon name="pin" [size]="pinIconSize" />
+          Pinned
+        </span>
+      }
+    </div>
+  }
+
+  @if (m.replyTo; as reply) {
+    <div class="message__reply">
+      <app-icon name="reply" [size]="replyIconSize" />
+      <span class="message__reply-author">{{ reply.authorFirstName }}</span>
+      <span class="message__reply-text truncate">{{ reply.text }}</span>
+    </div>
+  }
+
+  @if (editing()) {
+    <app-message-edit-form
+      [text]="m.text"
+      (saved)="onEditSaved($event)"
+      (cancelled)="onEditCancelled()"
+    />
+  } @else {
+    @if (hasText()) {
+      <p class="message__body">
+        @for (segment of m.segments; track $index) {
+          @if (segment.highlighted) {
+            <span class="message__highlight">{{ segment.text }}</span>
+          } @else {
+            <span>{{ segment.text }}</span>
+          }
+        }
+        @if (m.edited) {
+          <span class="message__edited"> (edited)</span>
+        }
+        @if (showsInlineStatus() && status(); as status) {
+          <span
+            class="message__status-inline"
+            [class.message__status--read]="status.read"
+            role="img"
+            [attr.aria-label]="status.accessibleLabel"
+            [attr.title]="status.label"
+          >
+            <app-icon [name]="status.icon" [size]="statusIconSize" />
+          </span>
+        }
+      </p>
+    }
+
+    @if (m.attachments.length > 0) {
+      <app-message-attachments
+        class="message__attachments"
+        [attachments]="m.attachments"
+        (download)="download.emit($event)"
+      />
+    }
+
+    @if (showsStatusLine() && status(); as status) {
+      <span class="message__status-line" [class.message__status--read]="status.read">
+        <app-icon [name]="status.icon" [size]="statusIconSize" />
+        {{ status.label }}
+      </span>
+    }
+
+    @if (hasReactions()) {
+      <app-reaction-bar
+        class="message__reactions"
+        [reactions]="m.reactions"
+        showAdd
+        (toggle)="react.emit($event)"
+        (add)="onAddReaction()"
+      />
+    }
+  }
+</div>
+
+@if (showsToolbar()) {
+  <app-message-toolbar
+    class="message__toolbar"
+    [(pickerOpen)]="pickerOpen"
+    [hasText]="hasText()"
+    [pinned]="m.pinned"
+    [mine]="m.mine"
+    (reactionPicked)="react.emit($event)"
+    (reply)="reply.emit()"
+    (copy)="copy.emit()"
+    (pin)="pin.emit()"
+    (edit)="editRequested.emit()"
+    (deleteRequested)="deleteRequested.emit()"
+  />
+}

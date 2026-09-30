@@ -1,0 +1,7 @@
+Archivo
+
+The Archivo font files in this folder are licensed under the SIL Open Font License, Version 1.1.
+The full licence text is available at https://openfontlicense.org
+
+Source: https://fonts.google.com/specimen/Archivo
+Files: archivo-latin.woff2, archivo-latin-ext.woff2 (variable weight 400-800)

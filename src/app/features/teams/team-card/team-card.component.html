@@ -1,0 +1,46 @@
+@let item = team();
+
+<a class="card__body" [routerLink]="link()">
+  <div class="card__top">
+    <app-avatar variant="inverted" [name]="item.name" [text]="item.code" [size]="48" />
+    <div class="card__identity">
+      <h2 class="card__name">{{ item.name }}</h2>
+      <span class="card__lead">{{ item.leadLabel }}</span>
+    </div>
+    <app-tag>{{ item.activityLevel }}</app-tag>
+  </div>
+  <p class="card__description">{{ item.description }}</p>
+  <div class="card__people">
+    <app-avatar-group [members]="item.members" [max]="stackSize" [size]="28" showOverflow />
+    <span class="card__counts">
+      <strong>{{ item.memberCount }}</strong> {{ item.memberCount | plural: 'member' }} ·
+      <strong>{{ item.channelCount }}</strong> {{ item.channelCount | plural: 'channel' }}
+    </span>
+  </div>
+</a>
+<div class="card__footer">
+  @if (item.joined) {
+    <a appButton variant="ghost" size="sm" [routerLink]="link()">
+      Open
+      <app-icon name="arrow-right" [size]="14" />
+      <span class="visually-hidden">{{ item.name }}</span>
+    </a>
+  } @else {
+    <button appButton type="button" size="sm" (click)="join.emit()">
+      Join team
+      <span class="visually-hidden">{{ item.name }}</span>
+    </button>
+  }
+  <span class="card__spacer"></span>
+  <button appIconButton type="button" [label]="'Manage ' + item.name" (click)="manage.emit()">
+    <app-icon name="settings" [size]="16" />
+  </button>
+  <button
+    appIconButton
+    type="button"
+    [label]="'Invite people to ' + item.name"
+    (click)="invite.emit()"
+  >
+    <app-icon name="user-plus" [size]="16" />
+  </button>
+</div>

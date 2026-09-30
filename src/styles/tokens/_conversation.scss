@@ -1,0 +1,10 @@
+@mixin conversation-tokens {
+  --conversation-list-width-desktop: 340px;
+  --conversation-list-width-tablet: 300px;
+  --conversation-header-height: 64px;
+  --conversation-typing-row-height: 22px;
+  --conversation-details-width: 320px;
+  --conversation-details-avatar: var(--size-avatar-72);
+  --member-picker-max-height: min(280px, 38vh);
+  --conversation-intro-max-width: 560px;
+}

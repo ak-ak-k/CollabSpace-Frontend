@@ -1,0 +1,41 @@
+:host {
+  display: block;
+}
+
+.files {
+  border-top: var(--rule-strong);
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-0);
+  border-bottom: var(--rule-hairline);
+}
+
+.file__tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--size-avatar-40);
+  height: var(--size-avatar-40);
+  background: var(--surface);
+}
+
+.file__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.file__name {
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-semibold);
+}
+
+.file__meta {
+  color: var(--text-muted);
+  font-size: var(--font-size-13);
+}

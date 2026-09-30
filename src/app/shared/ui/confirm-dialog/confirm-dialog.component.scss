@@ -1,0 +1,56 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: var(--dialog-width-sm);
+  max-width: 100%;
+  padding: var(--space-6);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-primary);
+}
+
+.confirm-dialog__summary {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.confirm-dialog__tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--size-confirm-icon-tile);
+  height: var(--size-confirm-icon-tile);
+  background: var(--danger-surface);
+  color: var(--danger);
+}
+
+:host(.confirm-dialog--neutral) .confirm-dialog__tile {
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+}
+
+.confirm-dialog__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.confirm-dialog__title {
+  margin: var(--space-0);
+  font-size: var(--font-size-20);
+}
+
+.confirm-dialog__body {
+  margin: var(--space-2) var(--space-0) var(--space-0);
+  font-size: var(--font-size-14);
+  color: var(--text-secondary);
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}

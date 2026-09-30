@@ -1,0 +1,112 @@
+<section class="block" aria-label="Toast">
+  <h3 class="block__title">Toast</h3>
+  <p class="note">The latest three stay on screen and leave after 4.5 seconds.</p>
+  <div class="actions">
+    <button appButton type="button" (click)="showPlainToast()">Plain toast</button>
+    <button appButton type="button" (click)="showUndoToast()">Toast with Undo</button>
+    <button appButton type="button" (click)="showLongToast()">Long toast</button>
+  </div>
+</section>
+
+<section class="block" aria-label="Modal">
+  <h3 class="block__title">Modal</h3>
+  <p class="note">Focus starts in the first field and returns to the button on close.</p>
+  <div class="actions">
+    <button appButton type="button" variant="primary" (click)="openFormModal()">
+      <app-icon name="users" [size]="16" />
+      New group chat
+    </button>
+  </div>
+  <p class="result" role="status">{{ modalResult() }}</p>
+</section>
+
+<section class="block" aria-label="Confirm dialog">
+  <h3 class="block__title">Confirm dialog</h3>
+  <p class="note">Danger starts on Cancel. Neutral starts on the confirm button.</p>
+  <div class="actions">
+    <button appButton type="button" (click)="confirmDelete()">Danger confirm</button>
+    <button appButton type="button" (click)="confirmSignOut()">Neutral confirm</button>
+  </div>
+  <p class="result" role="status">{{ confirmResult() }}</p>
+</section>
+
+<section class="block" aria-label="Drawer">
+  <h3 class="block__title">Drawer</h3>
+  <div class="actions">
+    <button appButton type="button" (click)="openDrawer('left')">
+      <app-icon name="menu" [size]="16" />
+      Left drawer
+    </button>
+    <button appButton type="button" (click)="openDrawer('right')">
+      <app-icon name="panel-right" [size]="16" />
+      Right drawer
+    </button>
+  </div>
+</section>
+
+<section class="block" aria-label="Dropdown">
+  <h3 class="block__title">Dropdown</h3>
+  <div class="actions">
+    <button appButton type="button" [cdkMenuTriggerFor]="conversationMenu">
+      Conversation actions
+      <app-icon name="chevron-down" [size]="16" />
+    </button>
+  </div>
+  <p class="result" role="status">{{ menuResult() }}</p>
+
+  <ng-template #conversationMenu>
+    <app-dropdown label="Conversation actions" width="md">
+      <app-dropdown-heading>Status</app-dropdown-heading>
+      @for (option of statusOptions; track option.value) {
+        <button
+          appDropdownItem
+          [selected]="status() === option.value"
+          (triggered)="status.set(option.value)"
+        >
+          {{ option.label }}
+        </button>
+      }
+      <app-dropdown-divider />
+      <app-dropdown-heading>Conversation</app-dropdown-heading>
+      <button appDropdownItem selection="checkbox" [selected]="muted()" (triggered)="toggleMuted()">
+        <app-icon name="bell-off" [size]="18" />
+        Mute notifications
+      </button>
+      <button appDropdownItem (triggered)="menuResult.set('Pinned the conversation.')">
+        <app-icon name="pin" [size]="18" />
+        Pin conversation
+      </button>
+      <a
+        appDropdownItem
+        href="/styleguide"
+        (triggered)="menuResult.set('Opened the styleguide link.')"
+      >
+        <app-icon name="external-link" [size]="18" />
+        Open styleguide
+      </a>
+      <app-dropdown-divider />
+      <button appDropdownItem tone="danger" (triggered)="confirmDelete()">
+        <app-icon name="trash-2" [size]="18" />
+        Delete task
+      </button>
+    </app-dropdown>
+  </ng-template>
+</section>
+
+<section class="block" aria-label="Tooltip">
+  <h3 class="block__title">Tooltip</h3>
+  <p class="note">Shown on hover and keyboard focus. Never shown on touch devices.</p>
+  <div class="actions">
+    @for (position of tooltipPositions; track position) {
+      <button
+        appButton
+        type="button"
+        class="tooltip-target"
+        [appTooltip]="'Tooltip on the ' + position"
+        [tooltipPosition]="position"
+      >
+        {{ position }}
+      </button>
+    }
+  </div>
+</section>

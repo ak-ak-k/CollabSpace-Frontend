@@ -1,0 +1,43 @@
+<label class="field__label" [class.visually-hidden]="hideLabel()" [attr.for]="controlId">
+  {{ label() }}
+  @if (optional()) {
+    <span class="field__optional">(optional)</span>
+  }
+</label>
+
+<textarea
+  #control
+  class="field__control field__control--multiline"
+  [class.field__control--invalid]="error().invalid"
+  [id]="controlId"
+  [rows]="rows()"
+  [value]="value()"
+  [disabled]="disabled()"
+  [readOnly]="readonly()"
+  [attr.name]="name() || null"
+  [attr.placeholder]="placeholder() || null"
+  [attr.autocomplete]="autocomplete() || null"
+  [attr.maxlength]="maxlength() ?? null"
+  [attr.aria-required]="required() ? 'true' : null"
+  [attr.aria-invalid]="error().invalid ? 'true' : null"
+  [attr.aria-describedby]="describedBy()"
+  (input)="value.set(control.value)"
+  (blur)="touch.emit()"
+></textarea>
+
+<div class="field__footer">
+  <div class="field__messages">
+    @if (hint()) {
+      <p class="field__hint" [attr.id]="hintId">{{ hint() }}</p>
+    }
+    @if (error().message) {
+      <app-field-error [attr.id]="errorId" [message]="error().message" />
+    }
+  </div>
+  @if (countVisible()) {
+    <p class="field__count" [attr.id]="countId">
+      {{ value().length }} / {{ maxlength() }}
+      <span class="visually-hidden">characters used</span>
+    </p>
+  }
+</div>

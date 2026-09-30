@@ -1,12 +1,14 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ThemeState } from './core/state/theme.state';
+import { ToastRegionComponent } from './shared/ui/toast/toast-region.component';
 
 @Component({
-  imports: [RouterOutlet],
   selector: 'app-root',
-  styleUrl: './app.scss',
-  templateUrl: './app.html',
+  imports: [RouterOutlet, ToastRegionComponent],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss',
 })
-export class App {
-  protected readonly title = signal('collabspace-frontend');
+export class AppComponent {
+  protected readonly theme = inject(ThemeState);
 }

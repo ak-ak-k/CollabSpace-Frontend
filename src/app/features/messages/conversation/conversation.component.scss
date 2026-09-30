@@ -1,0 +1,37 @@
+:host {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  background: var(--background);
+}
+
+.conversation {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.conversation__typing {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: var(--conversation-typing-row-height);
+  padding: var(--space-0) var(--space-4);
+}
+
+.conversation__details {
+  display: flex;
+  flex: none;
+  min-height: 0;
+}
+
+.conversation__state {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-4);
+}

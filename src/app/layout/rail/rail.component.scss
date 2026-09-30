@@ -1,0 +1,163 @@
+@use 'breakpoints';
+
+@mixin rail-hover {
+  background: var(--rail-hover);
+  color: var(--rail-foreground);
+}
+
+:host {
+  --rail-width: var(--rail-width-desktop);
+  --avatar-ring: var(--rail-background);
+  --badge-ring: var(--rail-background);
+  --badge-ring-width: var(--border-width-rule);
+  --focus-ring: var(--rail-foreground);
+
+  display: block;
+  flex: none;
+  width: var(--rail-width);
+  height: 100%;
+}
+
+@include breakpoints.tablet {
+  :host {
+    --rail-width: var(--rail-width-tablet);
+    --rail-workspace-size: var(--size-touch-target);
+  }
+
+  .rail__label {
+    display: none;
+  }
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden auto;
+  background: var(--rail-background);
+  color: var(--rail-foreground);
+}
+
+.rail__top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2-5);
+  padding: var(--space-3-5) var(--space-0) var(--space-4);
+}
+
+.rail__brand {
+  display: grid;
+  place-items: center;
+  min-width: var(--rail-control-size);
+  min-height: var(--rail-control-size);
+  text-decoration: none;
+}
+
+.rail__workspace {
+  display: grid;
+  place-items: center;
+  width: var(--rail-workspace-size);
+  height: var(--rail-workspace-size);
+  padding: var(--space-0);
+  border: var(--border-width-rule) solid var(--rail-muted);
+  background: transparent;
+  color: var(--rail-foreground);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-heavy);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--rail-foreground);
+  }
+}
+
+.rail__divider {
+  flex: none;
+  height: var(--border-width-rule);
+  margin: var(--space-0) var(--space-3);
+  background: var(--rail-hover);
+}
+
+.rail__items {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: var(--space-2) var(--space-0);
+}
+
+.rail__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  width: 100%;
+  height: var(--rail-item-height);
+  padding: var(--space-0);
+  border: var(--space-0);
+  background: transparent;
+  color: var(--rail-muted);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-label);
+  text-decoration: none;
+  cursor: pointer;
+  outline-offset: calc(var(--border-width-rule) * -1);
+
+  &:hover {
+    @include rail-hover;
+  }
+}
+
+.rail__item--active,
+.rail__control--active {
+  background: var(--rail-selected);
+  box-shadow: inset var(--border-width-bar) 0 0 var(--rail-foreground);
+  color: var(--rail-foreground);
+}
+
+.rail__badge {
+  position: absolute;
+  top: var(--rail-badge-top);
+  left: var(--rail-badge-left);
+}
+
+.rail__bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-0) var(--space-4);
+}
+
+.rail__control {
+  display: grid;
+  place-items: center;
+  width: var(--rail-control-size);
+  height: var(--rail-control-size);
+  padding: var(--space-0);
+  border: var(--space-0);
+  background: transparent;
+  color: var(--rail-muted);
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    @include rail-hover;
+  }
+}
+
+.rail__control--active {
+  color: var(--rail-foreground);
+}
+
+.rail__account {
+  display: block;
+  margin-top: var(--space-2);
+  padding: var(--space-0);
+  border: var(--space-0);
+  background: transparent;
+  cursor: pointer;
+}

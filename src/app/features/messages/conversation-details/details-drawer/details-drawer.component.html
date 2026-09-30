@@ -1,0 +1,10 @@
+<app-drawer heading="Details">
+  @if (view(); as conversation) {
+    <app-conversation-details
+      [view]="conversation"
+      [extras]="extras()"
+      (jump)="jumpTo($event)"
+      (addPeople)="addPeople()"
+    />
+  }
+</app-drawer>

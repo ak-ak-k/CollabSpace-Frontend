@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+.task-dialog__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--dialog-field-min-width-sm), 1fr));
+  gap: var(--space-4);
+}
+
+.task-dialog__priority {
+  max-width: var(--dialog-segmented-max-width);
+}

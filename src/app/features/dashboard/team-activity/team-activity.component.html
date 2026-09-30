@@ -1,0 +1,56 @@
+<app-section-header
+  headingId="dashboard-teams"
+  heading="Team activity"
+  caption="Messages this week"
+/>
+
+@switch (status()) {
+  @case ('loading') {
+    <app-skeleton layout="list" [rows]="5" compact label="Loading team activity" />
+  }
+  @case ('error') {
+    <app-empty-state
+      kind="error"
+      compact
+      [headingLevel]="3"
+      heading="Couldn’t load teams"
+      actionLabel="Try again"
+      (action)="retry.emit()"
+    />
+  }
+  @case ('empty') {
+    <app-empty-state
+      compact
+      [headingLevel]="3"
+      icon="users"
+      heading="No teams yet"
+      message="Create a team to see how active it is each week."
+    />
+  }
+  @default {
+    <ul class="teams">
+      @for (team of teams(); track team.id) {
+        <li>
+          <a
+            class="team"
+            [routerLink]="['/teams', team.id]"
+            [attr.aria-label]="team.name + ', ' + team.messageCount + ' messages this week'"
+          >
+            <app-avatar [name]="team.name" [text]="team.code" variant="inverted" [size]="32" />
+            <span class="team__body">
+              <span class="team__name truncate">{{ team.name }}</span>
+              <span class="team__meter">
+                <span
+                  class="team__meter-fill"
+                  [class.team__meter-fill--leading]="team.leading"
+                  [style.width.%]="team.share"
+                ></span>
+              </span>
+            </span>
+            <span class="team__count">{{ team.messageCount }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+}

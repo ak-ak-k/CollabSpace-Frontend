@@ -1,0 +1,26 @@
+:host {
+  --brand-mark-size: var(--size-brand-mark-md);
+  --brand-mark-font-size: var(--font-size-20);
+
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--brand-mark-size);
+  height: var(--brand-mark-size);
+  background: var(--brand);
+  color: var(--on-brand);
+  font-family: var(--font-heading);
+  font-size: var(--brand-mark-font-size);
+  font-weight: var(--font-weight-heavy);
+  line-height: var(--line-height-flat);
+}
+
+:host(.brand-mark--sm) {
+  --brand-mark-size: var(--size-brand-mark-sm);
+  --brand-mark-font-size: var(--font-size-16);
+}
+
+:host(.brand-mark--lg) {
+  --brand-mark-size: var(--size-brand-mark-lg);
+  --brand-mark-font-size: var(--font-size-22);
+}

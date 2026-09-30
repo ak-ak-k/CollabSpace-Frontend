@@ -1,0 +1,101 @@
+@if (view(); as conversation) {
+  <section class="conversation" [attr.aria-label]="'Conversation: ' + conversation.title">
+    <app-conversation-header
+      [view]="conversation"
+      [typingText]="thread.typingText()"
+      [starred]="starred()"
+      [muted]="muted()"
+      [searchOpen]="session.searchOpen()"
+      [detailsOpen]="detailsDocked()"
+      [compact]="isMobile()"
+      [backLink]="backTarget()"
+      (searchToggled)="session.toggleSearch()"
+      (starToggled)="actions.toggleStar(conversationId())"
+      (detailsToggled)="openDetails(true)"
+      (muteToggled)="actions.toggleMute(conversationId())"
+      (markedUnread)="actions.markUnread(conversationId())"
+      (linkCopied)="actions.copyLink(conversationId())"
+      (pinnedRequested)="openDetails(false)"
+      (left)="actions.leave(conversation, backLink())"
+    />
+
+    @if (session.searchOpen()) {
+      <app-conversation-search
+        [(query)]="session.query"
+        [resultCount]="thread.messages().length"
+        (closed)="session.closeSearch()"
+      />
+    }
+
+    <app-message-log
+      [view]="conversation"
+      [rows]="thread.rows()"
+      [status]="status()"
+      [searching]="session.searching()"
+      [editingId]="session.editingId()"
+      [pointerActions]="!isMobile()"
+      (action)="handle($event)"
+      (retry)="retry()"
+    />
+
+    <div class="conversation__typing" aria-live="polite">
+      <app-typing-indicator [text]="thread.typingText()" />
+    </div>
+
+    <app-message-composer
+      [conversationTitle]="conversation.title"
+      [placeholder]="placeholder()"
+      [members]="thread.mentionCandidates()"
+      [replyTo]="session.replyPreview()"
+      [offline]="!network.online()"
+      [layout]="isMobile() ? 'mobile' : 'desktop'"
+      [draft]="session.drafts.text(conversationId())"
+      (draftChange)="session.drafts.setText(conversationId(), $event)"
+      [attachments]="session.drafts.attachments(conversationId())"
+      (attachmentsChange)="session.drafts.setAttachments(conversationId(), $event)"
+      (send)="send($event)"
+      (cancelReply)="session.replyTo.set(null)"
+      (editLastRequested)="editLast()"
+    />
+  </section>
+
+  @if (detailsDocked()) {
+    <aside class="conversation__details" aria-label="Details">
+      <app-conversation-details
+        docked
+        [view]="conversation"
+        [extras]="extras()"
+        (closed)="session.dockedDetailsOpen.set(false)"
+        (jump)="jumpTo($event)"
+        (addPeople)="addPeople()"
+      />
+    </aside>
+  }
+} @else {
+  <div class="conversation__state">
+    @switch (creatingDirect() ? 'loading' : status()) {
+      @case ('loading') {
+        <app-skeleton layout="chat" label="Loading conversation" />
+      }
+      @case ('error') {
+        <app-empty-state
+          kind="error"
+          heading="Couldn’t load messages"
+          message="The conversation didn’t load. Your messages are safe — try again in a moment."
+          actionLabel="Try again"
+          (action)="retry()"
+        />
+      }
+      @default {
+        <app-empty-state
+          icon="message-square"
+          heading="Conversation not found"
+          message="It may have been deleted, or you may no longer have access."
+          actionLabel="Back to messages"
+          actionIcon="arrow-left"
+          (action)="goBack()"
+        />
+      }
+    }
+  </div>
+}

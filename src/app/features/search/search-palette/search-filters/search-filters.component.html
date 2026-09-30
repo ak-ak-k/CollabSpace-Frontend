@@ -1,0 +1,15 @@
+@for (chip of chips; track chip.key) {
+  <button
+    type="button"
+    class="chip"
+    [class.chip--selected]="chip.key === selected()"
+    [attr.aria-pressed]="chip.key === selected()"
+    (click)="picked.emit(chip.key)"
+  >
+    <app-icon [name]="chip.icon" [size]="14" />
+    <span>{{ chip.label }}</span>
+    @if (counts()[chip.key]; as count) {
+      <span class="chip__count">{{ count }}</span>
+    }
+  </button>
+}

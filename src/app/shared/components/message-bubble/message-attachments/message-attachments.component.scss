@@ -1,0 +1,64 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.attachment-image {
+  width: min(var(--message-max-attachment-width), 100%);
+}
+
+.attachment-image__placeholder {
+  display: grid;
+  place-items: center;
+  aspect-ratio: var(--message-image-aspect-ratio);
+  background: var(--surface-secondary);
+  color: var(--text-secondary);
+}
+
+.attachment-image__caption {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--font-size-12);
+}
+
+.attachment-image__meta {
+  flex: none;
+}
+
+.attachment-file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: min(var(--message-max-attachment-width), 100%);
+  padding: var(--space-2);
+  background: var(--surface);
+}
+
+.attachment-file__tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--size-message-file-tile);
+  height: var(--size-message-file-tile);
+  background: var(--secondary);
+  color: var(--on-secondary);
+}
+
+.attachment-file__details {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.attachment-file__name {
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+}
+
+.attachment-file__meta {
+  font-size: var(--font-size-12);
+  color: var(--text-secondary);
+}

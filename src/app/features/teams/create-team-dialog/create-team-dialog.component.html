@@ -1,0 +1,38 @@
+<form class="create-team" [formRoot]="teamForm">
+  <app-modal
+    heading="Create team"
+    description="Teams bring people, channels and files together around shared work."
+    size="md"
+  >
+    <app-input
+      label="Team name"
+      placeholder="e.g. Data Platform"
+      [maxlength]="nameMaxLength"
+      [formField]="teamForm.name"
+    />
+    <app-textarea
+      label="Description"
+      optional
+      [rows]="3"
+      placeholder="What does this team work on?"
+      [maxlength]="descriptionMaxLength"
+      [formField]="teamForm.description"
+    />
+    <div class="create-team__privacy">
+      <app-radio-group label="Privacy" [options]="privacyOptions" [formField]="teamForm.privacy" />
+      <p class="create-team__help" aria-live="polite">{{ privacyHelp() }}</p>
+    </div>
+    <p class="create-team__note">
+      <app-icon name="info" [size]="14" />
+      You’ll be the team lead. A #general channel is created automatically.
+    </p>
+
+    <ng-container modalActions>
+      <button appButton type="button" (click)="cancel()">Cancel</button>
+      <button appButton type="submit" variant="primary" [busy]="teamForm().submitting()">
+        <app-icon name="plus" [size]="16" />
+        Create team
+      </button>
+    </ng-container>
+  </app-modal>
+</form>

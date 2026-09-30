@@ -1,0 +1,34 @@
+@use 'breakpoints';
+
+:host {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: var(--rule-strong);
+}
+
+.section-header__heading {
+  flex: 1;
+  margin: var(--space-0);
+  font-size: var(--font-size-20);
+}
+
+.section-header__link {
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semibold);
+
+  @include breakpoints.tablet-and-down {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: var(--size-touch-target);
+    min-height: var(--size-touch-target);
+    margin-block: calc(var(--space-3) * -1);
+  }
+}
+
+.section-header__caption {
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+}

@@ -1,0 +1,79 @@
+<div class="panel__scrim" aria-hidden="true" (click)="close()"></div>
+
+<div
+  class="panel__dialog"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Search CollabSpace"
+  cdkTrapFocus
+>
+  <div class="panel__search">
+    <app-icon name="search" [size]="20" />
+    <input
+      #field
+      class="panel__field"
+      type="text"
+      role="combobox"
+      aria-label="Search messages, people, channels, teams, tasks and files"
+      aria-autocomplete="list"
+      aria-haspopup="listbox"
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+      enterkeyhint="search"
+      placeholder="Search messages, people, tasks, files…"
+      [attr.aria-expanded]="hasOptions()"
+      [attr.aria-controls]="hasOptions() ? listboxId : null"
+      [attr.aria-activedescendant]="activeOption()?.id ?? null"
+      [value]="session.query()"
+      (input)="session.setQuery(field.value)"
+      (keydown)="handleKey($event)"
+    />
+    @if (session.loading()) {
+      <app-spinner class="panel__spinner" />
+    }
+    @if (session.hasQuery()) {
+      <button appIconButton type="button" label="Clear search" (click)="clear()">
+        <app-icon name="x" [size]="16" />
+      </button>
+    }
+    <button type="button" class="panel__close" [attr.aria-label]="closeName()" (click)="close()">
+      {{ closeLabel() }}
+    </button>
+  </div>
+
+  <app-search-filters
+    [selected]="session.filter()"
+    [counts]="counts()"
+    (picked)="pickFilter($event)"
+  />
+
+  <div class="panel__body" #body>
+    <app-search-status
+      [status]="session.status()"
+      [term]="session.term()"
+      [total]="session.total()"
+    />
+    @if (hasOptions()) {
+      <app-search-options
+        [sections]="sections()"
+        [activeIndex]="activeIndex()"
+        (activated)="activate($event)"
+        (hovered)="requestedIndex.set($event)"
+        (expanded)="pickFilter($event)"
+        (removed)="removeRecent($event)"
+      />
+    }
+  </div>
+
+  @if (!isMobile()) {
+    <div class="panel__footer" aria-hidden="true">
+      <span><strong class="panel__key">↑ ↓</strong> navigate</span>
+      <span><strong class="panel__key">Enter</strong> open</span>
+      <span><strong class="panel__key">Esc</strong> close</span>
+      <span class="panel__shortcut"
+        ><strong class="panel__key">{{ shortcut }}</strong> anywhere</span
+      >
+    </div>
+  }
+</div>

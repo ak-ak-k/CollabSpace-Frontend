@@ -1,0 +1,102 @@
+<section class="block" aria-label="Input">
+  <h3 class="block__title">Input</h3>
+  <div class="grid">
+    <app-input label="Default" placeholder="What needs to be done?" [(value)]="title" />
+    <app-input label="Filled" value="Launch crew" />
+    <app-input
+      label="With hint"
+      placeholder="Northstar Labs"
+      hint="Your address: northstar.collabspace.app"
+    />
+    <app-input
+      label="Large, 44px"
+      type="email"
+      size="lg"
+      inputmode="email"
+      autocomplete="email"
+      placeholder="you@company.com"
+    />
+    <app-input label="Status message" optional placeholder="Heads-down until 3 pm" />
+    <app-input
+      label="Error"
+      type="email"
+      value="aarav@"
+      errorMessage="That doesn’t look like an email address."
+    />
+    <app-input
+      label="Error with hint"
+      value="N"
+      hint="You can change it later."
+      errorMessage="Name your workspace."
+    />
+    <app-input label="Disabled" value="Atlas Web" disabled />
+    <app-input label="Hidden label" hideLabel placeholder="The label is visually hidden" />
+    <app-input label="Due date" type="date" />
+    <app-input label="Seats" type="number" inputmode="numeric" value="12" />
+    <div class="field-group">
+      <app-input
+        label="Password with reveal and strength"
+        type="password"
+        size="lg"
+        revealable
+        autocomplete="new-password"
+        placeholder="At least 8 characters"
+        [(value)]="password"
+      />
+      <app-password-strength [password]="password()" />
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-label="Textarea">
+  <h3 class="block__title">Textarea</h3>
+  <div class="grid">
+    <app-textarea label="Default" placeholder="Add context, acceptance criteria or links" />
+    <app-textarea
+      label="Personal note"
+      optional
+      showCount
+      hint="Shown in the invite email."
+      [maxlength]="noteMaxLength"
+      [(value)]="note"
+    />
+    <app-textarea label="Error" errorMessage="Add a short description." />
+    <app-textarea label="Disabled" value="Teams bring people together." disabled />
+  </div>
+</section>
+
+<section class="block" aria-label="Select">
+  <h3 class="block__title">Select</h3>
+  <div class="grid">
+    <app-select label="Add to team" [options]="teamOptions" [(value)]="team" />
+    <app-select
+      label="With placeholder and hint"
+      placeholder="Choose a team"
+      hint="You can move people later."
+      [options]="teamOptions"
+      [(value)]="unpickedTeam"
+    />
+    <app-select label="Large, 44px" size="lg" value="design" [options]="teamOptions" />
+    <app-select
+      label="Error"
+      placeholder="Choose a team"
+      errorMessage="Pick a team."
+      [options]="teamOptions"
+    />
+    <app-select label="Disabled" value="platform" disabled [options]="teamOptions" />
+  </div>
+</section>
+
+<section class="block" aria-label="Search input">
+  <h3 class="block__title">Search input</h3>
+  <div class="grid">
+    <app-search-input
+      label="Search people"
+      placeholder="Search by name or title"
+      [(value)]="query"
+    />
+    <app-search-input label="Search files" size="lg" [(value)]="filledQuery" />
+    <app-search-input label="Search without clear" value="Atlas" [clearable]="false" />
+    <app-search-input label="Search disabled" placeholder="Search is unavailable" disabled />
+  </div>
+</section>

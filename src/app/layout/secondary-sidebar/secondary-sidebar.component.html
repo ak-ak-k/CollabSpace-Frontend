@@ -1,0 +1,9 @@
+<nav class="secondary-sidebar" [attr.aria-label]="label()">
+  <div class="secondary-sidebar__header">
+    <ng-content select="[sidebarHeader]" />
+  </div>
+  <div class="secondary-sidebar__body">
+    <ng-content />
+  </div>
+  <ng-content select="[sidebarFooter]" />
+</nav>

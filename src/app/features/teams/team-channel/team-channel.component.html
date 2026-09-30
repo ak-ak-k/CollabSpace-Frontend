@@ -1,0 +1,35 @@
+@if (belongsToTeam()) {
+  <app-conversation
+    [conversationId]="channelId()"
+    [backLink]="teamLink()"
+    [backBelowDesktop]="true"
+    [detailsOnWideScreens]="true"
+  />
+} @else {
+  <div class="team-channel__state">
+    @switch (status()) {
+      @case ('loading') {
+        <app-skeleton layout="chat" label="Loading channel" />
+      }
+      @case ('error') {
+        <app-empty-state
+          kind="error"
+          heading="Couldn’t load this channel"
+          actionLabel="Back to team"
+          actionIcon="arrow-left"
+          (action)="backToTeam()"
+        />
+      }
+      @default {
+        <app-empty-state
+          icon="hash"
+          heading="Channel not found"
+          message="It may have been archived, or it isn’t part of this team."
+          actionLabel="Back to team"
+          actionIcon="arrow-left"
+          (action)="backToTeam()"
+        />
+      }
+    }
+  </div>
+}

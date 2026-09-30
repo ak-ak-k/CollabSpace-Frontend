@@ -1,0 +1,66 @@
+<app-section-header
+  headingId="dashboard-tasks"
+  heading="Upcoming tasks"
+  linkLabel="Open board"
+  link="/tasks"
+/>
+
+@switch (status()) {
+  @case ('loading') {
+    <app-skeleton layout="list" [rows]="4" compact label="Loading tasks" />
+  }
+  @case ('error') {
+    <app-empty-state
+      kind="error"
+      compact
+      [headingLevel]="3"
+      heading="Couldn’t load tasks"
+      actionLabel="Try again"
+      (action)="retry.emit()"
+    />
+  }
+  @case ('empty') {
+    <app-empty-state
+      compact
+      [headingLevel]="3"
+      icon="list-checks"
+      heading="No tasks found"
+      message="Nothing is due. Create a task to plan the next piece of work."
+      actionLabel="New task"
+      (action)="newTask.emit()"
+    />
+  }
+  @default {
+    <ul>
+      @for (task of tasks(); track task.id) {
+        <li class="task-row">
+          <a class="task-row__link" routerLink="/tasks" [queryParams]="{ task: task.id }">
+            <span class="task-row__main">
+              <span class="task-row__meta">
+                <span class="task-row__id">{{ task.id }}</span>
+                <app-tag [tone]="task.priorityTone">{{ task.priorityLabel }}</app-tag>
+                <span class="task-row__status">{{ task.statusLabel }}</span>
+              </span>
+              <span class="task-row__title truncate">{{ task.title }}</span>
+            </span>
+            <span class="task-row__side">
+              <span
+                class="task-row__due"
+                [class.task-row__due--overdue]="task.due.overdue"
+                [class.task-row__due--soon]="task.due.soon"
+              >
+                <app-icon name="calendar" [size]="14" />
+                <span class="visually-hidden">{{ task.due.overdue ? 'Overdue, due' : 'Due' }}</span>
+                {{ task.due.label }}
+              </span>
+              @if (task.assignee; as assignee) {
+                <app-avatar [name]="assignee.name" [seed]="assignee.seed" [size]="28" />
+                <span class="visually-hidden">Assigned to {{ assignee.name }}</span>
+              }
+            </span>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+}

@@ -1,0 +1,28 @@
+@mixin display-tokens {
+  --size-state-icon-tile: 48px;
+  --state-padding: clamp(var(--space-5), 5vw, var(--space-14));
+  --state-max-width: 520px;
+  --state-min-height: 420px;
+
+  --size-tab-md: var(--size-control-md);
+  --size-tab-lg: var(--size-control-lg);
+  --size-scroll-fade: var(--space-8);
+
+  --table-min-width-sm: 420px;
+  --table-min-width-md: 560px;
+  --table-min-width-lg: 720px;
+
+  --size-skeleton-bar-sm: 10px;
+  --size-skeleton-bar-md: 12px;
+  --size-skeleton-bar-lg: 14px;
+  --size-skeleton-bar-xl: 28px;
+  --size-skeleton-block-sm: 32px;
+  --size-skeleton-block-md: 36px;
+  --size-skeleton-block-lg: 40px;
+  --skeleton-card-min-width: 260px;
+  --skeleton-card-min-height: 170px;
+  --skeleton-column-min-width: 240px;
+  --skeleton-detail-max-width: 720px;
+
+  --card-kicker-letter-spacing: 0.1em;
+}

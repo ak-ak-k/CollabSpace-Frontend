@@ -1,0 +1,52 @@
+<div
+  class="picker"
+  role="group"
+  [attr.aria-labelledby]="labelId"
+  [attr.aria-describedby]="renderedErrorId()"
+>
+  <div class="picker__header">
+    <span class="picker__label" [id]="labelId">{{ label() }}</span>
+    <span class="picker__count" aria-live="polite">{{ countLabel() }}</span>
+  </div>
+  <app-search-input label="Search people" placeholder="Search by name or title" [(value)]="query" />
+  <ul #list class="picker__list">
+    @for (option of options(); track option.user.id) {
+      <li class="picker__item">
+        <label class="picker__row">
+          <input
+            type="checkbox"
+            class="picker__native"
+            [checked]="option.checked"
+            [attr.aria-invalid]="error().invalid ? 'true' : null"
+            (change)="toggle(option.user.id)"
+          />
+          <span
+            class="picker__box"
+            [class.picker__box--checked]="option.checked"
+            aria-hidden="true"
+          >
+            @if (option.checked) {
+              <app-icon name="check" [size]="12" />
+            }
+          </span>
+          <app-avatar
+            [name]="option.user.name"
+            [seed]="option.seed"
+            [size]="32"
+            [status]="option.user.status"
+          />
+          <span class="picker__text">
+            <span class="picker__name">{{ option.user.name }}</span>
+            <span class="picker__detail">{{ option.detail }}</span>
+          </span>
+        </label>
+      </li>
+    }
+  </ul>
+  @if (options().length === 0) {
+    <p class="picker__empty">No one matches “{{ query() }}”.</p>
+  }
+  @if (error().message) {
+    <app-field-error [attr.id]="errorId" [message]="error().message" />
+  }
+</div>

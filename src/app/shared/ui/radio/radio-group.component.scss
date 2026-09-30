@@ -1,0 +1,200 @@
+@use 'breakpoints';
+@use '../input/field/field';
+
+@mixin focus-ring {
+  outline: var(--border-width-rule) solid var(--focus-ring);
+  outline-offset: var(--space-0-5);
+}
+
+@mixin touch-row {
+  @include breakpoints.tablet-and-down {
+    padding-block: calc((var(--size-touch-target) - 1lh) / 2);
+  }
+
+  @include breakpoints.touch-device {
+    padding-block: calc((var(--size-touch-target) - 1lh) / 2);
+  }
+}
+
+:host {
+  @include field.host;
+}
+
+.radio-group__label {
+  @include field.label;
+}
+
+.radio-group__hint {
+  @include field.message;
+}
+
+.radio-group__options {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-14);
+  cursor: pointer;
+}
+
+.option--disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.option__native {
+  position: absolute;
+  inset: var(--space-0);
+  width: 100%;
+  height: 100%;
+  margin: var(--space-0);
+  opacity: 0;
+  cursor: inherit;
+}
+
+.option__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.option__description {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-regular);
+  color: var(--text-secondary);
+}
+
+.option__swatch {
+  flex: none;
+  width: var(--size-radio-swatch);
+  height: var(--size-radio-swatch);
+}
+
+:host(.radio-group--segmented) {
+  .radio-group__options {
+    flex-direction: row;
+    align-items: stretch;
+    align-self: flex-start;
+    max-width: 100%;
+    border: var(--border-width-hairline) solid var(--border-control);
+  }
+
+  .option {
+    justify-content: center;
+    gap: var(--space-1-5);
+    min-height: var(--size-control-sm);
+    padding: var(--space-0) var(--space-3);
+    font-size: var(--font-size-13);
+
+    @include field.touch-height;
+  }
+
+  .option + .option {
+    border-left: var(--border-width-hairline) solid var(--border-control);
+  }
+
+  .option:hover:not(.option--selected, .option--disabled) {
+    background: var(--hover);
+  }
+
+  .option--selected {
+    background: var(--text-primary);
+    color: var(--background);
+  }
+
+  .option:has(.option__native:focus-visible) {
+    @include focus-ring;
+
+    z-index: var(--z-raised);
+  }
+}
+
+:host(.radio-group--segmented.radio-group--stretch) {
+  .radio-group__options {
+    align-self: stretch;
+  }
+
+  .option {
+    flex: 1;
+  }
+}
+
+:host(.radio-group--list) {
+  .radio-group__options {
+    gap: var(--space-2);
+  }
+
+  .option {
+    align-items: flex-start;
+    line-height: var(--line-height-body);
+
+    @include touch-row;
+  }
+
+  .option__dot {
+    flex: none;
+    width: var(--size-radio-dot);
+    height: var(--size-radio-dot);
+    margin-top: calc((1lh - var(--size-radio-dot)) / 2);
+    border: var(--border-width-radio) solid var(--border-control);
+    border-radius: var(--radius-round);
+  }
+
+  .option__icon {
+    align-items: center;
+    height: 1lh;
+  }
+
+  .option:hover:not(.option--disabled) .option__dot {
+    border-color: var(--text-primary);
+  }
+
+  .option--selected .option__dot {
+    border-color: var(--text-primary);
+    background: var(--text-primary);
+    box-shadow: inset 0 0 0 var(--radio-dot-inset) var(--background);
+  }
+
+  .option__native:focus-visible + .option__dot {
+    @include focus-ring;
+  }
+}
+
+:host(.radio-group--tiles) {
+  .radio-group__options {
+    display: grid;
+    grid-template-columns: repeat(var(--radio-tile-columns), minmax(0, 1fr));
+    gap: var(--space-2);
+    align-items: stretch;
+  }
+
+  .option {
+    min-height: var(--size-control-lg);
+    padding: var(--space-1-5) var(--space-3);
+    border: var(--border-width-hairline) solid var(--border-control);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .option:hover:not(.option--selected, .option--disabled) {
+    background: var(--hover);
+  }
+
+  .option--selected {
+    border-color: var(--text-primary);
+    background: var(--selected);
+  }
+
+  .option--selected .option__description {
+    color: var(--text-primary);
+  }
+
+  .option:has(.option__native:focus-visible) {
+    @include focus-ring;
+  }
+}

@@ -1,0 +1,86 @@
+<form class="auth-form" aria-labelledby="auth-title" [formRoot]="loginForm">
+  <div class="auth-form__header">
+    <h1 class="auth-form__title" id="auth-title">Log in</h1>
+    <p class="auth-form__subtitle">Welcome back. Pick up right where your team left off.</p>
+  </div>
+
+  @if (sessionExpired()) {
+    <div class="session-alert" role="alert">
+      <app-icon class="session-alert__icon" name="clock" [size]="16" />
+      <span>Your session expired for security. Log in again to pick up where you left off.</span>
+    </div>
+  }
+
+  <button
+    appButton
+    type="button"
+    size="lg"
+    block
+    [busy]="googleBusy()"
+    [disabled]="busy()"
+    (click)="continueWithGoogle()"
+  >
+    @if (!googleBusy()) {
+      <span class="provider-tile" aria-hidden="true">G</span>
+    }
+    Continue with Google
+  </button>
+  <div class="divider" aria-hidden="true">or with email</div>
+
+  <app-input
+    label="Email"
+    type="email"
+    size="lg"
+    inputmode="email"
+    autocomplete="email"
+    placeholder="you@company.com"
+    [formField]="loginForm.email"
+  />
+  <app-input
+    label="Password"
+    type="password"
+    size="lg"
+    revealable
+    autocomplete="current-password"
+    placeholder="Your password"
+    [formField]="loginForm.password"
+  >
+    <a
+      labelAction
+      class="forgot-link"
+      routerLink="/forgot-password"
+      [state]="{ email: loginForm.email().value() }"
+    >
+      Forgot password?
+    </a>
+  </app-input>
+  <app-checkbox [formField]="loginForm.remember">Remember me for 30 days</app-checkbox>
+
+  <button
+    appButton
+    type="submit"
+    variant="primary"
+    size="xl"
+    block
+    [busy]="submitting()"
+    [disabled]="busy()"
+  >
+    @if (submitting()) {
+      Logging in…
+    } @else {
+      Log in
+      <app-icon name="arrow-right" [size]="16" />
+    }
+  </button>
+
+  <p class="auth-form__switch">
+    New to CollabSpace?
+    <a
+      class="auth-form__switch-link"
+      routerLink="/signup"
+      [state]="{ email: loginForm.email().value() }"
+    >
+      Create a workspace
+    </a>
+  </p>
+</form>

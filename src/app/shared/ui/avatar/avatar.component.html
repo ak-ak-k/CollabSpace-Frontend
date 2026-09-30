@@ -1,0 +1,5 @@
+<span class="avatar__initials">{{ initials() }}</span>
+<ng-content />
+@if (status(); as presence) {
+  <app-status-dot class="avatar__status" [status]="presence" [size]="dotSize()" />
+}

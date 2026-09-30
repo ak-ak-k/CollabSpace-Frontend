@@ -1,0 +1,42 @@
+<app-section-header
+  headingId="dashboard-conversations"
+  heading="Recent conversations"
+  linkLabel="View all"
+  link="/messages"
+/>
+
+@switch (status()) {
+  @case ('loading') {
+    <app-skeleton layout="list" [rows]="4" compact label="Loading conversations" />
+  }
+  @case ('error') {
+    <app-empty-state
+      kind="error"
+      compact
+      [headingLevel]="3"
+      heading="Couldn’t load conversations"
+      actionLabel="Try again"
+      (action)="retry.emit()"
+    />
+  }
+  @case ('empty') {
+    <app-empty-state
+      compact
+      [headingLevel]="3"
+      icon="message-square"
+      heading="No conversations yet"
+      message="Say hello to your team — start a direct message or a group chat."
+      actionLabel="Start a conversation"
+      (action)="startConversation.emit()"
+    />
+  }
+  @default {
+    <ul class="ruled-list">
+      @for (conversation of conversations(); track conversation.id) {
+        <li class="ruled-list__item">
+          <app-conversation-item [conversation]="conversation" />
+        </li>
+      }
+    </ul>
+  }
+}

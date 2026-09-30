@@ -1,0 +1,34 @@
+<form class="task-dialog" [formRoot]="taskForm">
+  <app-modal heading="New task" description="Atlas Web · Sprint 24" size="lg">
+    <app-input label="Title" placeholder="What needs to be done?" [formField]="taskForm.title" />
+    <app-textarea
+      label="Description"
+      placeholder="Add context, acceptance criteria or links"
+      [formField]="taskForm.description"
+    />
+    <div class="task-dialog__row">
+      <app-select label="Status" [options]="statusOptions" [formField]="taskForm.status" />
+      <app-select
+        label="Assignee"
+        [options]="assigneeOptions()"
+        [formField]="taskForm.assigneeId"
+      />
+      <app-input label="Due date" type="date" [formField]="taskForm.dueDate" />
+    </div>
+    <app-radio-group
+      class="task-dialog__priority"
+      label="Priority"
+      stretch
+      [options]="priorityOptions"
+      [formField]="taskForm.priority"
+    />
+
+    <ng-container modalActions>
+      <button appButton type="button" (click)="cancel()">Cancel</button>
+      <button appButton type="submit" variant="primary" [busy]="taskForm().submitting()">
+        <app-icon name="plus" [size]="16" />
+        Create task
+      </button>
+    </ng-container>
+  </app-modal>
+</form>

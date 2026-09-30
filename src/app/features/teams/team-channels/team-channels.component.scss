@@ -1,0 +1,67 @@
+:host {
+  display: block;
+}
+
+.channels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.channels__toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.channels__list {
+  border-top: var(--rule-strong);
+}
+
+.channel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-0);
+  border-bottom: var(--rule-hairline);
+}
+
+.channel__tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--size-avatar-40);
+  height: var(--size-avatar-40);
+  background: var(--avatar-inverted-background);
+  color: var(--avatar-inverted-foreground);
+}
+
+.channel__text {
+  display: flex;
+  flex: 1 1 var(--team-channel-text-basis);
+  flex-direction: column;
+  gap: var(--space-0-5);
+  min-width: 0;
+}
+
+.channel__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.channel__name {
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-heavy);
+}
+
+.channel__description {
+  color: var(--text-muted);
+  font-size: var(--font-size-14);
+  text-wrap: pretty;
+}
+
+.channel__meta {
+  color: var(--text-muted);
+  font-size: var(--font-size-12);
+}

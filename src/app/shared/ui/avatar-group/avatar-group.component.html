@@ -1,0 +1,13 @@
+@for (member of visibleMembers(); track member.id) {
+  <app-avatar
+    class="avatar-group__member"
+    [name]="member.name"
+    [seed]="member.seed"
+    [size]="size()"
+  />
+}
+@if (overflowCount() > 0) {
+  <span class="avatar-group__more" [style.--avatar-group-more-size]="size() + 'px'"
+    >+{{ overflowCount() }}</span
+  >
+}

@@ -1,0 +1,14 @@
+@mixin system-tokens {
+  --system-page-max-width: 1040px;
+  --system-page-padding: clamp(var(--space-5), 5vw, var(--space-16));
+  --system-hero-gap: clamp(var(--space-6), 5vw, var(--space-16));
+  --system-code-line-height: 0.82;
+  --system-code-letter-spacing: -0.06em;
+  --system-title-line-height: 1.02;
+  --system-tile-size: clamp(96px, 14vw, 160px);
+  --system-text-basis: 360px;
+  --system-body-max-width: 560px;
+  --system-list-min-width: 280px;
+  --system-list-row-height: var(--space-12);
+  --size-network-dot: var(--space-2);
+}

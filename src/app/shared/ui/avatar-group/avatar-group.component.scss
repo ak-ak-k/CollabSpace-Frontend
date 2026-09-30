@@ -1,0 +1,26 @@
+:host {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+}
+
+.avatar-group__member {
+  box-shadow: 0 0 0 var(--border-width-rule) var(--avatar-ring, var(--background));
+
+  & + & {
+    margin-left: var(--avatar-group-overlap);
+  }
+}
+
+.avatar-group__more {
+  display: grid;
+  place-items: center;
+  min-width: var(--avatar-group-more-size);
+  height: var(--avatar-group-more-size);
+  margin-left: var(--avatar-group-overlap);
+  padding: var(--space-0) var(--space-1);
+  background: var(--background);
+  box-shadow: 0 0 0 var(--border-width-rule) var(--avatar-ring, var(--background));
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-heavy);
+}

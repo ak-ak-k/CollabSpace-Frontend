@@ -1,0 +1,73 @@
+:host {
+  display: block;
+}
+
+.members {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.members__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.members__search {
+  flex: 1 1 var(--team-members-search-basis);
+  max-width: var(--team-members-search-max-width);
+}
+
+.members__list {
+  border-top: var(--rule-strong);
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.members__list .member {
+  padding: var(--space-3) var(--space-0);
+  border-bottom: var(--rule-hairline);
+}
+
+.member__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.member__name {
+  font-weight: var(--font-weight-heavy);
+}
+
+.member__line {
+  color: var(--text-muted);
+  font-size: var(--font-size-13);
+}
+
+.members__cell-person {
+  padding-block: var(--space-3);
+}
+
+.members__status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  font-size: var(--font-size-13);
+}
+
+.members__time {
+  color: var(--text-muted);
+  font-size: var(--font-size-13);
+  white-space: nowrap;
+}
+
+.members__actions {
+  text-align: right;
+}

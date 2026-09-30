@@ -1,0 +1,11 @@
+<app-drawer [heading]="data.heading">
+  <ul class="rows">
+    @for (row of rows; track row.title) {
+      <li class="row">
+        <span class="row__title">{{ row.title }}</span>
+        <span class="row__detail">{{ row.detail }}</span>
+      </li>
+    }
+  </ul>
+  <button appButton drawerFooter type="button" block (click)="close()">Done</button>
+</app-drawer>

@@ -1,0 +1,89 @@
+.cdk-overlay-container {
+  z-index: var(--z-overlay-container);
+}
+
+.app-overlay-backdrop {
+  background: var(--scrim);
+  transition-duration: var(--duration-fast);
+}
+
+.dialog-container {
+  display: block;
+  color: var(--text-primary);
+}
+
+.dialog-container > * {
+  display: block;
+}
+
+.app-dialog-pane {
+  --dialog-width: var(--dialog-width-md);
+
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  height: 100%;
+  padding: var(--dialog-inset-top) var(--space-4) var(--space-4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.app-dialog-pane--sm {
+  --dialog-width: var(--dialog-width-sm);
+}
+
+.app-dialog-pane--lg {
+  --dialog-width: var(--dialog-width-lg);
+}
+
+.app-dialog-pane--centered {
+  padding-top: var(--space-4);
+}
+
+.app-dialog-pane > .dialog-container {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.app-dialog-pane--centered > .dialog-container {
+  margin-block: auto;
+}
+
+.app-drawer-pane {
+  height: 100%;
+  background: var(--background);
+  box-shadow: var(--shadow-lg);
+}
+
+.app-drawer-pane--sm {
+  width: var(--drawer-width-sm);
+}
+
+.app-drawer-pane--md {
+  width: var(--drawer-width-md);
+}
+
+.app-drawer-pane--lg {
+  width: var(--drawer-width-lg);
+}
+
+.app-drawer-pane--right {
+  border-left: var(--rule-strong);
+}
+
+.app-drawer-pane--bottom {
+  width: 100%;
+  height: auto;
+  max-height: var(--sheet-max-height);
+  border-top: var(--rule-strong);
+}
+
+.app-drawer-pane > .dialog-container,
+.app-drawer-pane > .dialog-container > * {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}

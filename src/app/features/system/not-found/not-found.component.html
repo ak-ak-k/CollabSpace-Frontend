@@ -1,0 +1,16 @@
+<app-system-page
+  kicker="Error 404"
+  code="404"
+  heading="This page doesn’t exist"
+  message="The link may be broken, or the page was moved or deleted. Check the address, or head back to somewhere familiar."
+  [lists]="lists"
+>
+  <a appButton variant="primary" size="lg" routerLink="/home">
+    <app-icon name="house" [size]="16" />
+    Go to dashboard
+  </a>
+  <button appButton type="button" size="lg" (click)="search.open()">
+    <app-icon name="search" [size]="16" />
+    Search CollabSpace
+  </button>
+</app-system-page>

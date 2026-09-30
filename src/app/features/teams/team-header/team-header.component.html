@@ -1,0 +1,29 @@
+@let item = team();
+
+<header class="header">
+  <app-avatar variant="inverted" [name]="item.name" [text]="item.code" [size]="64" />
+  <div class="header__text">
+    <h1 class="header__title">{{ item.name }}</h1>
+    <p class="header__description">{{ item.description }}</p>
+    <div class="header__tags">
+      <app-tag>{{ item.activityLevel }}</app-tag>
+      <app-tag>{{ item.memberIds.length | count: 'member' }}</app-tag>
+      <app-tag>Since {{ item.createdLabel }}</app-tag>
+    </div>
+  </div>
+  <div class="header__actions">
+    <button appButton type="button" variant="primary" (click)="invite.emit()">
+      <app-icon name="user-plus" [size]="16" />
+      Invite
+    </button>
+    <button appButton type="button" (click)="manage.emit()">
+      <app-icon name="settings" [size]="16" />
+      Manage
+    </button>
+    @if (item.joined) {
+      <button appButton type="button" (click)="leave.emit()">Leave team</button>
+    } @else {
+      <button appButton type="button" (click)="join.emit()">Join team</button>
+    }
+  </div>
+</header>

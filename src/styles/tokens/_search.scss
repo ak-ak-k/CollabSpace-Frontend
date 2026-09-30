@@ -1,0 +1,23 @@
+@mixin search-tokens {
+  --search-palette-width: 680px;
+  --search-palette-top: 10vh;
+  --search-palette-max-height: 76vh;
+  --search-palette-gutter: var(--space-4);
+
+  --search-row-min-height: 60px;
+  --search-input-height: var(--space-14);
+  --size-search-spinner: 16px;
+  --size-search-close: 32px;
+  --size-search-chip: 32px;
+  --size-search-show-all: 20px;
+
+  --search-option-min-height: var(--size-touch-target);
+  --search-result-min-height: 52px;
+  --search-result-line-gap: 1px;
+  --search-mark-inset: 1px;
+  --search-remove-reserve: calc(var(--size-touch-target) + var(--space-4));
+
+  --size-search-command-tile: 28px;
+  --size-search-result-tile: var(--size-avatar-32);
+  --size-search-empty-tile: 44px;
+}

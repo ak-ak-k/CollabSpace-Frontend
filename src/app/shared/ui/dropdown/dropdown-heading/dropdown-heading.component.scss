@@ -1,0 +1,9 @@
+:host {
+  display: block;
+  padding: var(--space-2) var(--space-4) var(--space-1);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}

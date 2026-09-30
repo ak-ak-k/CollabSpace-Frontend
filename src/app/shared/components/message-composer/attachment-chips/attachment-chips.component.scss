@@ -1,0 +1,31 @@
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-0);
+}
+
+.attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: var(--composer-chip-max-width);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-2);
+  border: var(--rule-hairline);
+  background: var(--surface);
+  font-size: var(--font-size-13);
+}
+
+.attachment-chip__name {
+  font-weight: var(--font-weight-semibold);
+}
+
+.attachment-chip__size {
+  flex: none;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.attachment-chip__remove {
+  --icon-button-base-size: var(--size-composer-chip-remove);
+}

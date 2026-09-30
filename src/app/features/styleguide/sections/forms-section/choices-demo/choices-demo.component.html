@@ -1,0 +1,68 @@
+<section class="block" aria-label="Checkbox">
+  <h3 class="block__title">Checkbox</h3>
+  <div class="grid">
+    <app-checkbox [(checked)]="remember">Remember me for 30 days</app-checkbox>
+    <app-checkbox [(checked)]="terms">
+      I agree to the <a href="/styleguide">Terms of Service</a> and
+      <a href="/styleguide">Privacy Policy</a>
+    </app-checkbox>
+    <app-checkbox errorMessage="Please accept the terms to continue.">
+      Error, not accepted yet
+    </app-checkbox>
+    <app-checkbox disabled>Disabled, off</app-checkbox>
+    <app-checkbox disabled [checked]="true">Disabled, on</app-checkbox>
+  </div>
+</section>
+
+<section class="block" aria-label="Radio group">
+  <h3 class="block__title">Radio group</h3>
+  <div class="grid">
+    <app-radio-group
+      label="Segmented, stretched"
+      stretch
+      [options]="priorityOptions"
+      [(value)]="priority"
+    />
+    <app-radio-group
+      label="Segmented with icons"
+      hint="Options keep their natural width."
+      [options]="layoutOptions"
+      [(value)]="layout"
+    />
+    <app-radio-group label="Segmented, disabled" value="low" disabled [options]="priorityOptions" />
+    <app-radio-group
+      label="List"
+      appearance="list"
+      [options]="privacyOptions"
+      [(value)]="privacy"
+    />
+    <app-radio-group
+      label="List with error"
+      appearance="list"
+      errorMessage="Choose who can join."
+      [options]="privacyOptions"
+    />
+    <app-radio-group
+      label="Tiles"
+      appearance="tiles"
+      [options]="statusOptions"
+      [(value)]="status"
+    />
+  </div>
+</section>
+
+<section class="block" aria-label="Toggle">
+  <h3 class="block__title">Toggle</h3>
+  <div class="grid">
+    <app-toggle
+      label="Desktop notifications"
+      description="Show a banner for new messages."
+      [(checked)]="notifications"
+    />
+    <app-toggle label="Message sounds" [(checked)]="sounds" />
+    <app-toggle label="Compact density" labelPosition="end" [(checked)]="compact" />
+    <app-toggle label="Hidden label, on" hideLabel [checked]="true" />
+    <app-toggle label="Disabled, off" disabled />
+    <app-toggle label="Disabled, on" disabled [checked]="true" />
+  </div>
+</section>

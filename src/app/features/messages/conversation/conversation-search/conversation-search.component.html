@@ -1,0 +1,17 @@
+<div class="search" role="search">
+  <app-icon class="search__icon" name="search" [size]="16" />
+  <input
+    #field
+    type="search"
+    class="search__input"
+    aria-label="Search messages in this conversation"
+    placeholder="Search in this conversation"
+    [value]="query()"
+    (input)="query.set(field.value)"
+    (keydown.escape)="close()"
+  />
+  <span class="search__count" aria-live="polite">{{ resultLabel() }}</span>
+  <button appIconButton type="button" label="Close search" (click)="close()">
+    <app-icon name="x" [size]="16" />
+  </button>
+</div>

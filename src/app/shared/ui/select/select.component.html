@@ -1,0 +1,39 @@
+<label class="field__label" [class.visually-hidden]="hideLabel()" [attr.for]="controlId">
+  {{ label() }}
+</label>
+
+<div class="field__body">
+  <select
+    #control
+    class="field__control field__control--native"
+    [class.field__control--large]="size() === 'lg'"
+    [class.field__control--invalid]="error().invalid"
+    [id]="controlId"
+    [disabled]="disabled()"
+    [attr.name]="name() || null"
+    [attr.aria-required]="required() ? 'true' : null"
+    [attr.aria-invalid]="error().invalid ? 'true' : null"
+    [attr.aria-describedby]="describedBy()"
+    (change)="value.set(control.value)"
+    (blur)="touch.emit()"
+  >
+    @if (placeholder()) {
+      <option class="field__option" value="" disabled hidden [selected]="value() === ''">
+        {{ placeholder() }}
+      </option>
+    }
+    @for (option of options(); track option.value) {
+      <option class="field__option" [value]="option.value" [selected]="option.value === value()">
+        {{ option.label }}
+      </option>
+    }
+  </select>
+  <app-icon class="field__chevron" name="chevron-down" [size]="16" />
+</div>
+
+@if (hint()) {
+  <p class="field__hint" [attr.id]="hintId">{{ hint() }}</p>
+}
+@if (error().message) {
+  <app-field-error [attr.id]="errorId" [message]="error().message" />
+}

@@ -1,0 +1,12 @@
+@mixin dashboard-tokens {
+  --dashboard-quick-actions-max-width: 760px;
+  --dashboard-quick-action-columns-narrow: 2;
+  --dashboard-quick-action-columns-wide: 4;
+  --dashboard-stat-columns-narrow: 2;
+  --dashboard-stat-columns-wide: 4;
+  --dashboard-primary-column-basis: 520px;
+  --dashboard-secondary-column-basis: 300px;
+  --dashboard-meter-height: var(--space-1-5);
+  --dashboard-stat-skeleton-width: 40%;
+  --dashboard-stat-caption-skeleton-width: 70%;
+}

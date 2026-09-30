@@ -1,0 +1,135 @@
+@use 'breakpoints';
+
+@mixin host {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+@mixin touch-height {
+  @include breakpoints.tablet-and-down {
+    min-height: var(--size-touch-target);
+  }
+
+  @include breakpoints.touch-device {
+    min-height: var(--size-touch-target);
+  }
+}
+
+@mixin label {
+  display: block;
+  margin-bottom: var(--field-label-gap);
+  font-size: var(--font-size-12);
+  color: var(--text-secondary);
+}
+
+@mixin optional-mark {
+  color: var(--text-muted);
+}
+
+@mixin message {
+  margin: var(--field-message-gap) var(--space-0) var(--space-0);
+  font-size: var(--font-size-12);
+  color: var(--text-secondary);
+}
+
+@mixin control {
+  display: block;
+  width: 100%;
+  min-height: var(--size-control-md);
+  margin: var(--space-0);
+  padding: var(--field-padding-block) var(--field-padding-inline);
+  border: var(--border-width-hairline) solid var(--border-control);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-primary);
+  caret-color: var(--text-primary);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-input);
+  transition: border-color var(--duration-fast);
+
+  &::placeholder {
+    color: var(--text-secondary);
+    opacity: initial;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--text-secondary);
+  }
+
+  &:focus-visible {
+    border-color: var(--text-primary);
+  }
+
+  &:disabled {
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
+  }
+
+  @include touch-height;
+}
+
+@mixin control-large {
+  min-height: var(--size-control-lg);
+}
+
+@mixin control-invalid {
+  &,
+  &:hover:not(:disabled),
+  &:focus-visible {
+    border-color: var(--danger);
+  }
+}
+
+@mixin body {
+  position: relative;
+  display: flex;
+}
+
+@mixin action {
+  position: absolute;
+  inset-block: var(--space-0);
+  right: var(--space-0);
+  display: grid;
+  place-items: center;
+  width: var(--field-action-width);
+  padding: var(--space-0);
+  border: var(--space-0);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: var(--text-primary);
+  }
+
+  &:focus-visible {
+    outline-offset: calc(var(--border-width-rule) * -1);
+  }
+
+  &:disabled {
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
+  }
+}
+
+@mixin decorative-icon {
+  position: absolute;
+  inset-block: var(--space-0);
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+@mixin leading-icon {
+  @include decorative-icon;
+
+  left: var(--field-padding-inline);
+}
+
+@mixin trailing-icon {
+  @include decorative-icon;
+
+  right: var(--field-padding-inline);
+}

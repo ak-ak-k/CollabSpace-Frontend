@@ -1,0 +1,21 @@
+<div class="messages">
+  @if (showList()) {
+    <app-conversation-list class="messages__list" [selectedId]="conversationId()" />
+  }
+  @if (showPane()) {
+    <div class="messages__pane">
+      @if (conversationId()) {
+        <router-outlet />
+      } @else {
+        <app-empty-state
+          icon="message-square"
+          heading="No conversation selected"
+          message="Pick a conversation from the list, or start a new one."
+          actionLabel="Start a conversation"
+          actionIcon="square-pen"
+          (action)="search.open('people')"
+        />
+      }
+    </div>
+  }
+</div>

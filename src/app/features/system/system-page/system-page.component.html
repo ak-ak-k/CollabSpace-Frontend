@@ -1,0 +1,63 @@
+<div class="system">
+  <div class="system__status">
+    <span class="system__kicker">{{ kicker() }}</span>
+    <span class="system__network">
+      <span
+        class="system__network-dot"
+        [class.system__network-dot--offline]="network.offline()"
+      ></span>
+      {{ network.online() ? 'Connected' : 'Offline · changes are queued' }}
+    </span>
+  </div>
+
+  <div class="system__hero">
+    @if (code()) {
+      <p class="system__code" aria-hidden="true">{{ code() }}</p>
+    } @else if (icon(); as tileIcon) {
+      <span class="system__tile" [class]="'system__tile--' + tileTone()" aria-hidden="true">
+        <app-icon [name]="tileIcon" [size]="56" />
+      </span>
+    }
+
+    <div class="system__text">
+      <h1 class="system__title">{{ heading() }}</h1>
+      <p class="system__message">{{ message() }}</p>
+      <ng-content select="[systemNote]" />
+      <div class="system__actions">
+        <ng-content />
+      </div>
+    </div>
+  </div>
+
+  @if (lists().length > 0) {
+    <div class="system__lists">
+      @for (list of lists(); track list.title) {
+        <section [attr.aria-label]="list.title">
+          <h2 class="system__list-title">{{ list.title }}</h2>
+          <ul>
+            @for (item of list.items; track item.label) {
+              <li class="system__list-item">
+                @if (item.link; as link) {
+                  <a class="system__row system__row--link" [routerLink]="link">
+                    <app-icon [name]="item.icon" [size]="18" />
+                    <span class="system__row-label">{{ item.label }}</span>
+                    <app-icon name="arrow-right" [size]="16" />
+                  </a>
+                } @else {
+                  <span class="system__row">
+                    <app-icon
+                      [name]="item.icon"
+                      [size]="18"
+                      [class]="'system__row-icon--' + (item.tone ?? 'muted')"
+                    />
+                    <span class="system__row-label">{{ item.label }}</span>
+                  </span>
+                }
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+  }
+</div>

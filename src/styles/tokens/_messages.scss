@@ -1,0 +1,24 @@
+@mixin message-tokens {
+  --message-avatar-column: var(--size-avatar-40);
+  --message-max-attachment-width: 360px;
+  --size-reaction-chip: 28px;
+  --size-message-toolbar-button: var(--size-control-sm);
+  --message-toolbar-offset: calc(var(--space-4) * -1);
+  --message-row-padding-first: var(--space-2-5) var(--space-2) var(--space-1);
+  --message-row-padding-continuation: var(--space-0-5) var(--space-2) var(--space-1);
+  --message-row-inline-margin: calc(var(--space-2) * -1);
+  --message-side-time-offset: var(--space-0-75);
+  --message-highlight-padding-inline: var(--space-0-5);
+  --message-status-icon-shift: calc(var(--space-0-5) * -1);
+  --message-image-aspect-ratio: 16 / 9;
+  --size-message-file-tile: var(--size-avatar-40);
+  --message-picker-offset: var(--space-5);
+  --size-message-picker-button: var(--size-control-sm);
+  --message-picker-emoji-size: var(--font-size-18);
+  --reaction-chip-touch-inset: calc((var(--size-reaction-chip) - var(--size-touch-target)) / 2);
+  --size-typing-dot: 5px;
+  --typing-dot-gap: var(--space-0-75);
+  --typing-dot-stagger: 150ms;
+  --z-message-toolbar: var(--z-raised);
+  --z-message-picker: calc(var(--z-raised) + 1);
+}

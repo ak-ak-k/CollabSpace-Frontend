@@ -1,0 +1,31 @@
+<app-dropdown label="Workspaces" width="md">
+  <app-dropdown-heading>Workspaces</app-dropdown-heading>
+  @for (workspace of workspaces(); track workspace.id) {
+    <button
+      appDropdownItem
+      type="button"
+      [selected]="workspace.id === currentId()"
+      (triggered)="pick(workspace)"
+    >
+      <span class="workspace-option">
+        <app-avatar
+          variant="inverted"
+          [name]="workspace.name"
+          [text]="workspace.code"
+          [size]="36"
+        />
+        <span class="workspace-option__text">
+          <span class="workspace-option__name">{{ workspace.name }}</span>
+          <span class="workspace-option__meta">
+            {{ workspace.memberCount }} members · {{ workspace.plan }}
+          </span>
+        </span>
+      </span>
+    </button>
+  }
+  <app-dropdown-divider />
+  <a appDropdownItem routerLink="/signup">
+    <app-icon name="plus" [size]="18" />
+    Create a workspace
+  </a>
+</app-dropdown>

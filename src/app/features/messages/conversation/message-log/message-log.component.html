@@ -1,0 +1,74 @@
+<div #log class="log" role="log" aria-label="Messages" (scroll)="trackScroll(log)">
+  <div class="log__content">
+    @switch (status()) {
+      @case ('loading') {
+        <app-skeleton layout="chat" label="Loading messages" />
+      }
+      @case ('error') {
+        <app-empty-state
+          kind="error"
+          heading="Couldn’t load messages"
+          message="The conversation didn’t load. Your messages are safe — try again in a moment."
+          actionLabel="Try again"
+          (action)="retry.emit()"
+        />
+      }
+      @default {
+        <div class="log__intro">
+          @if (view().channelIcon; as icon) {
+            <span class="log__intro-tile" aria-hidden="true"
+              ><app-icon [name]="icon" [size]="28"
+            /></span>
+          } @else {
+            <app-avatar
+              [name]="view().avatarName"
+              [seed]="view().avatarSeed"
+              [variant]="view().avatarVariant"
+              [size]="56"
+            />
+          }
+          <h2 class="log__intro-title">{{ view().title }}</h2>
+          <p class="log__intro-text">{{ view().intro }}</p>
+        </div>
+
+        @if (noResults()) {
+          <app-empty-state
+            compact
+            icon="search"
+            heading="No matching messages"
+            message="Try a different word or check the spelling."
+          />
+        }
+
+        @for (row of rows(); track row.key) {
+          @switch (row.kind) {
+            @case ('day') {
+              <app-date-separator [label]="row.label" />
+            }
+            @case ('new') {
+              <app-date-separator variant="new" />
+            }
+            @case ('message') {
+              <app-message-bubble
+                [attr.data-message-id]="row.message.id"
+                [message]="row.message"
+                [pointerActions]="pointerActions()"
+                [editing]="row.message.id === editingId()"
+                (reply)="emit('reply', row.message.id)"
+                (copy)="emit('copy', row.message.id)"
+                (pin)="emit('pin', row.message.id)"
+                (editRequested)="emit('edit', row.message.id)"
+                (deleteRequested)="emit('delete', row.message.id)"
+                (actionsRequested)="emit('actions', row.message.id)"
+                (editCancelled)="emit('editCancel', row.message.id)"
+                (react)="emitReact(row.message.id, $event)"
+                (download)="emitDownload(row.message.id, $event)"
+                (editSaved)="emitEditSave(row.message.id, $event)"
+              />
+            }
+          }
+        }
+      }
+    }
+  </div>
+</div>

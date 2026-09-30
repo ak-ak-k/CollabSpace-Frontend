@@ -1,0 +1,22 @@
+:host {
+  --spinner-size: var(--size-spinner-sm);
+
+  display: inline-flex;
+  flex: none;
+}
+
+:host(.spinner--md) {
+  --spinner-size: var(--size-spinner-md);
+}
+
+:host(.spinner--on-primary) {
+  color: var(--on-primary);
+}
+
+.spinner__ring {
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  border: var(--border-width-rule) solid var(--spinner-track);
+  border-top-color: currentColor;
+  animation: spin var(--duration-spin) linear infinite;
+}

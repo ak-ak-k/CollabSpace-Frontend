@@ -1,0 +1,52 @@
+:host {
+  padding: var(--space-3) var(--space-0) calc(var(--space-3) + env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+
+.sheet__emoji {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-1);
+  padding: var(--space-0) var(--space-4) var(--space-3);
+  border-bottom: var(--rule-hairline);
+}
+
+.sheet__emoji-button {
+  display: grid;
+  place-items: center;
+  width: var(--sheet-emoji-size);
+  height: var(--sheet-emoji-size);
+  border: var(--space-0);
+  background: var(--surface);
+  font-size: var(--font-size-22);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-secondary);
+  }
+}
+
+.sheet__action {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--sheet-row-height);
+  padding: var(--space-0) var(--space-4);
+  border: var(--space-0);
+  border-bottom: var(--rule-hairline);
+  background: none;
+  color: var(--text-primary);
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-semibold);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover);
+  }
+}
+
+.sheet__action--destructive {
+  color: var(--danger);
+}

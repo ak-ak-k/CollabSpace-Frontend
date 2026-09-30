@@ -1,0 +1,39 @@
+:host {
+  display: block;
+}
+
+.table__team {
+  padding-block: var(--space-3);
+}
+
+.table__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text-primary);
+  text-decoration: none;
+
+  &:hover .table__name {
+    text-decoration: underline;
+  }
+}
+
+.table__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.table__name {
+  font-weight: var(--font-weight-heavy);
+}
+
+.table__description {
+  color: var(--text-muted);
+  font-size: var(--font-size-13);
+}
+
+.table__actions {
+  text-align: right;
+  white-space: nowrap;
+}

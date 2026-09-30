@@ -1,0 +1,27 @@
+<div class="sheet__emoji" role="group" aria-label="Quick reactions">
+  @for (item of emoji; track item) {
+    <button
+      type="button"
+      class="sheet__emoji-button"
+      [attr.aria-label]="'React with ' + item"
+      (click)="react(item)"
+    >
+      <span aria-hidden="true">{{ item }}</span>
+    </button>
+  }
+</div>
+<ul>
+  @for (action of actions(); track action.kind) {
+    <li>
+      <button
+        type="button"
+        class="sheet__action"
+        [class.sheet__action--destructive]="action.destructive"
+        (click)="run(action.kind)"
+      >
+        <app-icon [name]="action.icon" [size]="20" />
+        {{ action.label }}
+      </button>
+    </li>
+  }
+</ul>

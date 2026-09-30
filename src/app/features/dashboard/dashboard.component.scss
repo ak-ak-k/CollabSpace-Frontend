@@ -1,0 +1,54 @@
+@use 'breakpoints';
+
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--background);
+}
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--page-gap);
+  max-width: var(--page-max-width);
+  padding: var(--page-padding);
+}
+
+.dashboard__stats {
+  display: grid;
+  grid-template-columns: repeat(var(--dashboard-stat-columns-narrow), minmax(0, 1fr));
+  gap: var(--border-width-rule);
+  border-block: var(--rule-strong);
+  background: var(--border);
+
+  @include breakpoints.tablet-and-up {
+    grid-template-columns: repeat(var(--dashboard-stat-columns-wide), minmax(0, 1fr));
+  }
+}
+
+.dashboard__stat {
+  background: var(--background);
+}
+
+.dashboard__columns {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--page-gap);
+}
+
+.dashboard__column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--page-gap);
+  min-width: 0;
+}
+
+.dashboard__column--primary {
+  flex: 2 1 var(--dashboard-primary-column-basis);
+}
+
+.dashboard__column--secondary {
+  flex: 1 1 var(--dashboard-secondary-column-basis);
+}

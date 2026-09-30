@@ -1,0 +1,128 @@
+<div
+  class="options__listbox"
+  role="listbox"
+  aria-label="Results"
+  [id]="listboxId"
+  [style.grid-row-end]="'span ' + rowCount()"
+  (mousedown)="keepFieldFocused($event)"
+>
+  @for (section of sections(); track section.key) {
+    <div
+      class="options__group"
+      role="group"
+      [attr.aria-labelledby]="section.headingId"
+      [style.grid-row-end]="'span ' + section.rowSpan"
+    >
+      <div
+        class="options__heading"
+        [class.options__heading--recent]="section.kind === 'recent'"
+        [class.options__heading--commands]="section.kind === 'commands'"
+        [class.options__heading--expandable]="section.expandKey !== null"
+        [id]="section.headingId"
+      >
+        <span>
+          {{ section.label }}
+          @if (section.total !== null) {
+            <span class="options__total">· {{ section.total }}</span>
+          }
+        </span>
+      </div>
+
+      @for (option of section.options; track option.id) {
+        <div
+          class="option"
+          role="option"
+          [class.option--active]="option.index === activeIndex()"
+          [class.option--recent]="option.type === 'recent'"
+          [class.option--result]="option.type === 'result'"
+          [id]="option.id"
+          [attr.aria-selected]="option.index === activeIndex()"
+          (click)="activated.emit(option)"
+          (mousemove)="hover(option.index)"
+        >
+          @switch (option.type) {
+            @case ('recent') {
+              <app-icon class="option__muted" name="history" [size]="16" />
+              <span class="truncate">{{ option.query }}</span>
+            }
+            @case ('command') {
+              <span class="option__tile">
+                <app-icon [name]="option.command.icon" [size]="15" />
+              </span>
+              <span class="option__label truncate">{{ option.command.label }}</span>
+              @if (option.command.hint) {
+                <span class="option__hint option__muted">{{ option.command.hint }}</span>
+              }
+            }
+            @case ('result') {
+              @if (option.result.kind === 'person') {
+                <app-avatar
+                  [name]="option.result.name"
+                  [seed]="option.result.colorSeed"
+                  [size]="32"
+                  [status]="option.result.status"
+                />
+              } @else if (option.result.kind === 'team') {
+                <app-avatar
+                  variant="inverted"
+                  [name]="option.result.name"
+                  [text]="option.result.code"
+                  [size]="32"
+                />
+              } @else {
+                <span class="option__tile option__tile--result">
+                  <app-icon [name]="option.result.icon" [size]="16" />
+                </span>
+              }
+              <span class="option__text">
+                <span class="option__title truncate">
+                  <span>{{ option.result.title.before }}</span>
+                  @if (option.result.title.match) {
+                    <mark class="option__mark">{{ option.result.title.match }}</mark>
+                  }
+                  <span>{{ option.result.title.after }}</span>
+                </span>
+                <span class="option__subtitle option__muted truncate">
+                  {{ option.result.subtitle }}
+                </span>
+              </span>
+              @if (option.index === activeIndex()) {
+                <app-icon class="option__muted" name="corner-down-left" [size]="14" />
+              }
+            }
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@for (section of sections(); track section.key) {
+  @if (section.expandKey; as groupKey) {
+    <button
+      type="button"
+      class="options__expand"
+      [attr.aria-label]="'Show all ' + section.label.toLowerCase()"
+      [style.grid-row-start]="section.row"
+      (click)="expanded.emit(groupKey)"
+    >
+      Show all
+    </button>
+  }
+  @for (option of section.options; track option.id) {
+    @if (option.type === 'recent') {
+      <button
+        appIconButton
+        type="button"
+        size="md"
+        class="options__remove"
+        [class.options__remove--active]="option.index === activeIndex()"
+        [label]="'Remove ' + option.query + ' from recent searches'"
+        [style.grid-row-start]="option.row"
+        (click)="removed.emit(option.query)"
+      >
+        <app-icon name="x" [size]="14" />
+      </button>
+    }
+  }
+}

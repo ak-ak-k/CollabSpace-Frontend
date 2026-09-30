@@ -1,0 +1,5 @@
+@use './demo';
+
+:host {
+  @include demo.host;
+}

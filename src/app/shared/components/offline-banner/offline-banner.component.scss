@@ -1,0 +1,49 @@
+@use 'breakpoints';
+
+@mixin touch-target {
+  min-height: var(--size-touch-target);
+}
+
+:host {
+  --focus-ring: var(--on-secondary);
+
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  background: var(--secondary);
+  color: var(--on-secondary);
+  font-size: var(--font-size-13);
+}
+
+.offline-banner__message {
+  flex: 1;
+  min-width: var(--offline-banner-message-min-width);
+}
+
+.offline-banner__link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--on-secondary);
+  font-weight: var(--font-weight-semibold);
+
+  @include breakpoints.tablet-and-down {
+    @include touch-target;
+  }
+}
+
+.offline-banner__retry {
+  padding: var(--space-1) var(--space-2-5);
+  border: var(--border-width-hairline) solid var(--on-secondary);
+  background: transparent;
+  color: var(--on-secondary);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+
+  @include breakpoints.tablet-and-down {
+    @include touch-target;
+  }
+}

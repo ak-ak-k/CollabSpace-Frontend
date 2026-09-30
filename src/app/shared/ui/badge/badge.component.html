@@ -1,0 +1,6 @@
+@if (visible()) {
+  <span aria-hidden="true">{{ text() }}</span>
+  @if (label()) {
+    <span class="visually-hidden">{{ label() }}</span>
+  }
+}

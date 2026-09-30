@@ -1,0 +1,10 @@
+@for (emoji of emojis; track emoji) {
+  <button
+    type="button"
+    class="emoji-picker__emoji"
+    [attr.aria-label]="'Insert ' + emoji"
+    (click)="pick.emit(emoji)"
+  >
+    {{ emoji }}
+  </button>
+}

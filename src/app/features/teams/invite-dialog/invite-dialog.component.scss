@@ -1,0 +1,9 @@
+:host {
+  display: block;
+}
+
+.invite-dialog__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--dialog-field-min-width-md), 1fr));
+  gap: var(--space-4);
+}

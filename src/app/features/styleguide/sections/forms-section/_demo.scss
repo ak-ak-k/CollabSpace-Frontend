@@ -1,0 +1,40 @@
+@mixin host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+@mixin block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+@mixin block-title {
+  margin: var(--space-0);
+  padding-bottom: var(--space-2);
+  border-bottom: var(--rule-strong);
+  font-size: var(--font-size-20);
+}
+
+@mixin grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--space-16) * 4)), 1fr));
+  gap: var(--space-5) var(--space-4);
+  align-items: start;
+}
+
+@mixin stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+@mixin note {
+  margin: var(--space-0);
+  font-size: var(--font-size-13);
+  color: var(--text-secondary);
+}

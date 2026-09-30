@@ -1,0 +1,14 @@
+<label class="visually-hidden" [attr.for]="controlId">Edit message</label>
+<textarea
+  #control
+  class="edit-form__control"
+  [id]="controlId"
+  [value]="draft()"
+  (input)="draft.set(control.value)"
+  (keydown)="onKeydown($event)"
+></textarea>
+<div class="edit-form__actions">
+  <span class="edit-form__hint">Enter to save · Esc to cancel</span>
+  <button appButton type="button" size="sm" (click)="cancel()">Cancel</button>
+  <button appButton type="button" size="sm" (click)="save()">Save</button>
+</div>

@@ -1,0 +1,8 @@
+@use '../auth-layout/auth-form';
+
+@include auth-form.styles;
+
+.legal-link {
+  @include auth-form.link-reset;
+  @include auth-form.inline-touch-target;
+}

@@ -1,0 +1,75 @@
+$sizes: (
+  24: 10,
+  26: 10,
+  28: 11,
+  32: 12,
+  36: 13,
+  40: 14,
+  44: 15,
+  48: 16,
+  56: 20,
+  64: 22,
+  72: 24,
+  96: 32,
+  128: 42,
+);
+$tones: 1, 2, 3, 4, 5, 6;
+
+:host {
+  --avatar-size: var(--size-avatar-40);
+  --avatar-font-size: var(--font-size-14);
+  --status-dot-ring: var(--avatar-ring, var(--background));
+  --status-dot-ring-width: var(--border-width-rule);
+
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  background: var(--avatar-background);
+  color: var(--avatar-foreground);
+  font-size: var(--avatar-font-size);
+  font-weight: var(--font-weight-heavy);
+  line-height: var(--line-height-flat);
+  user-select: none;
+}
+
+@each $size, $font-size in $sizes {
+  :host(.avatar--#{$size}) {
+    --avatar-size: var(--size-avatar-#{$size});
+    --avatar-font-size: var(--font-size-#{$font-size});
+  }
+}
+
+@each $tone in $tones {
+  :host(.avatar--tone-#{$tone}) {
+    --avatar-background: var(--avatar-tone-#{$tone}-background);
+    --avatar-foreground: var(--avatar-tone-#{$tone}-foreground);
+  }
+}
+
+:host(.avatar--inverted) {
+  --avatar-background: var(--avatar-inverted-background);
+  --avatar-foreground: var(--avatar-inverted-foreground);
+}
+
+.avatar__status {
+  position: absolute;
+  right: var(--status-dot-offset-md);
+  bottom: var(--status-dot-offset-md);
+}
+
+:host(.avatar--dot-sm) .avatar__status {
+  right: var(--status-dot-offset-sm);
+  bottom: var(--status-dot-offset-sm);
+}
+
+:host(.avatar--dot-lg) {
+  --status-dot-ring-width: var(--border-width-bar);
+
+  .avatar__status {
+    right: var(--status-dot-offset-lg);
+    bottom: var(--status-dot-offset-lg);
+  }
+}

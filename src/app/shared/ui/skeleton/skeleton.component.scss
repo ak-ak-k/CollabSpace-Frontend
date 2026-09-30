@@ -1,0 +1,127 @@
+@mixin stack($gap) {
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+}
+
+@mixin tile-grid($min-column-width) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, #{$min-column-width}), 1fr));
+  gap: var(--space-4);
+}
+
+@mixin tile($padding, $gap) {
+  padding: $padding;
+  background: var(--surface);
+
+  @include stack($gap);
+}
+
+:host {
+  display: block;
+  padding: var(--state-padding);
+}
+
+:host(.skeleton--compact) {
+  padding: var(--space-4);
+}
+
+.bar {
+  flex: none;
+  height: var(--size-skeleton-bar-md);
+  background: var(--skeleton);
+  animation: pulse var(--duration-pulse) ease-in-out infinite;
+}
+
+.bar--sm {
+  height: var(--size-skeleton-bar-sm);
+}
+
+.bar--lg {
+  height: var(--size-skeleton-bar-lg);
+}
+
+.bar--xl {
+  height: var(--size-skeleton-bar-xl);
+}
+
+.block--sm {
+  width: var(--size-skeleton-block-sm);
+  height: var(--size-skeleton-block-sm);
+}
+
+.block--md {
+  width: var(--size-skeleton-block-md);
+  height: var(--size-skeleton-block-md);
+}
+
+.block--lg {
+  width: var(--size-skeleton-block-lg);
+  height: var(--size-skeleton-block-lg);
+}
+
+.item__bars {
+  min-width: var(--space-0);
+}
+
+:host(.skeleton--rows) {
+  .section__header {
+    padding-bottom: var(--space-3);
+    border-bottom: var(--rule-strong);
+  }
+
+  .item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-0);
+    border-bottom: var(--rule-hairline);
+  }
+
+  .item__bars {
+    flex: 1;
+
+    @include stack(var(--space-2));
+  }
+}
+
+:host(.skeleton--cards) {
+  @include tile-grid(var(--skeleton-card-min-width));
+
+  .item {
+    min-height: var(--skeleton-card-min-height);
+
+    @include tile(var(--space-4), var(--space-3));
+  }
+
+  .item__bars {
+    @include stack(var(--space-3));
+  }
+}
+
+:host(.skeleton--board) {
+  @include tile-grid(var(--skeleton-column-min-width));
+
+  .section {
+    @include stack(var(--space-3));
+  }
+
+  .item {
+    @include tile(var(--space-3-5), var(--space-2-5));
+  }
+
+  .item__bars {
+    @include stack(var(--space-2-5));
+  }
+}
+
+:host(.skeleton--detail) {
+  box-sizing: content-box;
+  max-width: var(--skeleton-detail-max-width);
+
+  @include stack(var(--space-10));
+
+  .item__bars {
+    @include stack(var(--space-3-5));
+  }
+}

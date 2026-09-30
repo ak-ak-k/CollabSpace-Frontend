@@ -1,0 +1,38 @@
+<div class="channels">
+  <div class="channels__toolbar">
+    <button appButton type="button" (click)="createChannel.emit()">
+      <app-icon name="plus" [size]="16" />
+      Create channel
+    </button>
+  </div>
+  <ul class="channels__list">
+    @for (channel of channels(); track channel.id) {
+      <li class="channel">
+        <span class="channel__tile" aria-hidden="true">
+          <app-icon [name]="channel.icon" [size]="18" />
+        </span>
+        <span class="channel__text">
+          <span class="channel__heading">
+            <strong class="channel__name">{{ channel.name }}</strong>
+            @if (channel.isPrivate) {
+              <app-tag>Private</app-tag>
+            }
+            @if (channel.unreadCount > 0) {
+              <app-tag tone="outline">{{ channel.unreadCount }} new</app-tag>
+            }
+          </span>
+          <span class="channel__description">{{ channel.description }}</span>
+          <span class="channel__meta">
+            {{ channel.memberCount | count: 'member' }} ·
+            {{ channel.when ? 'Last activity ' + channel.when : 'No messages yet' }}
+          </span>
+        </span>
+        <a appButton size="sm" [routerLink]="channel.link">
+          Open
+          <app-icon name="arrow-right" [size]="14" />
+          <span class="visually-hidden">#{{ channel.name }}</span>
+        </a>
+      </li>
+    }
+  </ul>
+</div>

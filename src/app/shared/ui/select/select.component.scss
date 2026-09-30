@@ -1,0 +1,44 @@
+@use '../input/field/field';
+
+:host {
+  @include field.host;
+}
+
+.field__label {
+  @include field.label;
+}
+
+.field__body {
+  @include field.body;
+}
+
+.field__control {
+  @include field.control;
+}
+
+.field__control--native {
+  padding-right: var(--field-icon-reserve);
+  appearance: none;
+  cursor: pointer;
+}
+
+.field__control--large {
+  @include field.control-large;
+}
+
+.field__control--invalid {
+  @include field.control-invalid;
+}
+
+.field__option {
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.field__chevron {
+  @include field.trailing-icon;
+}
+
+.field__hint {
+  @include field.message;
+}

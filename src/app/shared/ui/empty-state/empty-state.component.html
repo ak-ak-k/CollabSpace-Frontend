@@ -1,0 +1,29 @@
+<span class="empty-state__tile" aria-hidden="true">
+  <app-icon [name]="shownIcon()" [size]="22" />
+</span>
+<div class="empty-state__text">
+  @switch (headingLevel()) {
+    @case (3) {
+      <h3 class="empty-state__heading">{{ shownHeading() }}</h3>
+    }
+    @case (4) {
+      <h4 class="empty-state__heading">{{ shownHeading() }}</h4>
+    }
+    @default {
+      <h2 class="empty-state__heading">{{ shownHeading() }}</h2>
+    }
+  }
+  <p class="empty-state__message">{{ shownMessage() }}</p>
+</div>
+@if (actionLabel()) {
+  <button
+    appButton
+    variant="secondary"
+    type="button"
+    class="empty-state__action"
+    (click)="action.emit()"
+  >
+    <app-icon [name]="shownActionIcon()" [size]="16" />
+    {{ actionLabel() }}
+  </button>
+}

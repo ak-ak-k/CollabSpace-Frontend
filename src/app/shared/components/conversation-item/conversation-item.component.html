@@ -1,0 +1,42 @@
+@let item = conversation();
+
+<a
+  class="conversation-item"
+  [routerLink]="['/messages', item.id]"
+  [attr.aria-current]="selected() ? 'page' : null"
+  [attr.aria-label]="accessibleLabel()"
+>
+  <app-avatar
+    [name]="item.avatarName"
+    [seed]="item.avatarSeed"
+    [size]="avatarSize()"
+    [status]="item.avatarStatus"
+    [variant]="isDirect() ? 'tone' : 'inverted'"
+  >
+    @if (isComfortable() && !isDirect()) {
+      <span class="conversation-item__members">{{ item.memberCount }}</span>
+    }
+  </app-avatar>
+
+  <span class="conversation-item__body">
+    <span class="conversation-item__heading">
+      <span class="conversation-item__title truncate">{{ item.title }}</span>
+      @if (isComfortable() && item.starred) {
+        <app-icon name="star" [size]="12" filled />
+      }
+      @if (isComfortable() && item.muted) {
+        <app-icon class="conversation-item__muted" name="bell-off" [size]="12" />
+      }
+      <span class="conversation-item__time">{{ when() }}</span>
+    </span>
+    <span class="conversation-item__summary">
+      <span
+        class="conversation-item__preview truncate"
+        [class.conversation-item__preview--typing]="isTyping()"
+      >
+        {{ line() }}
+      </span>
+      <app-badge [count]="item.unreadCount" />
+    </span>
+  </span>
+</a>

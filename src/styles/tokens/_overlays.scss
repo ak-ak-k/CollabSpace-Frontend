@@ -1,0 +1,28 @@
+@mixin overlay-tokens {
+  --z-overlay-container: var(--z-confirm);
+
+  --dialog-width-sm: 440px;
+  --dialog-width-md: 520px;
+  --dialog-width-lg: 560px;
+  --dialog-inset-top: max(var(--space-4), 8vh);
+  --size-confirm-icon-tile: 36px;
+
+  --drawer-width-sm: min(320px, 88vw);
+  --drawer-width-md: min(360px, 100vw);
+  --drawer-width-lg: min(520px, 100vw);
+  --drawer-header-height: 64px;
+  --sheet-max-height: 85dvh;
+  --sheet-emoji-size: var(--size-control-xl);
+  --sheet-row-height: 52px;
+
+  --dropdown-width-sm: 240px;
+  --dropdown-width-md: 300px;
+  --dropdown-max-width: calc(100vw - var(--space-6));
+  --dropdown-max-height: calc(100dvh - var(--space-6));
+
+  --toast-width: 380px;
+  --toast-bottom-offset-default: calc(var(--bottom-nav-height) + var(--space-3-5));
+  --toast-hover-strength: 16%;
+
+  --tooltip-max-width: 240px;
+}

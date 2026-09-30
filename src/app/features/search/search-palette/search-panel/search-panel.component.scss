@@ -1,0 +1,136 @@
+@use 'breakpoints';
+
+@mixin touch-height {
+  --close-height: var(--size-touch-target);
+}
+
+:host {
+  --close-height: var(--size-search-close);
+
+  position: fixed;
+  inset: var(--space-0);
+  z-index: var(--z-palette);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--search-palette-top) var(--search-palette-gutter) var(--space-0);
+
+  @include breakpoints.mobile {
+    padding: var(--space-0);
+  }
+
+  @include breakpoints.tablet-and-down {
+    @include touch-height;
+  }
+
+  @include breakpoints.touch-device {
+    @include touch-height;
+  }
+}
+
+.panel__scrim {
+  position: absolute;
+  inset: var(--space-0);
+  background: var(--scrim);
+}
+
+.panel__dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(var(--search-palette-width), 100%);
+  max-height: var(--search-palette-max-height);
+  border: var(--rule-hairline);
+  background: var(--background);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-primary);
+
+  @include breakpoints.mobile {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    border: var(--space-0);
+  }
+}
+
+.panel__search {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--search-row-min-height);
+  padding: var(--space-0) var(--space-2) var(--space-0) var(--space-4);
+  border-bottom: var(--rule-strong);
+}
+
+.panel__field {
+  flex: 1;
+  min-width: 0;
+  height: var(--search-input-height);
+  padding: var(--space-0);
+  border: var(--space-0);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: var(--font-size-17);
+}
+
+.panel__field::placeholder {
+  opacity: 1;
+  color: var(--text-secondary);
+}
+
+.panel__field:focus-visible {
+  outline-offset: calc(var(--border-width-rule) * -1);
+}
+
+.panel__spinner {
+  --spinner-size: var(--size-search-spinner);
+}
+
+.panel__close {
+  flex: none;
+  height: var(--close-height);
+  padding: var(--space-0) var(--space-2);
+  border: var(--border-width-hairline) solid var(--border-control);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.panel__close:hover {
+  background: var(--hover);
+}
+
+.panel__close:active {
+  background: var(--press);
+}
+
+.panel__body {
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-2) var(--space-0);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.panel__footer {
+  display: flex;
+  flex: none;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  border-top: var(--rule-hairline);
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+}
+
+.panel__key {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-heavy);
+}
+
+.panel__shortcut {
+  margin-left: auto;
+}

@@ -1,0 +1,48 @@
+@use '../input/field/field';
+
+:host {
+  @include field.host;
+}
+
+.field__label {
+  @include field.label;
+}
+
+.field__optional {
+  @include field.optional-mark;
+}
+
+.field__control {
+  @include field.control;
+}
+
+.field__control--multiline {
+  min-height: var(--size-textarea-min);
+  resize: vertical;
+}
+
+.field__control--invalid {
+  @include field.control-invalid;
+}
+
+.field__footer {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.field__messages {
+  flex: 1;
+  min-width: 0;
+}
+
+.field__hint {
+  @include field.message;
+}
+
+.field__count {
+  @include field.message;
+
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}

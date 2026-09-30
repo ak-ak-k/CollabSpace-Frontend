@@ -1,0 +1,97 @@
+<div class="members">
+  <div class="members__toolbar">
+    <app-search-input
+      class="members__search"
+      label="Search members"
+      placeholder="Search members"
+      [(value)]="query"
+    />
+    <button appButton type="button" (click)="invite.emit()">
+      <app-icon name="user-plus" [size]="16" />
+      Invite members
+    </button>
+  </div>
+
+  @if (visibleMembers().length === 0) {
+    <app-empty-state
+      compact
+      icon="search"
+      heading="No members found"
+      message="Try a different name or title."
+    />
+  } @else if (compact()) {
+    <ul class="members__list">
+      @for (member of visibleMembers(); track member.id) {
+        <li class="member">
+          <app-avatar [name]="member.name" [seed]="member.seed" [status]="member.status" />
+          <span class="member__text">
+            <strong class="member__name">{{ member.label }}</strong>
+            <span class="member__line truncate">{{ member.role }} · {{ member.title }}</span>
+            <span class="member__line truncate"
+              >{{ member.presence }} · {{ member.localTime }}</span
+            >
+          </span>
+          @if (!member.isMe) {
+            <button
+              appIconButton
+              type="button"
+              size="lg"
+              [label]="'Message ' + member.name"
+              (click)="message.emit(member.id)"
+            >
+              <app-icon name="message-square" [size]="18" />
+            </button>
+          }
+        </li>
+      }
+    </ul>
+  } @else {
+    <app-table label="Team members" minWidth="md">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Role</th>
+            <th scope="col">Status</th>
+            <th scope="col">Local time</th>
+            <th scope="col"><span class="visually-hidden">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (member of visibleMembers(); track member.id) {
+            <tr>
+              <td class="members__cell-person">
+                <span class="member">
+                  <app-avatar [name]="member.name" [seed]="member.seed" [size]="36" />
+                  <span class="member__text">
+                    <strong class="member__name">{{ member.label }}</strong>
+                    <span class="member__line">{{ member.title }}</span>
+                  </span>
+                </span>
+              </td>
+              <td>
+                <app-tag>{{ member.role }}</app-tag>
+              </td>
+              <td>
+                <span class="members__status">
+                  <app-status-dot [status]="member.status" size="sm" />
+                  {{ member.presence }}
+                </span>
+              </td>
+              <td class="members__time">{{ member.localTime }}</td>
+              <td class="members__actions">
+                @if (!member.isMe) {
+                  <button appButton type="button" size="sm" (click)="message.emit(member.id)">
+                    <app-icon name="message-square" [size]="14" />
+                    Message
+                    <span class="visually-hidden">{{ member.name }}</span>
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </app-table>
+  }
+</div>

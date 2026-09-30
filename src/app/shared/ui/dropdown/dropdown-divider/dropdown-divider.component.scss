@@ -1,0 +1,9 @@
+:host {
+  display: block;
+  margin: var(--space-1) var(--space-0);
+}
+
+.dropdown-divider__rule {
+  display: block;
+  border-top: var(--rule-hairline);
+}

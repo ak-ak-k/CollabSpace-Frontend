@@ -1,0 +1,34 @@
+:host {
+  --status-dot-size: var(--size-status-dot-md);
+
+  display: inline-block;
+  flex: none;
+  width: var(--status-dot-size);
+  height: var(--status-dot-size);
+  background: var(--status-dot-color);
+  box-shadow: 0 0 0 var(--status-dot-ring-width, var(--space-0)) var(--status-dot-ring, transparent);
+}
+
+:host(.status-dot--sm) {
+  --status-dot-size: var(--size-status-dot-sm);
+}
+
+:host(.status-dot--lg) {
+  --status-dot-size: var(--size-status-dot-lg);
+}
+
+:host(.status-dot--online) {
+  --status-dot-color: var(--status-online);
+}
+
+:host(.status-dot--away) {
+  --status-dot-color: var(--status-away);
+}
+
+:host(.status-dot--dnd) {
+  --status-dot-color: var(--status-dnd);
+}
+
+:host(.status-dot--offline) {
+  --status-dot-color: var(--status-offline);
+}

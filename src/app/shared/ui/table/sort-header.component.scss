@@ -1,0 +1,36 @@
+@use 'breakpoints';
+
+@mixin touch-height {
+  min-height: var(--size-touch-target);
+}
+
+.sort-header__button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-0);
+  border: var(--space-0);
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+
+  @include breakpoints.tablet-and-down {
+    @include touch-height;
+  }
+
+  @include breakpoints.touch-device {
+    @include touch-height;
+  }
+}
+
+:host(.sort-header--sorted) .sort-header__button {
+  color: var(--text-primary);
+}

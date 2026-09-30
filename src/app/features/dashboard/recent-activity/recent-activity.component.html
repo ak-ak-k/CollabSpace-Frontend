@@ -1,0 +1,53 @@
+<app-section-header
+  headingId="dashboard-activity"
+  heading="Recent activity"
+  linkLabel="All"
+  link="/notifications"
+/>
+
+@switch (status()) {
+  @case ('loading') {
+    <app-skeleton layout="list" [rows]="5" compact label="Loading activity" />
+  }
+  @case ('error') {
+    <app-empty-state
+      kind="error"
+      compact
+      [headingLevel]="3"
+      heading="Couldn’t load activity"
+      actionLabel="Try again"
+      (action)="retry.emit()"
+    />
+  }
+  @case ('empty') {
+    <app-empty-state
+      compact
+      [headingLevel]="3"
+      icon="activity"
+      heading="No activity yet"
+      message="Updates from your teams will show up here."
+    />
+  }
+  @default {
+    <ol>
+      @for (event of activity(); track event.id) {
+        <li class="activity">
+          <a class="activity__link" [routerLink]="linkTo(event.route)">
+            <app-avatar [name]="event.actor.name" [seed]="event.actor.seed" [size]="28" />
+            <span class="activity__body">
+              <span class="activity__sentence">
+                <strong>{{ event.actor.firstName }}</strong>
+                {{ event.verb }}
+                <span class="activity__object">{{ event.object }}</span>
+              </span>
+              <span class="activity__meta">
+                <app-icon [name]="event.icon" [size]="13" />
+                {{ event.when }}
+              </span>
+            </span>
+          </a>
+        </li>
+      }
+    </ol>
+  }
+}

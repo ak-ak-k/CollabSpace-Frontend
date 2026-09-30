@@ -1,0 +1,28 @@
+<a class="skip-link" href="#main" (click)="focusMain($event)">Skip to content</a>
+
+<div class="shell">
+  @if (!breakpoint.isMobile()) {
+    <app-rail (searchRequested)="search.open()" />
+  }
+
+  <div class="shell__column">
+    @if (network.offline()) {
+      <app-offline-banner (retry)="retryNetwork()" />
+    }
+    @if (breakpoint.isMobile() && !immersive()) {
+      <app-mobile-header (menuRequested)="openDrawer()" (searchRequested)="search.open()" />
+    }
+
+    <main class="shell__main" id="main" tabindex="-1" #main>
+      <router-outlet />
+    </main>
+
+    @if (breakpoint.isMobile() && !immersive()) {
+      <app-bottom-nav (moreRequested)="openDrawer()" />
+    }
+  </div>
+</div>
+
+@defer (on idle; when search.isOpen()) {
+  <app-search-palette />
+}

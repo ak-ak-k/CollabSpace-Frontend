@@ -1,0 +1,29 @@
+<form class="invite-dialog" [formRoot]="inviteForm">
+  <app-modal heading="Invite people" [description]="description()" size="md">
+    <app-input
+      label="Email addresses"
+      placeholder="name@company.com, another@company.com"
+      inputmode="email"
+      [formField]="inviteForm.emails"
+    />
+    <div class="invite-dialog__row">
+      <app-select label="Add to team" [options]="teamOptions()" [formField]="inviteForm.teamId" />
+      <app-radio-group label="Role" stretch [options]="roleOptions" [formField]="inviteForm.role" />
+    </div>
+    <app-textarea
+      label="Personal note"
+      optional
+      [rows]="2"
+      placeholder="Hey! We’re moving our team chat to CollabSpace."
+      [formField]="inviteForm.note"
+    />
+
+    <ng-container modalActions>
+      <button appButton type="button" (click)="cancel()">Cancel</button>
+      <button appButton type="submit" variant="primary" [busy]="inviteForm().submitting()">
+        <app-icon name="send-horizontal" [size]="16" />
+        Send invites
+      </button>
+    </ng-container>
+  </app-modal>
+</form>

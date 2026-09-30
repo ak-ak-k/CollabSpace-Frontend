@@ -1,0 +1,25 @@
+<nav class="bottom-nav" aria-label="Primary">
+  @for (item of items; track item.id) {
+    <a
+      class="bottom-nav__item"
+      [routerLink]="item.route"
+      routerLinkActive="bottom-nav__item--active"
+      ariaCurrentWhenActive="page"
+      [attr.aria-label]="badges.labelFor(item)"
+    >
+      <app-icon [name]="item.icon" [size]="22" />
+      <span>{{ item.label }}</span>
+      <app-badge class="bottom-nav__badge" size="sm" [count]="badges.countFor(item)" />
+    </a>
+  }
+  <button
+    type="button"
+    class="bottom-nav__item"
+    [class.bottom-nav__item--active]="route.inMoreSection()"
+    aria-haspopup="dialog"
+    (click)="moreRequested.emit()"
+  >
+    <app-icon name="menu" [size]="22" />
+    <span>More</span>
+  </button>
+</nav>

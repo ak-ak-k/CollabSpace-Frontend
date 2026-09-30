@@ -1,0 +1,72 @@
+:host {
+  --card-padding: var(--space-4);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: var(--space-0);
+  padding: var(--card-padding);
+  border-radius: var(--radius-md);
+  background-color: var(--surface);
+  color: var(--text-primary);
+}
+
+:host(.card--padding-sm) {
+  --card-padding: var(--space-3);
+}
+
+:host(.card--padding-lg) {
+  --card-padding: var(--space-6);
+}
+
+:host(.card--elevation-sm) {
+  box-shadow: var(--shadow-sm);
+}
+
+:host(.card--elevation-md) {
+  box-shadow: var(--shadow-md);
+}
+
+:host(.card--elevation-lg) {
+  box-shadow: var(--shadow-lg);
+}
+
+:host(.card--interactive:hover) {
+  background-image: linear-gradient(var(--hover), var(--hover));
+}
+
+.card__body {
+  flex: 1;
+  min-width: var(--space-0);
+  font-size: var(--font-size-13);
+
+  &:empty {
+    display: none;
+  }
+}
+
+:host ::ng-deep > [cardKicker] {
+  margin: var(--space-0);
+  color: var(--text-secondary);
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--card-kicker-letter-spacing);
+  text-transform: uppercase;
+}
+
+:host ::ng-deep > [cardTitle] {
+  margin: var(--space-0);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-17);
+  font-weight: var(--font-weight-heavy);
+  line-height: var(--line-height-compact);
+}
+
+:host ::ng-deep > [cardMeta] {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  margin: var(--space-0);
+  color: var(--text-secondary);
+  font-size: var(--font-size-11);
+}

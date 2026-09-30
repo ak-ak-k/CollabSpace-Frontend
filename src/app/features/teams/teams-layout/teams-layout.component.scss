@@ -1,0 +1,22 @@
+:host {
+  display: block;
+  height: 100%;
+  min-width: 0;
+}
+
+.teams {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  background: var(--background);
+}
+
+.teams__main {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+}

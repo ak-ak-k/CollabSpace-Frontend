@@ -1,0 +1,62 @@
+<div class="page">
+  <header class="page__header">
+    <div class="page__heading">
+      <a class="page__back" routerLink="/home">
+        <app-icon name="arrow-left" [size]="16" />
+        Back to the app
+      </a>
+      <h1 class="page__title">Styleguide</h1>
+      <p class="page__summary">Development only. Every shared component, in both themes.</p>
+    </div>
+
+    <div class="page__controls">
+      <p class="breakpoint" aria-label="Current breakpoint">
+        <app-icon name="monitor" [size]="16" />
+        <span class="breakpoint__name breakpoint__name--mobile">Mobile · below 768</span>
+        <span class="breakpoint__name breakpoint__name--tablet">Tablet · 768 to 1199</span>
+        <span class="breakpoint__name breakpoint__name--desktop">Desktop · 1200 and up</span>
+      </p>
+
+      <div class="preference" role="group" aria-label="App theme">
+        @for (option of preferences; track option.value) {
+          <button
+            type="button"
+            class="preference__option"
+            [class.preference__option--active]="theme.preference() === option.value"
+            [attr.aria-pressed]="theme.preference() === option.value"
+            (click)="theme.setPreference(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+    </div>
+  </header>
+
+  <app-tabs label="Styleguide sections" gap="lg" [tabs]="sections" [(active)]="section" />
+
+  <div class="panels">
+    @for (panel of panels; track panel) {
+      <section class="panel" [attr.data-theme]="panel" [attr.aria-label]="panel + ' theme'">
+        <h2 class="panel__title">{{ panel }}</h2>
+        @switch (section()) {
+          @case ('primitives') {
+            <app-styleguide-primitives-section />
+          }
+          @case ('forms') {
+            <app-styleguide-forms-section />
+          }
+          @case ('display') {
+            <app-styleguide-display-section />
+          }
+          @case ('overlays') {
+            <app-styleguide-overlays-section />
+          }
+          @default {
+            <app-styleguide-foundations />
+          }
+        }
+      </section>
+    }
+  </div>
+</div>

@@ -1,0 +1,12 @@
+<div
+  class="viewport"
+  role="region"
+  tabindex="0"
+  [attr.aria-label]="label()"
+  appScrollEdges
+  #edges="appScrollEdges"
+>
+  <div class="content"><ng-content /></div>
+</div>
+<span class="fade fade--start" [class.fade--visible]="edges.hiddenAtStart()"></span>
+<span class="fade fade--end" [class.fade--visible]="edges.hiddenAtEnd()"></span>

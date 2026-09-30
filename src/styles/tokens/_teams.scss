@@ -1,0 +1,21 @@
+@mixin teams-tokens {
+  --teams-directory-max-width: 1320px;
+  --team-detail-max-width: 1200px;
+  --teams-page-padding: clamp(16px, 3vw, 40px);
+  --team-card-min-width: 300px;
+  --team-card-description-min-height: 42px;
+  --teams-search-basis: 220px;
+  --teams-header-text-basis: 280px;
+  --team-detail-text-basis: 320px;
+  --team-overview-main-basis: 420px;
+  --team-overview-aside-basis: 260px;
+  --team-members-search-basis: 240px;
+  --team-members-search-max-width: 360px;
+  --team-channel-text-basis: 240px;
+  --team-stat-value-size: var(--font-size-32);
+  --teams-sidebar-team-height: 40px;
+  --teams-sidebar-channel-height: 34px;
+  --teams-sidebar-dm-height: 38px;
+  --teams-sidebar-channel-indent: calc(var(--space-4) + var(--size-avatar-36));
+  --create-team-privacy-max-width: 320px;
+}

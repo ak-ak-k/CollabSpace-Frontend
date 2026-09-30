@@ -1,0 +1,37 @@
+@use '../input/field/field';
+
+:host {
+  @include field.body;
+
+  min-width: 0;
+}
+
+.search__icon {
+  @include field.leading-icon;
+}
+
+.search__control {
+  @include field.control;
+}
+
+.search__control--native {
+  padding-left: var(--field-icon-reserve);
+  appearance: none;
+
+  &::-webkit-search-cancel-button,
+  &::-webkit-search-decoration {
+    appearance: none;
+  }
+}
+
+.search__control--large {
+  @include field.control-large;
+}
+
+.search__control--clearable {
+  padding-right: var(--field-action-reserve);
+}
+
+.search__clear {
+  @include field.action;
+}

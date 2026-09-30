@@ -1,0 +1,24 @@
+<button
+  #control
+  type="button"
+  role="switch"
+  class="toggle"
+  [class.toggle--label-end]="labelPosition() === 'end'"
+  [disabled]="disabled()"
+  [attr.name]="name() || null"
+  [attr.aria-checked]="checked()"
+  [attr.aria-labelledby]="labelId"
+  [attr.aria-describedby]="description() ? descriptionId : null"
+  (click)="toggle()"
+  (blur)="touch.emit()"
+>
+  <span class="toggle__text" [class.visually-hidden]="hideLabel()">
+    <span class="toggle__label" [attr.id]="labelId">{{ label() }}</span>
+    @if (description()) {
+      <span class="toggle__description" [attr.id]="descriptionId">{{ description() }}</span>
+    }
+  </span>
+  <span class="toggle__track" [class.toggle__track--on]="checked()" aria-hidden="true">
+    <span class="toggle__knob"></span>
+  </span>
+</button>

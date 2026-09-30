@@ -1,0 +1,54 @@
+@use 'breakpoints';
+
+@mixin touch-grid {
+  --emoji-button-size: var(--size-emoji-button-touch);
+
+  grid-template-columns: repeat(
+    var(--emoji-grid-columns-touch),
+    minmax(var(--space-0), var(--emoji-button-size))
+  );
+}
+
+:host {
+  --emoji-button-size: var(--size-emoji-button);
+
+  display: grid;
+  grid-template-columns: repeat(
+    var(--emoji-grid-columns),
+    minmax(var(--space-0), var(--emoji-button-size))
+  );
+  gap: var(--emoji-grid-gap);
+  padding: var(--space-2);
+  border: var(--rule-hairline);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+
+  @include breakpoints.tablet-and-down {
+    @include touch-grid;
+  }
+
+  @include breakpoints.touch-device {
+    @include touch-grid;
+  }
+}
+
+.emoji-picker__emoji {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: var(--emoji-button-size);
+  padding: var(--space-0);
+  border: var(--space-0);
+  background: transparent;
+  font-size: var(--font-size-18);
+  line-height: var(--line-height-flat);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover);
+  }
+
+  &:active {
+    background: var(--press);
+  }
+}

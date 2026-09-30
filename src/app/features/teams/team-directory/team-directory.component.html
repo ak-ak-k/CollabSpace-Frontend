@@ -1,0 +1,85 @@
+<div class="directory">
+  <header class="directory__header">
+    <div class="directory__heading">
+      <h1 class="directory__title">Teams</h1>
+      <p class="directory__subtitle">{{ subtitle() }}</p>
+    </div>
+    <div class="directory__tools">
+      <app-search-input
+        class="directory__search"
+        label="Search teams"
+        placeholder="Search teams"
+        [(value)]="query"
+      />
+      @if (!isMobile()) {
+        <app-radio-group
+          class="directory__layout"
+          label="Layout"
+          hideLabel
+          iconOnly
+          [options]="layoutOptions"
+          [(value)]="layout"
+        />
+      }
+      <button appButton type="button" variant="primary" (click)="actions.createTeam()">
+        <app-icon name="plus" [size]="16" />
+        Create team
+      </button>
+    </div>
+  </header>
+
+  <app-tabs
+    label="Team filter"
+    gap="lg"
+    [tabs]="tabs()"
+    [active]="filter()"
+    (activeChange)="selectFilter($event)"
+  />
+
+  @switch (status()) {
+    @case ('loading') {
+      <app-skeleton layout="cards" [rows]="6" label="Loading teams" />
+    }
+    @case ('error') {
+      <app-empty-state
+        kind="error"
+        heading="Couldn’t load teams"
+        actionLabel="Try again"
+        (action)="reload()"
+      />
+    }
+    @case ('empty') {
+      <app-empty-state
+        icon="users"
+        heading="No teams yet"
+        message="Teams group people, channels and files around a shared goal."
+        actionLabel="Create team"
+        (action)="actions.createTeam()"
+      />
+    }
+    @default {
+      @if (teams().length === 0) {
+        <app-empty-state icon="users" [heading]="noMatch().heading" [message]="noMatch().message" />
+      } @else if (showsTable()) {
+        <app-team-table
+          [teams]="teams()"
+          (manage)="actions.manage($event)"
+          (invite)="actions.invite($event)"
+        />
+      } @else {
+        <ul class="directory__grid">
+          @for (team of teams(); track team.id) {
+            <li class="directory__cell">
+              <app-team-card
+                [team]="team"
+                (join)="join(team.id)"
+                (manage)="actions.manage(team.id)"
+                (invite)="actions.invite(team.id)"
+              />
+            </li>
+          }
+        </ul>
+      }
+    }
+  }
+</div>

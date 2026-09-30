@@ -1,0 +1,23 @@
+<form class="new-group" [formRoot]="groupForm">
+  <app-modal
+    heading="New group chat"
+    description="Start one conversation with several people at once."
+    size="md"
+  >
+    <app-input
+      label="Group name"
+      placeholder="e.g. Launch crew"
+      [maxlength]="nameMaxLength"
+      [formField]="groupForm.name"
+    />
+    <app-member-picker [people]="people()" [formField]="groupForm.memberIds" />
+
+    <ng-container modalActions>
+      <button appButton type="button" (click)="cancel()">Cancel</button>
+      <button appButton type="submit" variant="primary" [busy]="groupForm().submitting()">
+        <app-icon name="users" [size]="16" />
+        Create group
+      </button>
+    </ng-container>
+  </app-modal>
+</form>

@@ -1,0 +1,91 @@
+<nav class="rail" aria-label="Primary">
+  <div class="rail__top">
+    <a class="rail__brand" routerLink="/home" aria-label="CollabSpace home">
+      <app-brand-mark />
+    </a>
+    <button
+      type="button"
+      class="rail__workspace"
+      [attr.aria-label]="workspaceLabel()"
+      [attr.title]="currentWorkspace()?.name"
+      [cdkMenuTriggerFor]="workspaceMenu"
+      [cdkMenuPosition]="workspaceMenuPositions"
+    >
+      {{ currentWorkspace()?.code }}
+    </button>
+  </div>
+
+  <div class="rail__divider"></div>
+
+  <ul class="rail__items">
+    @for (item of items; track item.id) {
+      <li>
+        <a
+          class="rail__item"
+          [routerLink]="item.route"
+          routerLinkActive="rail__item--active"
+          ariaCurrentWhenActive="page"
+          [attr.aria-label]="badges.labelFor(item)"
+          [attr.title]="item.label"
+        >
+          <app-icon [name]="item.icon" [size]="20" />
+          <span class="rail__label">{{ item.label }}</span>
+          <app-badge class="rail__badge" size="sm" [count]="badges.countFor(item)" />
+        </a>
+      </li>
+    }
+    <li>
+      <button
+        type="button"
+        class="rail__item"
+        aria-label="Search (Ctrl+K)"
+        title="Search"
+        (click)="searchRequested.emit()"
+      >
+        <app-icon name="search" [size]="20" />
+        <span class="rail__label">Search</span>
+      </button>
+    </li>
+  </ul>
+
+  <div class="rail__bottom">
+    <button
+      type="button"
+      class="rail__control"
+      [attr.aria-label]="themeLabel()"
+      [attr.title]="themeLabel()"
+      (click)="theme.toggle()"
+    >
+      <app-icon [name]="theme.isDark() ? 'sun' : 'moon'" [size]="20" />
+    </button>
+    <a
+      class="rail__control"
+      [routerLink]="settingsRoute"
+      [class.rail__control--active]="route.inSettings()"
+      [attr.aria-current]="route.inSettings() ? 'page' : null"
+      aria-label="Settings"
+      title="Settings"
+    >
+      <app-icon name="settings" [size]="20" />
+    </a>
+    @if (me(); as user) {
+      <button
+        type="button"
+        class="rail__account"
+        [attr.aria-label]="accountLabel()"
+        [cdkMenuTriggerFor]="userMenu"
+        [cdkMenuPosition]="userMenuPositions"
+      >
+        <app-avatar [name]="user.name" [seed]="mySeed()" [size]="44" [status]="user.status" />
+      </button>
+    }
+  </div>
+</nav>
+
+<ng-template #workspaceMenu>
+  <app-workspace-menu />
+</ng-template>
+
+<ng-template #userMenu>
+  <app-user-menu />
+</ng-template>

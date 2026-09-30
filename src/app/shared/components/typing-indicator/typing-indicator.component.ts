@@ -1,0 +1,10 @@
+import { Component, input } from '@angular/core';
+
+@Component({
+  selector: 'app-typing-indicator',
+  templateUrl: './typing-indicator.component.html',
+  styleUrl: './typing-indicator.component.scss',
+})
+export class TypingIndicatorComponent {
+  readonly text = input('');
+}

@@ -1,0 +1,10 @@
+<h2 class="section-header__heading" [id]="headingId()">{{ heading() }}</h2>
+@if (link()) {
+  <a class="section-header__link" [routerLink]="link()">
+    {{ linkLabel() }}
+    <span class="visually-hidden">: {{ heading() }}</span>
+  </a>
+}
+@if (caption()) {
+  <span class="section-header__caption">{{ caption() }}</span>
+}

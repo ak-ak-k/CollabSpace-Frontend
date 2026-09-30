@@ -1,0 +1,71 @@
+<app-secondary-sidebar label="Teams and channels">
+  <div class="sidebar">
+    <a class="sidebar__all" routerLink="/teams">
+      <app-icon name="layout-grid" [size]="16" />
+      All teams
+    </a>
+    <p class="sidebar__label" id="teams-sidebar-teams">Your teams</p>
+    <ul aria-labelledby="teams-sidebar-teams">
+      @for (team of teams(); track team.id) {
+        <li>
+          <a
+            class="sidebar__team"
+            [class.sidebar__row--current]="team.open && !channelId()"
+            [class.sidebar__team--open]="team.open"
+            [routerLink]="['/teams', team.id]"
+            [attr.aria-current]="team.open && !channelId() ? 'page' : null"
+          >
+            <app-avatar variant="inverted" [name]="team.name" [text]="team.code" [size]="24" />
+            <span class="sidebar__team-name">{{ team.name }}</span>
+            <app-icon
+              class="sidebar__chevron"
+              [name]="team.open ? 'chevron-down' : 'chevron-right'"
+              [size]="14"
+            />
+          </a>
+          @if (team.open) {
+            <ul class="sidebar__channels" [attr.aria-label]="team.name + ' channels'">
+              @for (channel of team.channels; track channel.id) {
+                <li>
+                  <a
+                    class="sidebar__channel"
+                    [class.sidebar__row--current]="channel.current"
+                    [class.sidebar__channel--active]="channel.current || channel.unreadCount > 0"
+                    [routerLink]="['/teams', team.id, 'c', channel.id]"
+                    [attr.aria-current]="channel.current ? 'page' : null"
+                  >
+                    <app-icon [name]="channel.icon" [size]="14" />
+                    <span class="sidebar__text truncate">{{ channel.name }}</span>
+                    <app-badge size="sm" [count]="channel.unreadCount" />
+                  </a>
+                </li>
+              }
+            </ul>
+          }
+        </li>
+      }
+    </ul>
+    <hr class="sidebar__divider" />
+    <p class="sidebar__label" id="teams-sidebar-dms">Direct messages</p>
+    <ul aria-labelledby="teams-sidebar-dms">
+      @for (conversation of directMessages(); track conversation.id) {
+        <li>
+          <a
+            class="sidebar__dm"
+            [class.sidebar__dm--unread]="conversation.unreadCount > 0"
+            [routerLink]="['/messages', conversation.id]"
+          >
+            <app-avatar
+              [name]="conversation.avatarName"
+              [seed]="conversation.avatarSeed"
+              [status]="conversation.avatarStatus"
+              [size]="24"
+            />
+            <span class="sidebar__text truncate">{{ conversation.title }}</span>
+            <app-badge size="sm" [count]="conversation.unreadCount" />
+          </a>
+        </li>
+      }
+    </ul>
+  </div>
+</app-secondary-sidebar>

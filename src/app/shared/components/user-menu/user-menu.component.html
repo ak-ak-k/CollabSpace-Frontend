@@ -1,0 +1,78 @@
+<app-dropdown label="Account" width="md">
+  @if (me(); as user) {
+    <div class="user-menu__identity">
+      <app-avatar [name]="user.name" [seed]="mySeed()" [size]="40" />
+      <span class="user-menu__text">
+        <span class="user-menu__name">{{ user.name }}</span>
+        <span class="user-menu__email truncate">{{ user.email }}</span>
+      </span>
+    </div>
+    <app-dropdown-divider />
+
+    <app-dropdown-heading>Status</app-dropdown-heading>
+    @for (option of statusOptions; track option.status) {
+      <button
+        appDropdownItem
+        type="button"
+        [selected]="user.status === option.status"
+        (triggered)="setStatus(option)"
+      >
+        <span class="user-menu__status">
+          <app-status-dot [status]="option.status" size="sm" />
+          {{ option.label }}
+        </span>
+      </button>
+    }
+    <app-dropdown-divider />
+  }
+
+  <a appDropdownItem routerLink="/profile">
+    <app-icon name="user" [size]="18" />
+    View profile
+  </a>
+  <a appDropdownItem routerLink="/settings/account">
+    <app-icon name="settings" [size]="18" />
+    Settings
+  </a>
+  <button
+    appDropdownItem
+    type="button"
+    selection="checkbox"
+    [selected]="theme.isDark()"
+    (triggered)="theme.toggle()"
+  >
+    <app-icon name="moon" [size]="18" />
+    Dark mode
+  </button>
+  <button
+    appDropdownItem
+    type="button"
+    selection="checkbox"
+    [selected]="network.simulatedOffline()"
+    (triggered)="network.toggleSimulatedOffline()"
+  >
+    <app-icon name="wifi-off" [size]="18" />
+    Simulate offline
+  </button>
+
+  @if (dataMode.available) {
+    <app-dropdown-divider />
+    <app-dropdown-heading>Data state · dev only</app-dropdown-heading>
+    @for (option of dataModeOptions; track option.mode) {
+      <button
+        appDropdownItem
+        type="button"
+        [selected]="dataMode.mode() === option.mode"
+        (triggered)="dataMode.setMode(option.mode)"
+      >
+        {{ option.label }}
+      </button>
+    }
+  }
+
+  <app-dropdown-divider />
+  <button appDropdownItem type="button" (triggered)="signOut()">
+    <app-icon name="log-out" [size]="18" />
+    Sign out
+  </button>
+</app-dropdown>

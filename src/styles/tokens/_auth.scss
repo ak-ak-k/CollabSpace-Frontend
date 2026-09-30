@@ -1,0 +1,16 @@
+@mixin auth-tokens {
+  --auth-form-max-width: 420px;
+  --auth-form-gap: var(--space-4);
+  --auth-main-padding-inline: clamp(var(--space-6), 6vw, 96px);
+
+  --auth-poster-width-tablet: 38%;
+  --auth-poster-width-desktop: 44%;
+  --auth-poster-padding: clamp(var(--space-6), 4vw, var(--space-14));
+  --auth-poster-rule-strength: 40%;
+  --auth-headline-size-tablet: clamp(var(--font-size-28), 4vw, var(--font-size-42));
+  --auth-wordmark-letter-spacing: -0.01em;
+  --auth-point-number-width: var(--space-12);
+
+  --size-auth-provider-tile: var(--space-5);
+  --size-auth-panel-tile: var(--size-control-lg);
+}

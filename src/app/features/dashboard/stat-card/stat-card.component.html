@@ -1,0 +1,27 @@
+@let item = stat();
+
+<a
+  class="stat-card"
+  [routerLink]="item.link"
+  [attr.aria-busy]="availability() === 'loading' ? 'true' : null"
+>
+  <span class="stat-card__label">
+    <app-icon [name]="item.icon" [size]="14" />
+    {{ item.label }}
+  </span>
+  @switch (availability()) {
+    @case ('loading') {
+      <span class="stat-card__skeleton stat-card__skeleton--value"></span>
+      <span class="stat-card__skeleton stat-card__skeleton--caption"></span>
+      <span class="visually-hidden">Loading</span>
+    }
+    @case ('unavailable') {
+      <span class="stat-card__value" aria-hidden="true">—</span>
+      <span class="stat-card__caption">Couldn’t load</span>
+    }
+    @default {
+      <span class="stat-card__value">{{ item.value }}</span>
+      <span class="stat-card__caption">{{ item.caption }}</span>
+    }
+  }
+</a>

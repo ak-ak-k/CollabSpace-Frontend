@@ -1,0 +1,28 @@
+:host {
+  --badge-size: var(--size-badge-sm);
+  --badge-padding: var(--space-1);
+
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  min-width: var(--badge-size);
+  height: var(--badge-size);
+  padding: var(--space-0) var(--badge-padding);
+  background: var(--background);
+  color: var(--text-primary);
+  box-shadow:
+    inset 0 0 0 var(--border-width-hairline) var(--text-primary),
+    0 0 0 var(--badge-ring-width, var(--space-0)) var(--badge-ring, transparent);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-heavy);
+  line-height: var(--line-height-flat);
+}
+
+:host(.badge--md) {
+  --badge-size: var(--size-badge-md);
+  --badge-padding: var(--space-1-5);
+}
+
+:host(.badge--hidden) {
+  display: none;
+}

@@ -1,0 +1,96 @@
+@use 'breakpoints';
+
+@mixin touch-height {
+  min-height: max(var(--button-height), var(--size-touch-target));
+}
+
+:host {
+  --button-height: var(--size-control-md);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1-5);
+  min-height: var(--button-height);
+  padding: var(--space-2) var(--button-padding-inline);
+  border: var(--border-width-hairline) solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-heavy);
+  line-height: var(--line-height-compact);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+
+  @include breakpoints.tablet-and-down {
+    @include touch-height;
+  }
+
+  @include breakpoints.touch-device {
+    @include touch-height;
+  }
+}
+
+:host(.button--sm) {
+  --button-height: var(--size-control-sm);
+}
+
+:host(.button--lg) {
+  --button-height: var(--size-control-lg);
+}
+
+:host(.button--xl) {
+  --button-height: var(--size-control-xl);
+
+  font-size: var(--font-size-15);
+}
+
+:host(:disabled),
+:host([aria-disabled='true']) {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+:host(.button--busy) {
+  pointer-events: none;
+}
+
+:host(.button--primary) {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+:host(.button--primary:hover:not(:disabled)) {
+  background: var(--primary-hover);
+}
+
+:host(.button--primary:active:not(:disabled)) {
+  background: var(--primary-active);
+}
+
+:host(.button--secondary) {
+  border-color: var(--border-control);
+}
+
+:host(.button--secondary:hover:not(:disabled)),
+:host(.button--ghost:hover:not(:disabled)) {
+  background: var(--hover);
+}
+
+:host(.button--secondary:active:not(:disabled)),
+:host(.button--ghost:active:not(:disabled)) {
+  background: var(--press);
+}
+
+:host(.button--ghost) {
+  padding-inline: var(--space-1);
+}
+
+:host(.button--block) {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+}

@@ -1,0 +1,44 @@
+@switch (status()) {
+  @case ('loading') {
+    <app-skeleton layout="list" [rows]="4" compact label="Loading files" />
+  }
+  @case ('error') {
+    <app-empty-state
+      kind="error"
+      heading="Couldn’t load files"
+      actionLabel="Try again"
+      (action)="retry.emit()"
+    />
+  }
+  @default {
+    @if (files().length === 0) {
+      <app-empty-state
+        icon="folder-open"
+        heading="No shared files"
+        message="Files shared in this team’s channels will appear here."
+      />
+    } @else {
+      <ul class="files">
+        @for (file of files(); track file.id) {
+          <li class="file">
+            <span class="file__tile" aria-hidden="true"
+              ><app-icon [name]="file.icon" [size]="18"
+            /></span>
+            <span class="file__text">
+              <strong class="file__name truncate">{{ file.name }}</strong>
+              <span class="file__meta">{{ file.meta }}</span>
+            </span>
+            <button
+              appIconButton
+              type="button"
+              [label]="'Download ' + file.name"
+              (click)="download.emit(file.name)"
+            >
+              <app-icon name="download" [size]="16" />
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  }
+}

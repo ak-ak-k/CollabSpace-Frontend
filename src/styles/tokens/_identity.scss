@@ -1,0 +1,37 @@
+@mixin shared-identity {
+  --avatar-tone-1-background: var(--color-neutral-300);
+  --avatar-tone-1-foreground: var(--color-neutral-900);
+  --avatar-tone-2-background: var(--color-neutral-800);
+  --avatar-tone-2-foreground: var(--color-neutral-100);
+  --avatar-tone-5-background: var(--color-neutral-200);
+  --avatar-tone-5-foreground: var(--color-neutral-800);
+  --avatar-tone-6-background: var(--color-neutral-700);
+  --avatar-tone-6-foreground: var(--color-neutral-100);
+  --avatar-inverted-background: var(--color-text);
+  --avatar-inverted-foreground: var(--color-bg);
+
+  --status-online: var(--success);
+  --status-away: var(--warning);
+  --status-dnd: var(--color-neutral-800);
+  --status-offline: var(--color-neutral-600);
+
+  --delivery-read: var(--color-accent-700);
+
+  --spinner-track: color-mix(in srgb, currentColor 45%, transparent);
+}
+
+@mixin light-identity {
+  @include shared-identity;
+  --avatar-tone-3-background: var(--color-neutral-400);
+  --avatar-tone-3-foreground: var(--color-neutral-900);
+  --avatar-tone-4-background: var(--color-neutral-500);
+  --avatar-tone-4-foreground: var(--color-neutral-900);
+}
+
+@mixin dark-identity {
+  @include shared-identity;
+  --avatar-tone-3-background: var(--color-neutral-600);
+  --avatar-tone-3-foreground: var(--color-neutral-100);
+  --avatar-tone-4-background: var(--color-neutral-500);
+  --avatar-tone-4-foreground: var(--color-neutral-100);
+}

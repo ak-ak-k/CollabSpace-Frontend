@@ -1,0 +1,51 @@
+<app-table label="Teams" minWidth="md">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Team</th>
+        <th scope="col">Members</th>
+        <th scope="col">Channels</th>
+        <th scope="col">Activity</th>
+        <th scope="col"><span class="visually-hidden">Actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (team of teams(); track team.id) {
+        <tr>
+          <td class="table__team">
+            <a class="table__link" [routerLink]="['/teams', team.id]">
+              <app-avatar variant="inverted" [name]="team.name" [text]="team.code" [size]="36" />
+              <span class="table__text">
+                <strong class="table__name">{{ team.name }}</strong>
+                <span class="table__description">{{ team.description }}</span>
+              </span>
+            </a>
+          </td>
+          <td>{{ team.memberCount }}</td>
+          <td>{{ team.channelCount }}</td>
+          <td>
+            <app-tag>{{ team.activityLevel }}</app-tag>
+          </td>
+          <td class="table__actions">
+            <button
+              appIconButton
+              type="button"
+              [label]="'Manage ' + team.name"
+              (click)="manage.emit(team.id)"
+            >
+              <app-icon name="settings" [size]="16" />
+            </button>
+            <button
+              appIconButton
+              type="button"
+              [label]="'Invite people to ' + team.name"
+              (click)="invite.emit(team.id)"
+            >
+              <app-icon name="user-plus" [size]="16" />
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</app-table>

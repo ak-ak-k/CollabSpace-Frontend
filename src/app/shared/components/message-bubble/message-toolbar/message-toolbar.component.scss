@@ -1,0 +1,48 @@
+:host {
+  display: contents;
+}
+
+.toolbar {
+  position: absolute;
+  top: var(--message-toolbar-offset);
+  right: var(--space-3);
+  z-index: var(--z-message-toolbar);
+  display: flex;
+  border: var(--rule-hairline);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.toolbar__delete {
+  color: var(--danger);
+}
+
+.picker {
+  position: absolute;
+  top: var(--message-picker-offset);
+  right: var(--space-3);
+  z-index: var(--z-message-picker);
+  display: flex;
+  gap: var(--space-0-5);
+  padding: var(--space-1);
+  border: var(--rule-hairline);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.picker__emoji {
+  display: grid;
+  place-items: center;
+  width: var(--size-message-picker-button);
+  height: var(--size-message-picker-button);
+  padding: var(--space-0);
+  border: none;
+  background: transparent;
+  font-size: var(--message-picker-emoji-size);
+  line-height: var(--line-height-flat);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover);
+  }
+}

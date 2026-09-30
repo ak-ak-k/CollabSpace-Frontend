@@ -1,0 +1,112 @@
+@use 'breakpoints';
+
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--background);
+}
+
+.auth {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+
+  @include breakpoints.tablet-and-up {
+    flex-direction: row;
+  }
+}
+
+.auth__poster {
+  --auth-poster-rule: var(--border-width-rule) solid
+    color-mix(in srgb, var(--rail-foreground) var(--auth-poster-rule-strength), transparent);
+
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-6);
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--rail-background);
+  color: var(--rail-foreground);
+
+  @include breakpoints.tablet-and-up {
+    flex-basis: var(--auth-poster-width-tablet);
+    padding: var(--auth-poster-padding);
+  }
+
+  @include breakpoints.desktop {
+    flex-basis: var(--auth-poster-width-desktop);
+  }
+}
+
+.auth__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.auth__wordmark {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-20);
+  font-weight: var(--font-weight-heavy);
+  letter-spacing: var(--auth-wordmark-letter-spacing);
+}
+
+.auth__poster-body {
+  display: none;
+
+  @include breakpoints.tablet-and-up {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+}
+
+.auth__headline {
+  margin: var(--space-0);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-display-xl);
+  font-weight: var(--font-weight-heavy);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
+  text-wrap: balance;
+
+  @include breakpoints.tablet {
+    font-size: var(--auth-headline-size-tablet);
+    overflow-wrap: break-word;
+  }
+}
+
+.auth__points {
+  border-top: var(--auth-poster-rule);
+}
+
+.auth__point {
+  display: grid;
+  grid-template-columns: var(--auth-point-number-width) minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-0);
+  border-bottom: var(--auth-poster-rule);
+  font-size: var(--font-size-20);
+  font-weight: var(--font-weight-heavy);
+  line-height: var(--line-height-snug);
+}
+
+.auth__point-number {
+  color: var(--rail-muted);
+}
+
+.auth__main {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  min-width: 0;
+  padding: var(--space-6) var(--space-4) var(--space-8);
+
+  @include breakpoints.tablet-and-up {
+    align-items: center;
+    padding: var(--space-8) var(--auth-main-padding-inline);
+  }
+}

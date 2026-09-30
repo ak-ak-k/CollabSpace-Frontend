@@ -1,0 +1,58 @@
+:host {
+  display: block;
+}
+
+.directory {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: var(--teams-directory-max-width);
+  padding: var(--teams-page-padding);
+}
+
+.directory__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+.directory__heading {
+  display: flex;
+  flex: 1 1 var(--teams-header-text-basis);
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.directory__title {
+  margin: var(--space-0);
+  font-size: var(--font-size-display-sm);
+}
+
+.directory__subtitle {
+  margin: var(--space-0);
+  color: var(--text-muted);
+  font-size: var(--font-size-15);
+}
+
+.directory__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.directory__search {
+  flex: 1 1 var(--teams-search-basis);
+}
+
+.directory__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--team-card-min-width)), 1fr));
+  gap: var(--space-4);
+}
+
+.directory__cell {
+  display: flex;
+  min-width: 0;
+}

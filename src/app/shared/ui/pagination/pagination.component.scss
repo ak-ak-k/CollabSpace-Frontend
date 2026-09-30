@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+}
+
+.pagination__summary {
+  flex: 1;
+  margin: var(--space-0);
+  color: var(--text-secondary);
+  font-size: var(--font-size-13);
+  font-variant-numeric: tabular-nums;
+}
+
+.pagination__controls {
+  display: flex;
+  gap: var(--space-1);
+}

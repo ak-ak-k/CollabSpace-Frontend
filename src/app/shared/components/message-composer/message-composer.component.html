@@ -1,0 +1,160 @@
+<form class="message-composer" (submit)="onSubmit($event)">
+  <label class="visually-hidden" [for]="inputId">Message {{ conversationTitle() }}</label>
+
+  @if (replyTo(); as reply) {
+    <app-reply-banner [reply]="reply" (cancel)="cancelReply.emit()" />
+  }
+
+  @if (attachments().length > 0) {
+    <app-attachment-chips [attachments]="attachments()" (remove)="removeAttachment($event)" />
+  }
+
+  <div class="message-composer__box">
+    @if (isMobile()) {
+      <button
+        appIconButton
+        type="button"
+        size="md"
+        label="More options"
+        [attr.aria-expanded]="extrasOpen()"
+        (click)="toggleExtras()"
+      >
+        <app-icon name="plus" [size]="20" />
+      </button>
+    } @else {
+      <button
+        appIconButton
+        type="button"
+        size="md"
+        label="Attach a file"
+        (click)="openFilePicker()"
+      >
+        <app-icon name="paperclip" [size]="20" />
+      </button>
+    }
+
+    <textarea
+      #textarea
+      appTextareaAutoGrow
+      class="message-composer__input"
+      rows="1"
+      role="combobox"
+      aria-autocomplete="list"
+      [id]="inputId"
+      [placeholder]="placeholderText()"
+      [value]="draft()"
+      [attr.aria-expanded]="mention.open()"
+      [attr.aria-controls]="mention.open() ? listId : null"
+      [attr.aria-activedescendant]="mention.open() ? activeOptionId() : null"
+      (input)="onInput()"
+      (keydown)="onKeydown($event)"
+      (keyup)="syncCaret()"
+      (click)="syncCaret()"
+      (select)="syncCaret()"
+      (focus)="syncCaret()"
+    ></textarea>
+
+    @if (!isMobile()) {
+      <button
+        appIconButton
+        type="button"
+        size="md"
+        label="Insert emoji"
+        [attr.aria-expanded]="emojiOpen()"
+        (click)="toggleEmoji()"
+      >
+        <app-icon name="smile" [size]="20" />
+      </button>
+      <button
+        appIconButton
+        type="button"
+        size="md"
+        label="Mention someone"
+        (click)="startMention()"
+      >
+        <app-icon name="at-sign" [size]="20" />
+      </button>
+    }
+
+    <button
+      appButton
+      type="submit"
+      variant="primary"
+      class="message-composer__send"
+      aria-label="Send message"
+      title="Send"
+      [disabled]="!canSend()"
+    >
+      <app-icon name="send-horizontal" [size]="18" />
+    </button>
+  </div>
+
+  @if (extrasOpen()) {
+    <div class="message-composer__extras">
+      <button appButton type="button" class="message-composer__extra" (click)="openFilePicker()">
+        <app-icon name="paperclip" [size]="18" />
+        File
+      </button>
+      <button
+        appButton
+        type="button"
+        class="message-composer__extra"
+        [attr.aria-expanded]="emojiOpen()"
+        (click)="toggleEmoji()"
+      >
+        <app-icon name="smile" [size]="18" />
+        Emoji
+      </button>
+      <button appButton type="button" class="message-composer__extra" (click)="startMention()">
+        <app-icon name="at-sign" [size]="18" />
+        Mention
+      </button>
+    </div>
+  }
+
+  @if (mention.open()) {
+    <app-mention-list
+      class="message-composer__mentions"
+      [listId]="listId"
+      [candidates]="mention.candidates()"
+      [activeIndex]="mention.activeIndex()"
+      (pick)="insertMention($event)"
+    />
+  }
+
+  @if (emojiOpen()) {
+    <app-emoji-picker
+      class="message-composer__emoji"
+      (pick)="insertEmoji($event)"
+      (keydown.escape)="closeEmoji()"
+    />
+  }
+
+  @if (showsHelper()) {
+    <div class="message-composer__helper">
+      @if (!isMobile()) {
+        @if (enterToSend()) {
+          <span><kbd>Enter</kbd> to send · <kbd>Shift + Enter</kbd> for a new line</span>
+        } @else {
+          <span><kbd>Enter</kbd> for a new line · <kbd>Ctrl + Enter</kbd> to send</span>
+        }
+      }
+      @if (offline()) {
+        <span class="message-composer__offline">
+          <app-icon name="cloud-off" [size]="12" />
+          Offline — messages will be queued
+        </span>
+      }
+    </div>
+  }
+
+  <input
+    #fileInput
+    class="message-composer__file"
+    type="file"
+    multiple
+    tabindex="-1"
+    aria-hidden="true"
+    (change)="onFilesChosen()"
+  />
+</form>

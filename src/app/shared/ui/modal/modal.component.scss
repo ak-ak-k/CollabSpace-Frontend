@@ -1,0 +1,63 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: var(--dialog-width, var(--dialog-width-md));
+  max-width: 100%;
+  padding: var(--space-6);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-primary);
+}
+
+:host(.modal--sm) {
+  width: var(--dialog-width-sm);
+}
+
+:host(.modal--md) {
+  width: var(--dialog-width-md);
+}
+
+:host(.modal--lg) {
+  width: var(--dialog-width-lg);
+}
+
+.modal__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.modal__heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.modal__title {
+  margin: var(--space-0);
+  font-size: var(--font-size-20);
+}
+
+.modal__description {
+  margin: var(--space-1) var(--space-0) var(--space-0);
+  font-size: var(--font-size-14);
+  color: var(--text-secondary);
+}
+
+.modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+
+  &:empty {
+    display: none;
+  }
+}

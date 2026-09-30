@@ -1,0 +1,7 @@
+@if (isNew()) {
+  <span class="date-separator__rule"></span>
+  <span class="date-separator__label">New</span>
+} @else {
+  <span class="date-separator__label">{{ label() }}</span>
+  <span class="date-separator__rule"></span>
+}

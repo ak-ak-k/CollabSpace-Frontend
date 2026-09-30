@@ -1,0 +1,11 @@
+:host {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.team-channel__state {
+  flex: 1;
+  padding: var(--space-4);
+}

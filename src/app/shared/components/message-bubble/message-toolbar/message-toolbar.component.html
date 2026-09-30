@@ -1,0 +1,45 @@
+<div class="toolbar" role="toolbar" aria-label="Message actions">
+  <button
+    #addButton
+    appIconButton
+    label="Add reaction"
+    [attr.aria-expanded]="pickerOpen()"
+    (click)="togglePicker()"
+  >
+    <app-icon name="smile-plus" [size]="iconSize" />
+  </button>
+  <button appIconButton label="Reply" (click)="reply.emit()">
+    <app-icon name="reply" [size]="iconSize" />
+  </button>
+  @if (hasText()) {
+    <button appIconButton label="Copy" (click)="copy.emit()">
+      <app-icon name="copy" [size]="iconSize" />
+    </button>
+  }
+  <button appIconButton [label]="pinned() ? 'Unpin' : 'Pin message'" (click)="pin.emit()">
+    <app-icon [name]="pinned() ? 'pin-off' : 'pin'" [size]="iconSize" />
+  </button>
+  @if (mine()) {
+    <button appIconButton label="Edit" (click)="edit.emit()">
+      <app-icon name="pencil" [size]="iconSize" />
+    </button>
+    <button appIconButton class="toolbar__delete" label="Delete" (click)="deleteRequested.emit()">
+      <app-icon name="trash-2" [size]="iconSize" />
+    </button>
+  }
+</div>
+
+@if (pickerOpen()) {
+  <div class="picker" role="group" aria-label="Pick a reaction" (keydown.escape)="closePicker()">
+    @for (emoji of quickEmoji; track emoji) {
+      <button
+        type="button"
+        class="picker__emoji"
+        [attr.aria-label]="'React with ' + emoji"
+        (click)="pick(emoji)"
+      >
+        {{ emoji }}
+      </button>
+    }
+  </div>
+}

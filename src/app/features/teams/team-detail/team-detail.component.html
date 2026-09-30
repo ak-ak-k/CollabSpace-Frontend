@@ -1,0 +1,79 @@
+@switch (status()) {
+  @case ('loading') {
+    <div class="detail"><app-skeleton layout="detail" label="Loading team" /></div>
+  }
+  @case ('error') {
+    <div class="detail">
+      <app-empty-state
+        kind="error"
+        heading="Couldn’t load this team"
+        actionLabel="Try again"
+        (action)="reload()"
+      />
+    </div>
+  }
+  @default {
+    @if (detail.team(); as team) {
+      <div class="detail">
+        <app-breadcrumb [items]="breadcrumb()" />
+        <app-team-header
+          [team]="team"
+          (invite)="actions.invite(team.id)"
+          (manage)="actions.manage(team.id)"
+          (join)="actions.join(team)"
+          (leave)="actions.leave(team)"
+        />
+        <app-tabs label="Team sections" gap="lg" size="lg" [tabs]="tabs()" [active]="activeTab()" />
+
+        @switch (activeTab()) {
+          @case ('members') {
+            <app-team-members
+              [members]="detail.members()"
+              [compact]="breakpoint.isMobile()"
+              (invite)="actions.invite(team.id)"
+              (message)="actions.message($event)"
+            />
+          }
+          @case ('channels') {
+            <app-team-channels
+              [channels]="detail.channels()"
+              (createChannel)="actions.createChannel()"
+            />
+          }
+          @case ('files') {
+            <app-team-files
+              [files]="detail.files()"
+              [status]="fileState.status()"
+              (download)="actions.download($event)"
+              (retry)="fileState.reload()"
+            />
+          }
+          @case ('activity') {
+            <app-team-activity [activity]="detail.activity()" />
+          }
+          @default {
+            <app-team-overview
+              [teamId]="team.id"
+              [channels]="detail.channels()"
+              [activity]="detail.activity()"
+              [stats]="detail.stats()"
+              [lead]="detail.lead()"
+              (message)="actions.message($event)"
+            />
+          }
+        }
+      </div>
+    } @else {
+      <div class="detail">
+        <app-empty-state
+          icon="users"
+          heading="Team not found"
+          message="This team may have been archived, or you don’t have access to it."
+          actionLabel="All teams"
+          actionIcon="arrow-left"
+          (action)="backToTeams()"
+        />
+      </div>
+    }
+  }
+}

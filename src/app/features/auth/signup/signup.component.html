@@ -1,0 +1,85 @@
+<form class="auth-form" aria-labelledby="auth-title" [formRoot]="signupForm">
+  <div class="auth-form__header">
+    <h1 class="auth-form__title" id="auth-title">Create your workspace</h1>
+    <p class="auth-form__subtitle">Set up CollabSpace for your team in under a minute.</p>
+  </div>
+
+  <app-input
+    label="Full name"
+    size="lg"
+    autocomplete="name"
+    placeholder="Aarav Shah"
+    [formField]="signupForm.fullName"
+  />
+  <app-input
+    label="Work email"
+    type="email"
+    size="lg"
+    inputmode="email"
+    autocomplete="email"
+    placeholder="you@company.com"
+    [formField]="signupForm.email"
+  />
+  <div class="auth-form__group">
+    <app-input
+      label="Password"
+      type="password"
+      size="lg"
+      revealable
+      autocomplete="new-password"
+      placeholder="At least 8 characters"
+      [formField]="signupForm.password"
+    />
+    <app-password-strength [password]="signupForm.password().value()" />
+  </div>
+  <app-input
+    label="Confirm password"
+    type="password"
+    size="lg"
+    autocomplete="new-password"
+    placeholder="Repeat the password"
+    [formField]="signupForm.confirmPassword"
+  />
+  <app-input
+    label="Workspace name"
+    size="lg"
+    autocomplete="organization"
+    placeholder="Northstar Labs"
+    [hint]="addressHint()"
+    [formField]="signupForm.workspaceName"
+  />
+  <app-checkbox [formField]="signupForm.acceptTerms">
+    I agree to the
+    <button type="button" class="legal-link" (click)="showLegalNotice()">Terms of Service</button>
+    and
+    <button type="button" class="legal-link" (click)="showLegalNotice()">Privacy Policy</button>
+  </app-checkbox>
+
+  <button
+    appButton
+    type="submit"
+    variant="primary"
+    size="xl"
+    block
+    [busy]="submitting()"
+    [disabled]="submitting()"
+  >
+    @if (submitting()) {
+      Creating workspace…
+    } @else {
+      Create workspace
+      <app-icon name="arrow-right" [size]="16" />
+    }
+  </button>
+
+  <p class="auth-form__switch">
+    Already have an account?
+    <a
+      class="auth-form__switch-link"
+      routerLink="/login"
+      [state]="{ email: signupForm.email().value() }"
+    >
+      Log in
+    </a>
+  </p>
+</form>

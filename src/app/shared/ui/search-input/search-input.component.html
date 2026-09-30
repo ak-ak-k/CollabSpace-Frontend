@@ -1,0 +1,21 @@
+<app-icon class="search__icon" name="search" [size]="16" />
+<input
+  #control
+  type="search"
+  class="search__control search__control--native"
+  [class.search__control--large]="size() === 'lg'"
+  [class.search__control--clearable]="clearVisible()"
+  [value]="value()"
+  [disabled]="disabled()"
+  [attr.name]="name() || null"
+  [attr.aria-label]="label()"
+  [attr.placeholder]="placeholder() || null"
+  autocomplete="off"
+  (input)="value.set(control.value)"
+  (blur)="touch.emit()"
+/>
+@if (clearVisible()) {
+  <button type="button" class="search__clear" aria-label="Clear search" (click)="clear()">
+    <app-icon name="x" [size]="16" />
+  </button>
+}

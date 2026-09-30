@@ -1,0 +1,39 @@
+@use 'breakpoints';
+
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.typing-indicator__dots {
+  display: inline-flex;
+  flex: none;
+  gap: var(--typing-dot-gap);
+}
+
+.typing-indicator__dot {
+  width: var(--size-typing-dot);
+  height: var(--size-typing-dot);
+  background: var(--color-neutral-500);
+  animation: typing-dot var(--duration-typing) ease-in-out infinite;
+
+  &:nth-child(2) {
+    animation-delay: var(--typing-dot-stagger);
+  }
+
+  &:nth-child(3) {
+    animation-delay: calc(var(--typing-dot-stagger) * 2);
+  }
+
+  @include breakpoints.reduced-motion {
+    animation: none;
+  }
+}
+
+.typing-indicator__text {
+  font-size: var(--font-size-12);
+  font-style: italic;
+  color: var(--text-secondary);
+}

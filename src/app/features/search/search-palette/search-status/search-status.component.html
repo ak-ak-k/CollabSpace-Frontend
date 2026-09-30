@@ -1,0 +1,32 @@
+@switch (status()) {
+  @case ('searching') {
+    <p class="status__searching">
+      <app-spinner class="status__spinner" />
+      <span>Searching for “{{ term() }}”…</span>
+    </p>
+  }
+  @case ('refreshing') {
+    <span class="visually-hidden">Searching</span>
+  }
+  @case ('results') {
+    <span class="visually-hidden">{{ resultCount() }}</span>
+  }
+  @case ('empty') {
+    <div class="status__block">
+      <span class="status__tile"><app-icon name="search" [size]="20" /></span>
+      <strong class="status__title">No results for “{{ term() }}”</strong>
+      <span class="status__hint">
+        Check the spelling, try fewer words, or search a different category.
+      </span>
+    </div>
+  }
+  @case ('failed') {
+    <div class="status__block">
+      <span class="status__tile"><app-icon name="triangle-alert" [size]="20" /></span>
+      <strong class="status__title">Couldn’t load results</strong>
+      <span class="status__hint">
+        We couldn’t load this right now. Check your connection and try again.
+      </span>
+    </div>
+  }
+}

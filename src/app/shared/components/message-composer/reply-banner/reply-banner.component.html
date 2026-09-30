@@ -1,0 +1,13 @@
+<app-icon name="reply" [size]="14" />
+<span class="reply-banner__text truncate">
+  Replying to <strong>{{ reply().authorFirstName }}</strong> — {{ reply().text }}
+</span>
+<button
+  appIconButton
+  type="button"
+  class="reply-banner__cancel"
+  label="Cancel reply"
+  (click)="cancel.emit()"
+>
+  <app-icon name="x" [size]="14" />
+</button>

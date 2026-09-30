@@ -1,0 +1,223 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+:host(.details--docked) {
+  flex: none;
+  width: var(--conversation-details-width);
+  height: 100%;
+  border-left: var(--rule-strong);
+  background: var(--background);
+}
+
+.details__header {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--conversation-header-height);
+  padding: var(--space-0) var(--space-2) var(--space-0) var(--space-4);
+  border-bottom: var(--rule-strong);
+}
+
+.details__title {
+  flex: 1;
+  margin: var(--space-0);
+  font-size: var(--font-size-17);
+}
+
+.details__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.details__identity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-bottom: var(--rule-strong);
+}
+
+.details__person {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  margin-top: var(--space-1);
+}
+
+.details__name {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-20);
+  font-weight: var(--font-weight-heavy);
+}
+
+.details__muted {
+  color: var(--text-muted);
+}
+
+.details__person .details__muted,
+.details__about {
+  font-size: var(--font-size-14);
+}
+
+.details__about {
+  margin: var(--space-0);
+  color: var(--text-muted);
+  text-wrap: pretty;
+}
+
+.details__facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1-5) var(--space-3);
+  width: 100%;
+  margin: var(--space-2) var(--space-0) var(--space-0);
+  font-size: var(--font-size-13);
+
+  dt {
+    color: var(--text-muted);
+  }
+
+  dd {
+    min-width: 0;
+    margin: var(--space-0);
+  }
+}
+
+.details__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+
+.details__email {
+  overflow-wrap: anywhere;
+
+  a {
+    color: var(--text-primary);
+  }
+}
+
+.details__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.details__section {
+  padding: var(--space-4);
+  border-bottom: var(--rule-strong);
+}
+
+.details__section--last {
+  border-bottom: var(--space-0);
+}
+
+.details__section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.details__section-title {
+  flex: 1;
+  margin: var(--space-0);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-heavy);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+}
+
+.details__section-title--spaced {
+  margin-bottom: var(--space-2);
+}
+
+.details__member,
+.details__file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1-5) var(--space-0);
+}
+
+.details__member-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.details__member-name {
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+}
+
+.details__line,
+.details__file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.details__line,
+.details__file-meta,
+.details__pinned-meta {
+  font-size: var(--font-size-12);
+}
+
+.details__pinned {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  width: 100%;
+  margin-bottom: var(--space-2);
+  padding: var(--space-2);
+  border: var(--space-0);
+  background: var(--surface);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-secondary);
+  }
+
+  strong {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-heavy);
+  }
+}
+
+.details__pinned-text {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: var(--font-size-13);
+  line-height: var(--line-height-input);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.details__file-tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--size-avatar-32);
+  height: var(--size-avatar-32);
+  background: var(--surface);
+}
+
+.details__file-name {
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semibold);
+}
+
+.details__empty {
+  margin: var(--space-0);
+  color: var(--text-muted);
+  font-size: var(--font-size-13);
+}

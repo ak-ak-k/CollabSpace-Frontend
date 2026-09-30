@@ -1,0 +1,60 @@
+@use '../auth-layout/auth-form';
+
+@include auth-form.styles;
+
+.session-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--danger-surface);
+  color: var(--on-danger-surface);
+  font-size: var(--font-size-14);
+}
+
+.session-alert__icon {
+  flex: none;
+  margin-top: var(--space-0-5);
+}
+
+.provider-tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--size-auth-provider-tile);
+  height: var(--size-auth-provider-tile);
+  background: var(--secondary);
+  color: var(--on-secondary);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-heavy);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: var(--border-width-hairline);
+    background: var(--border);
+  }
+}
+
+.forgot-link {
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+
+  @include auth-form.touch-contexts {
+    min-width: var(--size-touch-target);
+    min-height: var(--size-touch-target);
+    margin-top: calc(var(--auth-form-gap) * -1);
+  }
+}

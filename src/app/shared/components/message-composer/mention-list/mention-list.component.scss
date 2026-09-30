@@ -1,0 +1,54 @@
+@use 'breakpoints';
+
+@mixin touch-option {
+  min-height: var(--size-touch-target);
+}
+
+:host {
+  display: block;
+  padding: var(--space-1) var(--space-0);
+  border: var(--rule-hairline);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.mention-list__header {
+  padding: var(--space-1-5) var(--space-3);
+}
+
+.mention-list__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  min-height: var(--composer-option-height);
+  padding: var(--space-0) var(--space-3);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover);
+  }
+
+  @include breakpoints.tablet-and-down {
+    @include touch-option;
+  }
+
+  @include breakpoints.touch-device {
+    @include touch-option;
+  }
+}
+
+.mention-list__option--active,
+.mention-list__option--active:hover {
+  background: var(--selected);
+}
+
+.mention-list__name {
+  flex: none;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+}
+
+.mention-list__title {
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+}

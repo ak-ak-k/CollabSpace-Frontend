@@ -1,0 +1,43 @@
+@use 'breakpoints';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.welcome__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.welcome__title {
+  margin: var(--space-0);
+  font-size: var(--font-size-display-sm);
+}
+
+.welcome__summary {
+  margin: var(--space-0);
+  color: var(--text-secondary);
+  font-size: var(--font-size-15);
+  text-wrap: pretty;
+}
+
+.welcome__actions {
+  display: grid;
+  grid-template-columns: repeat(var(--dashboard-quick-action-columns-narrow), minmax(0, 1fr));
+  gap: var(--space-2);
+  max-width: var(--dashboard-quick-actions-max-width);
+
+  @include breakpoints.desktop {
+    grid-template-columns: repeat(var(--dashboard-quick-action-columns-wide), minmax(0, 1fr));
+  }
+}
+
+.welcome__action {
+  justify-content: flex-start;
+  min-width: 0;
+  white-space: normal;
+  text-align: left;
+}

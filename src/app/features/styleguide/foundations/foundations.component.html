@@ -1,0 +1,97 @@
+<section class="block" aria-label="Colour">
+  <h3 class="block__title">Colour</h3>
+  @for (group of colorGroups; track group.title) {
+    <div class="swatch-group">
+      <h4 class="caps-label">{{ group.title }}</h4>
+      <ul class="swatches">
+        @for (token of group.tokens; track token) {
+          <li class="swatch">
+            <span class="swatch__chip" [style.background]="cssVariable(token)"></span>
+            <code class="swatch__name">{{ token }}</code>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+</section>
+
+<section class="block" aria-label="Filled surfaces">
+  <h3 class="block__title">Filled surfaces</h3>
+  <div class="fills">
+    <span class="fill fill--brand">C</span>
+    <span class="fill fill--primary">Primary action</span>
+    <span class="fill fill--secondary">Toast and badge</span>
+    <span class="fill fill--danger">Error banner</span>
+  </div>
+</section>
+
+<section class="block" aria-label="Typography">
+  <h3 class="block__title">Typography</h3>
+  <div class="type">
+    <h1>Heading one</h1>
+    <h2>Heading two</h2>
+    <h3>Heading three</h3>
+    <h4>Heading four</h4>
+    <h5>Heading five</h5>
+    <h6>Heading six</h6>
+    <p>
+      Body copy in Archivo regular. <strong>Heavy emphasis</strong> and
+      <a href="/styleguide">a text link</a>.
+    </p>
+  </div>
+  <ul class="samples">
+    @for (sample of textColors; track sample.token) {
+      <li class="sample" [style.color]="cssVariable(sample.token)">
+        <span>{{ sample.label }}</span>
+        <code>{{ sample.token }}</code>
+      </li>
+    }
+  </ul>
+  <ul class="samples">
+    @for (token of fontSizes; track token) {
+      <li class="sample">
+        <span [style.font-size]="cssVariable(token)">Conversations, tasks and files</span>
+        <code>{{ token }}</code>
+      </li>
+    }
+  </ul>
+</section>
+
+<section class="block" aria-label="Spacing">
+  <h3 class="block__title">Spacing</h3>
+  <ul class="samples">
+    @for (token of spacing; track token) {
+      <li class="sample">
+        <span class="space-bar" [style.width]="cssVariable(token)"></span>
+        <code>{{ token }}</code>
+      </li>
+    }
+  </ul>
+</section>
+
+<section class="block" aria-label="Elevation">
+  <h3 class="block__title">Elevation</h3>
+  <ul class="shadows">
+    @for (token of shadows; track token) {
+      <li class="shadow" [style.box-shadow]="cssVariable(token)">
+        <code>{{ token }}</code>
+      </li>
+    }
+  </ul>
+</section>
+
+<section class="block" aria-label="Icons">
+  <h3 class="block__title">Icons · {{ iconNames.length }}</h3>
+  <ul class="icons">
+    @for (name of iconNames; track name) {
+      <li class="icon-tile">
+        <app-icon [name]="name" [size]="20" />
+        <code class="icon-tile__name">{{ name }}</code>
+      </li>
+    }
+    <li class="icon-tile">
+      <app-icon name="star" [size]="20" filled />
+      <code class="icon-tile__name">star filled</code>
+    </li>
+  </ul>
+</section>

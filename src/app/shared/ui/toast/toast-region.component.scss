@@ -1,0 +1,73 @@
+@use 'breakpoints';
+
+@mixin inverse-hover {
+  background: color-mix(in srgb, currentColor var(--toast-hover-strength), transparent);
+}
+
+:host {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-2);
+  width: var(--toast-width);
+  pointer-events: none;
+
+  @include breakpoints.mobile {
+    right: var(--space-3);
+    bottom: var(--toast-bottom-offset, var(--toast-bottom-offset-default));
+    left: var(--space-3);
+    width: auto;
+  }
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  background: var(--secondary);
+  box-shadow: var(--shadow-lg);
+  color: var(--on-secondary);
+  font-size: var(--font-size-14);
+  pointer-events: auto;
+}
+
+.toast__message {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.toast__action {
+  flex: none;
+  padding: var(--space-1-5) var(--space-2);
+  border: var(--space-0);
+  background: transparent;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-heavy);
+  text-decoration: underline;
+  text-underline-offset: var(--underline-offset);
+  cursor: pointer;
+
+  @include breakpoints.tablet-and-down {
+    min-height: var(--size-touch-target);
+  }
+
+  @include breakpoints.touch-device {
+    min-height: var(--size-touch-target);
+  }
+}
+
+.toast .toast__action:hover,
+.toast .toast__dismiss:hover:not(:disabled) {
+  @include inverse-hover;
+}
+
+.toast__action:focus-visible,
+.toast__dismiss:focus-visible {
+  outline-color: var(--on-secondary);
+}

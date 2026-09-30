@@ -1,0 +1,54 @@
+<div class="viewport" appScrollEdges #viewport #edges="appScrollEdges">
+  @if (isNavigation()) {
+    <nav class="list" [attr.aria-label]="label()">
+      @for (tab of tabs(); track tab.id) {
+        <a
+          #tabElement
+          class="tab"
+          [class.tab--active]="tab.id === active()"
+          [routerLink]="tab.link"
+          [attr.aria-current]="tab.id === active() ? 'page' : null"
+          (click)="active.set(tab.id)"
+        >
+          @if (tab.icon; as icon) {
+            <app-icon [name]="icon" [size]="16" />
+          }
+          <span>{{ tab.label }}</span>
+          @if (hasCount(tab)) {
+            <span class="tab__count">{{ tab.count }}</span>
+          }
+        </a>
+      }
+    </nav>
+  } @else {
+    <div
+      class="list"
+      role="tablist"
+      [attr.aria-label]="label()"
+      (keydown)="moveWithKeyboard($event)"
+    >
+      @for (tab of tabs(); track tab.id) {
+        <button
+          #tabElement
+          type="button"
+          role="tab"
+          class="tab"
+          [class.tab--active]="tab.id === active()"
+          [attr.aria-selected]="tab.id === active()"
+          [attr.tabindex]="tab.id === focusableId() ? 0 : -1"
+          (click)="active.set(tab.id)"
+        >
+          @if (tab.icon; as icon) {
+            <app-icon [name]="icon" [size]="16" />
+          }
+          <span>{{ tab.label }}</span>
+          @if (hasCount(tab)) {
+            <span class="tab__count">{{ tab.count }}</span>
+          }
+        </button>
+      }
+    </div>
+  }
+</div>
+<span #edgeFade class="fade fade--start" [class.fade--visible]="edges.hiddenAtStart()"></span>
+<span class="fade fade--end" [class.fade--visible]="edges.hiddenAtEnd()"></span>

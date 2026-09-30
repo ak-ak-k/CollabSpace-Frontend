@@ -1,0 +1,72 @@
+@use 'breakpoints';
+
+@mixin touch-height {
+  --chip-height: var(--size-touch-target);
+}
+
+:host {
+  --chip-height: var(--size-search-chip);
+
+  display: flex;
+  flex: none;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  border-bottom: var(--rule-hairline);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @include breakpoints.tablet-and-down {
+    @include touch-height;
+  }
+
+  @include breakpoints.touch-device {
+    @include touch-height;
+  }
+}
+
+.chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1-5);
+  height: var(--chip-height);
+  padding: var(--space-0) var(--space-3);
+  border: var(--border-width-hairline) solid var(--border-control);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.chip:hover {
+  background: var(--hover);
+}
+
+.chip:active {
+  background: var(--press);
+}
+
+.chip--selected,
+.chip--selected:hover,
+.chip--selected:active {
+  border-color: var(--secondary);
+  background: var(--secondary);
+  color: var(--on-secondary);
+}
+
+.chip__count {
+  color: var(--text-secondary);
+  font-size: var(--font-size-11);
+}
+
+.chip--selected .chip__count {
+  color: inherit;
+}

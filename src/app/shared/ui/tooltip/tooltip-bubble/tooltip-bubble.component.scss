@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  max-width: var(--tooltip-max-width);
+  padding: var(--space-1) var(--space-2);
+  background: var(--secondary);
+  color: var(--on-secondary);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-compact);
+  overflow-wrap: anywhere;
+  pointer-events: none;
+}

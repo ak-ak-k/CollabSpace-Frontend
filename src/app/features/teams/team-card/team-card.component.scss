@@ -1,0 +1,79 @@
+:host {
+  --avatar-ring: var(--surface);
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--surface);
+}
+
+.card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  color: var(--text-primary);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--hover);
+  }
+}
+
+.card__top {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.card__identity {
+  flex: 1;
+  min-width: 0;
+}
+
+.card__name {
+  margin: var(--space-0);
+  font-size: var(--font-size-20);
+}
+
+.card__lead {
+  color: var(--text-muted);
+  font-size: var(--font-size-13);
+}
+
+.card__description {
+  min-height: var(--team-card-description-min-height);
+  margin: var(--space-0);
+  color: var(--text-muted);
+  font-size: var(--font-size-14);
+  text-wrap: pretty;
+}
+
+.card__people {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.card__counts {
+  font-size: var(--font-size-13);
+
+  strong {
+    font-weight: var(--font-weight-heavy);
+  }
+}
+
+.card__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-top: var(--rule-strong);
+}
+
+.card__spacer {
+  flex: 1;
+}

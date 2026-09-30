@@ -1,0 +1,29 @@
+@for (section of view().sections; track $index) {
+  <div class="section">
+    @if (section.header; as header) {
+      <div class="section__header">
+        <div
+          class="bar"
+          [class]="'bar--' + header.height"
+          [style.width.%]="header.widthPercent"
+        ></div>
+      </div>
+    }
+    @for (item of section.items; track $index) {
+      <div class="item">
+        @if (item.block; as block) {
+          <div class="bar" [class]="'block--' + block"></div>
+        }
+        <div class="item__bars">
+          @for (bar of item.bars; track $index) {
+            <div
+              class="bar"
+              [class]="'bar--' + bar.height"
+              [style.width.%]="bar.widthPercent"
+            ></div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

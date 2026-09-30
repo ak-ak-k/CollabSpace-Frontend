@@ -1,0 +1,16 @@
+<div class="mention-list__header caps-label" aria-hidden="true">Members</div>
+@for (candidate of candidates(); track candidate.id; let index = $index) {
+  <div
+    class="mention-list__option"
+    role="option"
+    [id]="optionId(index)"
+    [class.mention-list__option--active]="index === activeIndex()"
+    [attr.aria-selected]="index === activeIndex()"
+    (mousedown)="$event.preventDefault()"
+    (click)="pick.emit(candidate)"
+  >
+    <app-avatar [name]="candidate.name" [seed]="candidate.seed" [size]="24" />
+    <span class="mention-list__name">{{ candidate.name }}</span>
+    <span class="mention-list__title truncate">{{ candidate.title }}</span>
+  </div>
+}

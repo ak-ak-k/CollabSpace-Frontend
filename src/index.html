@@ -1,13 +1,32 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>CollabspaceFrontend</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-</head>
-<body>
-  <app-root></app-root>
-</body>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <title>CollabSpace</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f3f2f2" />
+    <meta
+      name="description"
+      content="CollabSpace brings conversations, tasks and files into one workspace."
+    />
+    <link rel="icon" type="image/png" href="assets/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+    <script>
+      (function () {
+        var preference = 'light';
+        try {
+          preference = localStorage.getItem('collabspace.theme') || preference;
+        } catch (error) {
+          preference = 'light';
+        }
+        var systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var useDark = preference === 'dark' || (preference === 'system' && systemPrefersDark);
+        document.documentElement.dataset.theme = useDark ? 'dark' : 'light';
+      })();
+    </script>
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
 </html>

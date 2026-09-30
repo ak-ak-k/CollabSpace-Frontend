@@ -1,0 +1,16 @@
+@for (attachment of attachments(); track $index) {
+  <span class="attachment-chip">
+    <app-icon [name]="iconFor(attachment)" [size]="14" />
+    <span class="attachment-chip__name truncate">{{ attachment.name }}</span>
+    <span class="attachment-chip__size">{{ attachment.size }}</span>
+    <button
+      appIconButton
+      type="button"
+      class="attachment-chip__remove"
+      [label]="'Remove ' + attachment.name"
+      (click)="remove.emit($index)"
+    >
+      <app-icon name="x" [size]="14" />
+    </button>
+  </span>
+}

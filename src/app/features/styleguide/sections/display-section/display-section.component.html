@@ -1,0 +1,137 @@
+<section class="block" aria-label="Tabs">
+  <h3 class="block__title">Tabs</h3>
+  <div class="example">
+    <p class="caps-label">Filter tabs with counts · {{ activeFilter() }}</p>
+    <app-tabs label="Filter conversations" [tabs]="filterTabs" [(active)]="activeFilter" />
+  </div>
+  <div class="example example--narrow">
+    <p class="caps-label">Overflowing strip · {{ activeSection() }}</p>
+    <app-tabs
+      label="Team sections"
+      gap="lg"
+      size="lg"
+      [tabs]="sectionTabs"
+      [(active)]="activeSection"
+    />
+  </div>
+  <div class="example example--narrow example--surface">
+    <p class="caps-label">Full bleed inside a padded surface · {{ activeColumn() }}</p>
+    <app-tabs label="Columns" bleed [tabs]="columnTabs" [(active)]="activeColumn" />
+  </div>
+  <div class="example">
+    <p class="caps-label">Route links · {{ activeLocation() }}</p>
+    <app-tabs label="File locations" [tabs]="locationTabs" [(active)]="activeLocation" />
+  </div>
+</section>
+
+<section class="block" aria-label="Breadcrumb">
+  <h3 class="block__title">Breadcrumb</h3>
+  <app-breadcrumb [items]="breadcrumbItems" />
+  <app-breadcrumb label="Settings breadcrumb" [items]="settingsBreadcrumbItems" />
+</section>
+
+<section class="block" aria-label="Cards">
+  <h3 class="block__title">Cards</h3>
+  <ul class="tiles">
+    @for (card of teamCards; track card.title) {
+      <li>
+        <app-card class="tiles__card" interactive [elevation]="card.elevation">
+          <p cardKicker>{{ card.kicker }} · elevation {{ card.elevation }}</p>
+          <h4 cardTitle>{{ card.title }}</h4>
+          {{ card.body }}
+          <p cardMeta>{{ card.meta }}</p>
+        </app-card>
+      </li>
+    }
+  </ul>
+</section>
+
+<section class="block" aria-label="Table and pagination">
+  <h3 class="block__title">Table and pagination</h3>
+  <app-table label="Shared files" minWidth="lg">
+    <table>
+      <caption class="visually-hidden">
+        Shared files
+      </caption>
+      <thead>
+        <tr>
+          <th appSortHeader [direction]="sortDirection('name')" (sort)="sortBy('name')">Name</th>
+          <th scope="col">Type</th>
+          <th
+            appSortHeader
+            class="cell--numeric"
+            [direction]="sortDirection('bytes')"
+            (sort)="sortBy('bytes')"
+          >
+            Size
+          </th>
+          <th scope="col">Owner</th>
+          <th appSortHeader [direction]="sortDirection('modifiedOn')" (sort)="sortBy('modifiedOn')">
+            Modified
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (file of visibleFiles(); track file.name) {
+          <tr>
+            <th scope="row" class="cell--nowrap">{{ file.name }}</th>
+            <td class="cell--nowrap">{{ file.type }}</td>
+            <td class="cell--nowrap cell--numeric">{{ file.size }}</td>
+            <td class="cell--nowrap">{{ file.owner }}</td>
+            <td class="cell--nowrap cell--secondary">{{ file.modified }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </app-table>
+  <app-pagination
+    label="Shared files pages"
+    [total]="fileCount"
+    [pageSize]="filesPerPage"
+    [(page)]="filePage"
+  />
+</section>
+
+<section class="block" aria-label="Empty states">
+  <h3 class="block__title">Empty states · last action: {{ lastAction() }}</h3>
+  <ul class="states">
+    @for (state of emptyStates; track state.kind) {
+      <li class="states__frame">
+        <app-empty-state
+          [kind]="state.kind"
+          [heading]="state.heading"
+          [message]="state.message"
+          [actionLabel]="state.actionLabel"
+          [headingLevel]="4"
+          (action)="lastAction.set(state.actionLabel)"
+        />
+      </li>
+      <li class="states__frame">
+        <app-empty-state
+          compact
+          [kind]="state.kind"
+          [heading]="state.heading"
+          [message]="state.message"
+          [headingLevel]="4"
+        />
+      </li>
+    }
+  </ul>
+</section>
+
+<section class="block" aria-label="Skeletons">
+  <h3 class="block__title">Skeletons</h3>
+  <ul class="skeletons">
+    @for (skeleton of skeletons; track skeleton.layout) {
+      <li class="skeletons__frame" [class.skeletons__frame--wide]="skeleton.wide">
+        <p class="caps-label">{{ skeleton.layout }}</p>
+        <app-skeleton
+          compact
+          [layout]="skeleton.layout"
+          [rows]="skeletonRows"
+          [label]="'Loading ' + skeleton.layout + ' example'"
+        />
+      </li>
+    }
+  </ul>
+</section>

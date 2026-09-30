@@ -1,0 +1,38 @@
+@mixin host {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: var(--space-0);
+}
+
+@mixin hidden-scrollbar {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@mixin edges {
+  .fade {
+    position: absolute;
+    inset-block: var(--space-0);
+    width: var(--size-scroll-fade);
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .fade--visible {
+    visibility: visible;
+  }
+
+  .fade--start {
+    inset-inline-start: var(--space-0);
+    background: linear-gradient(to right, var(--scroll-fade-color, var(--background)), transparent);
+  }
+
+  .fade--end {
+    inset-inline-end: var(--space-0);
+    background: linear-gradient(to left, var(--scroll-fade-color, var(--background)), transparent);
+  }
+}
