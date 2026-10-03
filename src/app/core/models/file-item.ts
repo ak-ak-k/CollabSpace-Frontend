@@ -6,6 +6,7 @@ export type FileType =
 export type FileView = 'recent' | 'shared' | 'mine' | 'starred';
 
 export interface FileItem {
+  readonly workspaceId: string;
   readonly id: string;
   readonly name: string;
   readonly type: FileType;

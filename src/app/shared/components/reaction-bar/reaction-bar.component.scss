@@ -1,12 +1,4 @@
-@use 'breakpoints';
-
-@mixin touch-hit-area {
-  &::before {
-    content: '';
-    position: absolute;
-    inset: var(--reaction-chip-touch-inset) var(--space-0);
-  }
-}
+@use 'touch';
 
 :host {
   display: flex;
@@ -25,12 +17,8 @@
   color: var(--text-primary);
   cursor: pointer;
 
-  @include breakpoints.tablet-and-down {
-    @include touch-hit-area;
-  }
-
-  @include breakpoints.touch-device {
-    @include touch-hit-area;
+  @include touch.on-touch {
+    @include touch.minimum-hit-area;
   }
 }
 
@@ -64,5 +52,12 @@
 
   &:hover {
     background: var(--hover);
+  }
+
+  @include touch.on-touch {
+    &::before {
+      left: var(--space-0);
+      transform: translateY(-50%);
+    }
   }
 }

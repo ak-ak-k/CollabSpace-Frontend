@@ -42,10 +42,11 @@
       <app-dashboard-team-activity
         [status]="workspaceStatus()"
         [teams]="teams()"
+        [workspaceName]="workspaceName()"
         (retry)="reloadWorkspace()"
       />
       <app-dashboard-recent-activity
-        [status]="workspaceStatus()"
+        [status]="activityStatus()"
         [activity]="activity()"
         (retry)="reloadWorkspace()"
       />

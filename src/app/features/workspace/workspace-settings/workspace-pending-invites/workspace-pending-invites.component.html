@@ -1,0 +1,68 @@
+<section class="invites" [attr.aria-labelledby]="headingId">
+  <div class="invites__header">
+    <h3 #heading class="invites__title" tabindex="-1" [id]="headingId">
+      Pending invitations · {{ count() }}
+    </h3>
+    @if (canInvite()) {
+      <button appButton type="button" (click)="invite()">
+        <app-icon name="user-plus" [size]="16" />
+        Invite people
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <app-skeleton layout="list" [rows]="3" compact label="Loading invitations" />
+  } @else if (rows().length === 0) {
+    <p class="invites__empty">No pending invitations. Everyone you’ve invited has joined.</p>
+  } @else {
+    <ul class="invites__list">
+      @for (row of rows(); track row.invite.id) {
+        <li class="invite">
+          <span class="invite__tile" aria-hidden="true">
+            <app-icon name="mail" [size]="16" />
+          </span>
+          <span class="invite__text">
+            <span class="invite__line">
+              <strong class="invite__email">{{ row.invite.email }}</strong>
+              <app-tag>{{ row.roleLabel }}</app-tag>
+              @if (row.invite.queued) {
+                <app-tag tone="subtle">
+                  <app-icon name="clock" [size]="11" />
+                  Queued
+                </app-tag>
+              }
+            </span>
+            <span class="invite__meta">{{ row.meta }}</span>
+          </span>
+          <span class="invite__actions">
+            <button
+              appButton
+              type="button"
+              variant="ghost"
+              [attr.aria-label]="'Resend invitation to ' + row.invite.email"
+              (click)="resend(row.invite)"
+            >
+              Resend
+            </button>
+            <button
+              appButton
+              type="button"
+              variant="ghost"
+              class="invite__revoke"
+              [attr.aria-label]="'Revoke invitation to ' + row.invite.email"
+              (click)="revoke(row.invite)"
+            >
+              Revoke
+            </button>
+          </span>
+        </li>
+      }
+    </ul>
+  }
+
+  <p class="invites__footer">
+    Looking for the member list?
+    <a class="invites__link" routerLink="/workspace/members">Go to Members</a>
+  </p>
+</section>

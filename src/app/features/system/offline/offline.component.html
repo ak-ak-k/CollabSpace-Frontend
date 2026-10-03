@@ -1,0 +1,25 @@
+<app-system-page
+  kicker="Network"
+  icon="wifi-off"
+  heading="You’re offline"
+  message="CollabSpace can’t reach the network. Everything you’ve already opened is still here, and anything you send is queued until the connection comes back."
+  [lists]="lists"
+>
+  <button
+    appButton
+    type="button"
+    variant="primary"
+    size="lg"
+    [busy]="checking()"
+    (click)="tryAgain()"
+  >
+    @if (!checking()) {
+      <app-icon name="refresh-cw" [size]="16" />
+    }
+    {{ checking() ? 'Checking connection…' : 'Try again' }}
+  </button>
+  <a appButton size="lg" routerLink="/home">
+    <app-icon name="house" [size]="16" />
+    Go to dashboard
+  </a>
+</app-system-page>

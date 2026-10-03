@@ -1,0 +1,78 @@
+<header class="page__header">
+  <div class="page__title-row">
+    <div class="page__heading">
+      <span class="page__kicker">{{ kicker }}</span>
+      <h1 class="page__title">Tasks</h1>
+    </div>
+    <button appButton type="button" variant="primary" (click)="actions.newTask()">
+      <app-icon name="plus" [size]="16" />
+      New task
+    </button>
+  </div>
+  <app-tasks-toolbar
+    [(query)]="query"
+    [(assigneeIds)]="assigneeIds"
+    [(priority)]="priority"
+    [people]="people()"
+    [visibleCount]="visibleCount()"
+    [totalCount]="totalCount()"
+    [showCount]="status() === 'ready'"
+  />
+</header>
+
+@switch (status()) {
+  @case ('loading') {
+    <div class="page__state"><app-skeleton layout="board" label="Loading tasks" /></div>
+  }
+  @case ('error') {
+    <div class="page__state">
+      <app-empty-state
+        kind="error"
+        heading="Couldn’t load the board"
+        message="We couldn’t reach the task service. Your changes weren’t lost."
+        actionLabel="Try again"
+        (action)="reload()"
+      />
+    </div>
+  }
+  @case ('empty') {
+    <div class="page__state">
+      <app-empty-state
+        icon="square-kanban"
+        heading="No tasks yet"
+        message="Plan the sprint by adding the first task to the board."
+        actionLabel="Create a task"
+        (action)="actions.newTask()"
+      />
+    </div>
+  }
+  @default {
+    @if (noMatch()) {
+      <div class="page__state">
+        <app-empty-state
+          icon="square-kanban"
+          heading="No tasks found"
+          message="Nothing matches these filters. Try removing one."
+          actionLabel="Clear filters"
+          actionIcon="x"
+          (action)="clearFilters()"
+        />
+      </div>
+    } @else if (breakpoint.isMobile()) {
+      <app-task-mobile-board
+        [columns]="columns()"
+        (open)="actions.open($event)"
+        (add)="actions.newTask($event)"
+      />
+    } @else {
+      <app-task-board
+        [columns]="columns()"
+        [selectedId]="task() ?? null"
+        (open)="actions.open($event)"
+        (dropped)="actions.move($event.taskId, $event.status, $event.beforeId)"
+        (stepped)="actions.moveByStep($event.taskId, $event.step)"
+        (add)="actions.newTask($event)"
+      />
+    }
+  }
+}

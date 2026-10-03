@@ -1,0 +1,7 @@
+<section class="danger-zone" [attr.aria-labelledby]="headingId">
+  <div class="danger-zone__text">
+    <h3 class="danger-zone__title" [id]="headingId">{{ heading() }}</h3>
+    <p class="danger-zone__description">{{ description() }}</p>
+  </div>
+  <ng-content />
+</section>

@@ -1,0 +1,9 @@
+@mixin compact-density {
+  --conversation-row-height: 56px;
+  --message-row-padding-first: var(--space-1-5) var(--space-2) var(--space-0-5);
+  --message-row-padding-continuation: var(--space-0) var(--space-2) var(--space-0-5);
+  --sheet-row-height: var(--size-touch-target);
+  --teams-sidebar-team-height: 36px;
+  --teams-sidebar-channel-height: 30px;
+  --teams-sidebar-dm-height: 34px;
+}

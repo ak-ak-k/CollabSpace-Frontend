@@ -1,0 +1,26 @@
+<app-theme-picker />
+
+<div class="density">
+  <span class="density__text">
+    <strong class="density__label">Density</strong>
+    <span class="density__description">Compact fits more messages and tasks on screen.</span>
+  </span>
+  <app-radio-group
+    label="Density"
+    hideLabel
+    name="settings-density"
+    [options]="densityOptions"
+    [value]="preferences().density"
+    (valueChange)="setDensity($event)"
+  />
+</div>
+
+<ul class="appearance-switches">
+  <li
+    appSettingSwitch
+    label="Reduce motion"
+    description="Minimise animation in lists, drawers and typing indicators."
+    [checked]="preferences().reduceMotion"
+    (checkedChange)="setReduceMotion($event)"
+  ></li>
+</ul>

@@ -3,6 +3,7 @@ export type TaskStatus = 'backlog' | 'todo' | 'progress' | 'review' | 'done';
 export type TaskPriority = 'urgent' | 'high' | 'medium' | 'low';
 
 export interface Task {
+  readonly workspaceId: string;
   readonly id: string;
   readonly title: string;
   readonly description: string;
@@ -49,3 +50,11 @@ export const TASK_PRIORITY_LABELS: Record<TaskPriority, string> = {
 };
 
 export const TASK_PRIORITIES: readonly TaskPriority[] = ['urgent', 'high', 'medium', 'low'];
+
+export interface TaskComment {
+  readonly id: string;
+  readonly taskId: string;
+  readonly authorId: string;
+  readonly text: string;
+  readonly createdAt: number;
+}

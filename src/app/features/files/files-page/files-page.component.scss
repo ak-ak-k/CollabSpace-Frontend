@@ -1,0 +1,47 @@
+:host {
+  --secondary-sidebar-width-desktop: var(--files-sidebar-width);
+
+  display: flex;
+  height: 100%;
+  min-width: var(--space-0);
+  background: var(--background);
+}
+
+.files {
+  flex: 1;
+  min-width: var(--space-0);
+  overflow-y: auto;
+}
+
+.files__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: var(--files-page-max-width);
+  padding: var(--page-padding);
+}
+
+.files__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.files__heading {
+  display: flex;
+  flex: 1 1 var(--files-header-text-basis);
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.files__title {
+  margin: var(--space-0);
+  font-size: var(--font-size-display-sm);
+}
+
+.files__description {
+  margin: var(--space-0);
+  color: var(--text-muted);
+  font-size: var(--font-size-15);
+}

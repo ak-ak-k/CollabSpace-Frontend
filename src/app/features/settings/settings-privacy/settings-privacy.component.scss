@@ -1,0 +1,34 @@
+@use '../settings-section';
+
+:host {
+  @include settings-section.section-host;
+}
+
+.privacy-switches {
+  @include settings-section.list;
+}
+
+.visibility {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.visibility__text {
+  @include settings-section.row-text;
+
+  flex: 1 1 var(--settings-row-text-basis);
+}
+
+.visibility__label {
+  @include settings-section.row-label;
+}
+
+.visibility__description {
+  @include settings-section.helper-text;
+}
+
+.visibility__select {
+  max-width: 100%;
+}

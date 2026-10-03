@@ -1,0 +1,30 @@
+@use '../settings-section';
+
+:host {
+  @include settings-section.row;
+}
+
+.setting-row__text {
+  @include settings-section.row-text;
+}
+
+.setting-row__label {
+  @include settings-section.row-label;
+}
+
+.setting-row__description {
+  @include settings-section.helper-text;
+}
+
+.setting-switch__control {
+  --size-toggle-track-width: var(--settings-switch-track-width);
+  --size-toggle-track-height: var(--settings-switch-track-height);
+  --toggle-knob-offset: var(--settings-switch-knob-offset);
+  --toggle-knob-travel: var(--settings-switch-knob-travel);
+
+  display: grid;
+  flex: none;
+  place-items: center;
+  min-width: var(--settings-switch-box-width);
+  min-height: var(--settings-switch-box-height);
+}

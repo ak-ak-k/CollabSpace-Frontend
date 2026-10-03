@@ -1,6 +1,10 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { BreakpointService } from '../../../core/services/breakpoint.service';
 import { WorkspaceState } from '../../../core/state/workspace.state';
+import {
+  BreadcrumbComponent,
+  BreadcrumbItem,
+} from '../../../shared/ui/breadcrumb/breadcrumb.component';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
@@ -23,6 +27,7 @@ const LAYOUT_OPTIONS: readonly RadioOption[] = [
 @Component({
   selector: 'app-team-directory',
   imports: [
+    BreadcrumbComponent,
     ButtonComponent,
     EmptyStateComponent,
     IconComponent,
@@ -47,12 +52,19 @@ export class TeamDirectoryComponent {
   protected readonly layoutOptions = LAYOUT_OPTIONS;
 
   protected readonly status = this.workspace.status;
+  protected readonly canCreateTeams = computed(() => this.workspace.access().canCreateTeams);
   protected readonly isMobile = this.breakpoint.isMobile;
   protected readonly showsTable = computed(() => this.layout() === 'list' && !this.isMobile());
+  private readonly workspaceName = computed(
+    () => this.workspace.currentWorkspace()?.name ?? 'your workspace',
+  );
+  protected readonly breadcrumb = computed<readonly BreadcrumbItem[]>(() => [
+    { label: this.workspaceName(), link: '/workspace' },
+    { label: 'Teams' },
+  ]);
   protected readonly subtitle = computed(() => {
-    const workspaceName = this.workspace.currentWorkspace()?.name ?? 'your workspace';
     const total = this.workspace.teams().length;
-    return `${total} teams in ${workspaceName} · you’re in ${this.workspace.joinedTeams().length}`;
+    return `${total} teams in ${this.workspaceName()} · you’re in ${this.workspace.joinedTeams().length}`;
   });
   protected readonly tabs = computed<readonly TabItem[]>(() => [
     { id: 'all', label: `All teams · ${this.workspace.teams().length}` },
@@ -72,8 +84,8 @@ export class TeamDirectoryComponent {
       return { heading: 'No teams found', message: `No teams match “${query}”.` };
     }
     return {
-      heading: 'No teams joined yet',
-      message: 'Join a team from All teams to see it here.',
+      heading: 'No teams found',
+      message: `You haven’t joined any teams in ${this.workspaceName()} yet.`,
     };
   });
 

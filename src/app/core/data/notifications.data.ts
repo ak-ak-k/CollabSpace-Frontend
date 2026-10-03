@@ -21,10 +21,11 @@ export class NotificationsData {
     });
   }
 
-  markAllRead(filter: NotificationFilter): Promise<void> {
+  markAllRead(filter: NotificationFilter, workspaceId: string): Promise<void> {
     return this.request.write(() => {
       this.notifications = this.notifications.map((notification) =>
-        filter === 'all' || notification.category === filter
+        notification.workspaceId === workspaceId &&
+        (filter === 'all' || notification.category === filter)
           ? { ...notification, read: true }
           : notification,
       );

@@ -1,0 +1,20 @@
+@use '../profile-section';
+
+:host {
+  display: block;
+}
+
+.section {
+  @include profile-section.section;
+}
+
+.section__heading {
+  @include profile-section.heading;
+}
+
+.section__bio {
+  margin: var(--space-0);
+  font-size: var(--font-size-15);
+  line-height: var(--profile-bio-line-height);
+  text-wrap: pretty;
+}

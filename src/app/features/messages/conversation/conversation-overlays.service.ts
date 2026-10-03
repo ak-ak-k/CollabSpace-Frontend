@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { MessageView } from '../../../core/models/thread';
 import { DialogService } from '../../../core/services/dialog.service';
-import { InviteDialogComponent } from '../../teams/invite-dialog/invite-dialog.component';
+import { WorkspaceActions } from '../../workspace/workspace-actions.service';
 import {
   DetailsDrawerComponent,
   DetailsDrawerData,
@@ -17,6 +17,7 @@ import {
 @Injectable()
 export class ConversationOverlays {
   private readonly dialogs = inject(DialogService);
+  private readonly workspaceActions = inject(WorkspaceActions);
 
   openDetails(conversationId: string): Observable<DetailsDrawerResult | undefined> {
     return this.dialogs.openDrawer<DetailsDrawerResult, DetailsDrawerData>(DetailsDrawerComponent, {
@@ -35,6 +36,6 @@ export class ConversationOverlays {
   }
 
   invite(teamId: string | undefined): void {
-    this.dialogs.open(InviteDialogComponent, { size: 'md', data: { teamId } });
+    this.workspaceActions.openInvite(teamId ?? null);
   }
 }

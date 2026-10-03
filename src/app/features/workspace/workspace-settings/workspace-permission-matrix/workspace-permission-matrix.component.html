@@ -1,0 +1,34 @@
+<app-table label="Permissions by role" minWidth="md">
+  <table class="matrix">
+    <caption class="visually-hidden">
+      Permissions by role
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">Permission</th>
+        @for (role of roleNames; track role) {
+          <th scope="col" class="matrix__role">{{ role }}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (permission of permissions; track permission.label) {
+        <tr>
+          <th scope="row" class="matrix__permission">{{ permission.label }}</th>
+          @for (allowed of permission.allowed; track $index) {
+            <td class="matrix__cell">
+              <span
+                class="permission-mark"
+                [class.permission-mark--allowed]="allowed"
+                role="img"
+                [attr.aria-label]="permissionLabelOf(roleNames[$index], permission.label, allowed)"
+              >
+                <app-icon [name]="allowed ? 'check' : 'x'" [size]="14" />
+              </span>
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</app-table>

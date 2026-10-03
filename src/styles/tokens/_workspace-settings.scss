@@ -1,0 +1,27 @@
+@mixin workspace-settings-tokens {
+  --workspace-settings-nav-width: 220px;
+  --workspace-settings-layout-gap: clamp(var(--space-5), 3vw, var(--space-10));
+  --workspace-settings-content-max-width: 760px;
+  --workspace-settings-title-size: clamp(var(--font-size-22), 2.6vw, var(--font-size-28));
+  --workspace-settings-nav-item-height: var(--size-control-md);
+  --workspace-settings-chip-height: var(--size-control-sm);
+  --workspace-settings-list-item-height: var(--space-14);
+
+  --workspace-settings-logo-size: 72px;
+  --workspace-settings-logo-font-size: var(--font-size-25);
+  --workspace-settings-logo-text-basis: 220px;
+  --workspace-settings-narrow-field-max-width: 360px;
+  --workspace-settings-domains-basis: 260px;
+
+  --workspace-settings-invite-tile-size: var(--size-avatar-36);
+  --workspace-settings-invite-text-basis: 220px;
+
+  --workspace-settings-role-column-width: 130px;
+  --workspace-settings-count-column-width: 110px;
+  --workspace-settings-permission-column-width: 84px;
+  --workspace-settings-permission-mark-size: var(--space-6);
+
+  --workspace-settings-radio-size: var(--space-4);
+  --workspace-settings-integration-card-min-width: 230px;
+  --workspace-settings-integration-tile-size: var(--size-control-md);
+}

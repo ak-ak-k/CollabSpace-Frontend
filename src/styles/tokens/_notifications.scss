@@ -1,0 +1,12 @@
+@mixin notifications-tokens {
+  --notifications-sidebar-width: 248px;
+  --notifications-content-max-width: 880px;
+  --notifications-header-text-basis: 240px;
+  --notifications-category-height: 42px;
+  --notification-marker-size: var(--space-2);
+  --notification-marker-offset: var(--space-4);
+  --notification-avatar-size: var(--size-avatar-40);
+  --notification-text-line-height: var(--line-height-input);
+  --notification-snippet-line-height: 1.45;
+  --notification-snippet-lines: 2;
+}

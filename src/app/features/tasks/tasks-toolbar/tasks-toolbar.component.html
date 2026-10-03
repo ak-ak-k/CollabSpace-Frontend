@@ -1,0 +1,32 @@
+<div class="toolbar" role="group" aria-label="Filter tasks">
+  <app-search-input
+    class="toolbar__search"
+    label="Search tasks"
+    placeholder="Search tasks or IDs"
+    [(value)]="query"
+  />
+  <div class="toolbar__people" role="group" aria-label="Filter by assignee">
+    @for (person of people(); track person.id) {
+      <button
+        type="button"
+        class="toolbar__person"
+        [class.toolbar__person--on]="assigneeIds().includes(person.id)"
+        [attr.aria-pressed]="assigneeIds().includes(person.id)"
+        [attr.aria-label]="'Show tasks for ' + person.name"
+        [attr.title]="person.name"
+        (click)="toggleAssignee(person.id)"
+      >
+        <app-avatar [name]="person.name" [seed]="person.seed" [size]="32" />
+      </button>
+    }
+  </div>
+  <app-select label="Priority" inlineLabel [options]="priorityOptions" [(value)]="priority" />
+  @if (filtered()) {
+    <button appButton type="button" variant="ghost" (click)="clear()">
+      <app-icon name="x" [size]="14" />
+      Clear filters
+    </button>
+  }
+  <span class="toolbar__spacer"></span>
+  <span class="toolbar__count" aria-live="polite">{{ showCount() ? countLabel() : '' }}</span>
+</div>

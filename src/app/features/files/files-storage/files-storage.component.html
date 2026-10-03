@@ -1,0 +1,13 @@
+<span class="storage__label" id="files-storage-label">Storage</span>
+<div
+  class="storage__track"
+  role="progressbar"
+  aria-labelledby="files-storage-label"
+  aria-valuemin="0"
+  aria-valuemax="100"
+  [attr.aria-valuenow]="percent()"
+  [attr.aria-valuetext]="label()"
+>
+  <div class="storage__fill" [style.width.%]="percent()"></div>
+</div>
+<span class="storage__text">{{ label() }}</span>

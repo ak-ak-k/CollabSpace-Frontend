@@ -51,7 +51,7 @@ export class NewGroupDialogComponent {
 
   protected readonly nameMaxLength = GROUP_NAME_MAX_LENGTH;
   protected readonly people = computed(() =>
-    this.workspace.users().filter((user) => user.id !== this.workspace.currentUser()?.id),
+    this.workspace.members().filter((user) => user.id !== this.workspace.currentUser()?.id),
   );
 
   private readonly draft = signal<GroupDraft>({ name: '', memberIds: [] });

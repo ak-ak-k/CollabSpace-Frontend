@@ -117,6 +117,8 @@
 }
 
 .system__actions {
+  --button-padding-inline: var(--space-4);
+
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);

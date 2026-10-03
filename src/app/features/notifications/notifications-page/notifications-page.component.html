@@ -1,0 +1,53 @@
+<div class="notifications">
+  @if (isDesktop()) {
+    <app-notification-sidebar [categories]="categories()" />
+  }
+  <div class="notifications__main">
+    <div class="notifications__content">
+      <app-notifications-header
+        [summary]="summary()"
+        [canMarkAllRead]="canMarkAllRead()"
+        [(show)]="show"
+        (markAllRead)="markAllRead()"
+      />
+
+      @if (!isDesktop()) {
+        <app-tabs
+          class="notifications__tabs"
+          label="Notification categories"
+          [tabs]="tabs()"
+          [active]="filter()"
+        />
+      }
+
+      @switch (body()) {
+        @case ('loading') {
+          <app-skeleton layout="list" compact label="Loading notifications" />
+        }
+        @case ('error') {
+          <app-empty-state
+            kind="error"
+            heading="Couldn’t load notifications"
+            actionLabel="Try again"
+            (action)="reload()"
+          />
+        }
+        @case ('empty') {
+          <app-empty-state
+            icon="check-check"
+            heading="You’re all caught up"
+            [message]="emptyMessage()"
+          />
+        }
+        @default {
+          <app-notification-list
+            [groups]="groups()"
+            (opened)="open($event)"
+            (readToggled)="toggleRead($event)"
+            (dismissed)="dismiss($event)"
+          />
+        }
+      }
+    </div>
+  </div>
+</div>

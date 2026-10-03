@@ -1,0 +1,46 @@
+<div class="settings">
+  @if (showNav()) {
+    <app-settings-nav [current]="navCurrent()" />
+  }
+
+  @if (current(); as section) {
+    <div class="settings__main">
+      <div class="settings__content">
+        @if (isMobile()) {
+          <h1 class="visually-hidden">Settings</h1>
+          <a class="settings__back" [routerLink]="listUrl" [state]="returnState(section.id)">
+            <app-icon name="arrow-left" [size]="16" />
+            All settings
+          </a>
+        }
+
+        <app-settings-section-header
+          [group]="section.group"
+          [heading]="section.label"
+          [description]="section.description"
+        />
+
+        @switch (section.id) {
+          @case ('account') {
+            <app-settings-account />
+          }
+          @case ('profile') {
+            <app-settings-profile />
+          }
+          @case ('notifications') {
+            <app-settings-notifications />
+          }
+          @case ('appearance') {
+            <app-settings-appearance />
+          }
+          @case ('privacy') {
+            <app-settings-privacy />
+          }
+          @case ('security') {
+            <app-settings-security />
+          }
+        }
+      </div>
+    </div>
+  }
+</div>

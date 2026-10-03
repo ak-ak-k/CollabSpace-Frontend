@@ -8,16 +8,18 @@ import { DROPDOWN_IMPORTS } from './dropdown-imports';
   template: `
     <button type="button" class="trigger" [cdkMenuTriggerFor]="menu">More actions</button>
     <ng-template #menu>
-      <app-dropdown label="Conversation actions" width="md">
-        <app-dropdown-heading>Status</app-dropdown-heading>
-        <button appDropdownItem [selected]="true">Online</button>
-        <button appDropdownItem [selected]="false">Away</button>
-        <app-dropdown-divider />
-        <button appDropdownItem tone="danger" (triggered)="deleted.set(true)">
-          <app-icon name="trash-2" [size]="18" />
-          Delete conversation
-        </button>
-      </app-dropdown>
+      <div appDropdownPanel="Conversation actions">
+        <app-dropdown label="Conversation actions" width="md">
+          <app-dropdown-heading>Status</app-dropdown-heading>
+          <button appDropdownItem [selected]="true">Online</button>
+          <button appDropdownItem [selected]="false">Away</button>
+          <app-dropdown-divider />
+          <button appDropdownItem tone="danger" (triggered)="deleted.set(true)">
+            <app-icon name="trash-2" [size]="18" />
+            Delete conversation
+          </button>
+        </app-dropdown>
+      </div>
     </ng-template>
   `,
 })
@@ -52,6 +54,15 @@ describe('DropdownComponent', () => {
     expect(menu()?.getAttribute('role')).toBe('menu');
     expect(menu()?.getAttribute('aria-label')).toBe('Conversation actions');
     expect(menu()?.classList.contains('dropdown--md')).toBe(true);
+  });
+
+  it('wraps the menu in a labelled popup panel', async () => {
+    await open();
+
+    const panel = menu()?.parentElement;
+    expect(panel?.getAttribute('role')).toBe('dialog');
+    expect(panel?.getAttribute('aria-label')).toBe('Conversation actions');
+    expect(panel?.hasAttribute('aria-modal')).toBe(false);
   });
 
   it('renders the heading, divider and items', async () => {

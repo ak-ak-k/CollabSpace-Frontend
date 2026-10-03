@@ -4,6 +4,7 @@ import { PRESENCE_OPTIONS, PresenceOption, userColorSeed } from '../../../core/m
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthState } from '../../../core/state/auth.state';
 import { DATA_MODE_OPTIONS, DataModeState } from '../../../core/state/data-mode.state';
+import { InstallState } from '../../../core/state/install.state';
 import { NetworkState } from '../../../core/state/network.state';
 import { ThemeState } from '../../../core/state/theme.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
@@ -27,6 +28,7 @@ export class UserMenuComponent {
   protected readonly theme = inject(ThemeState);
   protected readonly network = inject(NetworkState);
   protected readonly dataMode = inject(DataModeState);
+  protected readonly installer = inject(InstallState);
 
   protected readonly statusOptions = PRESENCE_OPTIONS;
   protected readonly dataModeOptions = DATA_MODE_OPTIONS;

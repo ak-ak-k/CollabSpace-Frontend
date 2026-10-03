@@ -1,0 +1,49 @@
+@use 'breakpoints';
+
+:host {
+  display: contents;
+}
+
+.category-nav {
+  padding: var(--space-4) var(--space-0);
+}
+
+.category-nav__label {
+  margin: var(--space-0);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-heavy);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+}
+
+.category-nav__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--notifications-category-height);
+  padding: var(--space-0) var(--space-4);
+  color: var(--text-primary);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--hover);
+  }
+
+  @include breakpoints.touch-device {
+    min-height: var(--size-touch-target);
+  }
+}
+
+.category-nav__link--current,
+.category-nav__link--current:hover {
+  background: var(--selected);
+  font-weight: var(--font-weight-heavy);
+}
+
+.category-nav__text {
+  flex: 1;
+  min-width: 0;
+}

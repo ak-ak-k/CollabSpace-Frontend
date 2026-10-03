@@ -1,0 +1,7 @@
+@mixin workspace-dialog-tokens {
+  --channel-name-prefix-width: var(--space-4);
+  --channel-privacy-max-width: 320px;
+  --invite-result-tile-size: var(--size-control-md);
+  --invite-result-list-max-height: min(240px, 34vh);
+  --invite-field-min-width: var(--dialog-field-min-width-md);
+}

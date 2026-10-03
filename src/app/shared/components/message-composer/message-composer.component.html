@@ -38,12 +38,11 @@
       appTextareaAutoGrow
       class="message-composer__input"
       rows="1"
-      role="combobox"
       aria-autocomplete="list"
+      aria-haspopup="listbox"
       [id]="inputId"
       [placeholder]="placeholderText()"
       [value]="draft()"
-      [attr.aria-expanded]="mention.open()"
       [attr.aria-controls]="mention.open() ? listId : null"
       [attr.aria-activedescendant]="mention.open() ? activeOptionId() : null"
       (input)="onInput()"

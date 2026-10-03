@@ -1,0 +1,45 @@
+<form class="create-workspace" novalidate (submit)="create($event)">
+  <app-modal
+    heading="Create workspace"
+    description="A workspace is the home for your organisation’s people, teams and channels."
+    size="md"
+  >
+    <app-input
+      label="Workspace name"
+      placeholder="e.g. Acme Technologies"
+      autocomplete="organization"
+      [maxlength]="nameMaxLength"
+      [formField]="workspaceForm.name"
+      (valueChange)="followName($event)"
+    />
+    <app-workspace-url-field
+      label="Workspace URL"
+      placeholder="acme-technologies"
+      hint="Lowercase letters, numbers and hyphens. You can change it later."
+      [suffix]="urlSuffix"
+      [maxlength]="slugMaxLength"
+      [formField]="workspaceForm.slug"
+      (valueChange)="markSlugEdited()"
+    />
+    <app-textarea
+      label="Description"
+      optional
+      [rows]="2"
+      placeholder="e.g. Build better products together."
+      [maxlength]="descriptionMaxLength"
+      [formField]="workspaceForm.description"
+    />
+    <p class="create-workspace__note">
+      <app-icon name="info" [size]="14" />
+      You’ll be the owner. You can invite people as soon as it’s created.
+    </p>
+
+    <ng-container modalActions>
+      <button appButton type="button" (click)="cancel()">Cancel</button>
+      <button appButton type="submit" variant="primary" [busy]="workspaceForm().submitting()">
+        <app-icon name="building-2" [size]="16" />
+        Create workspace
+      </button>
+    </ng-container>
+  </app-modal>
+</form>

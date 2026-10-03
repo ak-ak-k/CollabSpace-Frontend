@@ -84,4 +84,20 @@ describe('ChatState', () => {
       false,
     );
   });
+
+  it('keeps each workspace inbox separate', async () => {
+    const chat = await load();
+    const workspace = TestBed.inject(WorkspaceState);
+
+    workspace.switchWorkspace('w2');
+
+    expect(chat.previews()).toEqual([]);
+    expect(chat.unreadTotal()).toBe(0);
+    expect(chat.inboxStatus()).toBe('empty');
+
+    const id = await chat.openDirectConversation('u2');
+
+    expect(id).toBe('dm-u2-w2');
+    expect(chat.previews().map((preview) => preview.id)).toEqual(['dm-u2-w2']);
+  });
 });

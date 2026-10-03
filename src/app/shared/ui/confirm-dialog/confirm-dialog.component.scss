@@ -1,3 +1,5 @@
+@use '../input/field/field';
+
 :host {
   display: flex;
   flex-direction: column;
@@ -45,6 +47,24 @@
   margin: var(--space-2) var(--space-0) var(--space-0);
   font-size: var(--font-size-14);
   color: var(--text-secondary);
+}
+
+.confirm-dialog__type {
+  display: flex;
+  flex-direction: column;
+}
+
+.confirm-dialog__type-label {
+  @include field.label;
+
+  strong {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-heavy);
+  }
+}
+
+.confirm-dialog__type-input {
+  @include field.control;
 }
 
 .confirm-dialog__actions {

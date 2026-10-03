@@ -4,6 +4,7 @@ import { FILE_TYPE_ICONS, FILE_TYPE_LABELS, FileItem } from '../../core/models/f
 import { Message } from '../../core/models/message';
 import { Team } from '../../core/models/team';
 import { firstNameOf, PresenceStatus, User, userColorSeed } from '../../core/models/user';
+import { WORKSPACE_ROLE_LABELS } from '../../core/models/workspace-role';
 import { formatLocalTime, formatRelative, formatWhen } from '../../shared/pipes/time-format';
 import { AvatarGroupMember } from '../../shared/ui/avatar-group/avatar-group.component';
 import { IconName } from '../../shared/ui/icon/icon-registry';
@@ -128,13 +129,6 @@ export const channelRowView = (
   };
 };
 
-const TEAM_ROLE_LABELS: Record<User['role'], string> = {
-  owner: 'Admin',
-  admin: 'Admin',
-  member: 'Member',
-  guest: 'Guest',
-};
-
 export const teamMemberView = (user: User, team: Team, currentUserId: string): TeamMemberView => {
   const isMe = user.id === currentUserId;
   return {
@@ -142,7 +136,7 @@ export const teamMemberView = (user: User, team: Team, currentUserId: string): T
     name: user.name,
     label: isMe ? `${user.name} (you)` : user.name,
     title: user.title,
-    role: user.id === team.leadId ? 'Lead' : TEAM_ROLE_LABELS[user.role],
+    role: user.id === team.leadId ? 'Lead' : WORKSPACE_ROLE_LABELS[user.role],
     status: user.status,
     presence: presenceLabelOf(user),
     localTime: formatLocalTime(user.timeZone),

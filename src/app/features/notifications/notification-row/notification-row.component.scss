@@ -1,0 +1,89 @@
+:host {
+  display: grid;
+  grid-template-columns:
+    var(--notification-marker-size) var(--notification-avatar-size)
+    minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-2) var(--space-3) var(--space-3);
+  border-bottom: var(--rule-hairline);
+}
+
+:host(.notification--unread) {
+  background: var(--surface);
+}
+
+.notification__marker {
+  width: var(--notification-marker-size);
+  height: var(--notification-marker-size);
+  margin-top: var(--notification-marker-offset);
+}
+
+:host(.notification--unread) .notification__marker {
+  background: var(--text-primary);
+}
+
+.notification__system {
+  display: grid;
+  place-items: center;
+  width: var(--notification-avatar-size);
+  height: var(--notification-avatar-size);
+  background: var(--text-primary);
+  color: var(--background);
+}
+
+.notification__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.notification__content--link:hover {
+  text-decoration: underline;
+}
+
+.notification__text {
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--notification-text-line-height);
+}
+
+:host(.notification--unread) .notification__text {
+  font-weight: var(--font-weight-semibold);
+}
+
+.notification__actor {
+  font-weight: var(--font-weight-heavy);
+}
+
+.notification__snippet {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: var(--font-size-14);
+  line-height: var(--notification-snippet-line-height);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--notification-snippet-lines);
+  line-clamp: var(--notification-snippet-lines);
+}
+
+.notification__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+}
+
+.notification__tag {
+  padding: var(--space-0-5) var(--space-2);
+}
+
+.notification__actions {
+  display: flex;
+  gap: var(--space-0-5);
+}

@@ -65,6 +65,7 @@ export class TeamDetailComponent {
   protected readonly status = this.workspace.status;
   protected readonly activeTab = computed(() => tabOf(this.tab()) ?? 'overview');
   protected readonly breadcrumb = computed<readonly BreadcrumbItem[]>(() => [
+    { label: this.workspace.currentWorkspace()?.name ?? 'Workspace', link: '/workspace' },
     { label: 'Teams', link: '/teams' },
     { label: this.detail.team()?.name ?? '' },
   ]);

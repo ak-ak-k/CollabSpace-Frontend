@@ -1,0 +1,21 @@
+<app-secondary-sidebar label="Notification categories">
+  <div class="category-nav">
+    <p class="category-nav__label">Categories</p>
+    <ul>
+      @for (category of categories(); track category.id) {
+        <li>
+          <a
+            class="category-nav__link"
+            [class.category-nav__link--current]="category.current"
+            [routerLink]="category.link"
+            [attr.aria-current]="category.current ? 'page' : null"
+          >
+            <app-icon [name]="category.icon" [size]="18" />
+            <span class="category-nav__text">{{ category.label }}</span>
+            <app-badge [count]="category.unreadCount" [label]="category.unreadCount + ' unread'" />
+          </a>
+        </li>
+      }
+    </ul>
+  </div>
+</app-secondary-sidebar>

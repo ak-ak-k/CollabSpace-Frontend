@@ -32,6 +32,7 @@ export interface RadioOption {
   host: {
     '[class]': '"radio-group--" + appearance()',
     '[class.radio-group--stretch]': 'stretch()',
+    '[class.radio-group--icon-only]': 'iconOnly()',
   },
 })
 export class RadioGroupComponent extends FieldControl implements FormValueControl<string> {

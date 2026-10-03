@@ -1,0 +1,67 @@
+<div class="emails" role="group" [attr.aria-labelledby]="labelId">
+  <div class="emails__header">
+    <span class="emails__label" [id]="labelId">Email addresses</span>
+    <span class="emails__count" aria-live="polite">{{ countLabel() }}</span>
+  </div>
+
+  @for (row of views(); track row.id; let position = $index, total = $count) {
+    <div class="row">
+      <div class="row__line">
+        <input
+          #emailField
+          class="row__field"
+          type="email"
+          inputmode="email"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="name@company.com"
+          [class.row__field--invalid]="row.message?.tone === 'error'"
+          [attr.data-row-id]="row.id"
+          [attr.aria-label]="'Email address ' + (position + 1) + ' of ' + total"
+          [attr.aria-invalid]="row.message?.tone === 'error' ? 'true' : null"
+          [attr.aria-describedby]="row.message ? messageId(row) : null"
+          [value]="row.value"
+          (input)="onInput(row, $event)"
+          (paste)="onPaste(row, $event)"
+          (keydown)="onKeydown(row, $event)"
+        />
+        @if (removable()) {
+          <button
+            appIconButton
+            type="button"
+            size="md"
+            [label]="removeLabel(row, position + 1)"
+            (click)="remove(row)"
+          >
+            <app-icon name="x" [size]="16" />
+          </button>
+        }
+      </div>
+      @if (row.message; as message) {
+        <span
+          class="row__message"
+          [class.row__message--alert]="message.tone !== 'hint'"
+          [id]="messageId(row)"
+        >
+          <app-icon [name]="message.icon" [size]="14" />
+          {{ message.text }}
+        </span>
+      }
+    </div>
+  }
+
+  <div class="emails__more">
+    <button appButton type="button" variant="ghost" [disabled]="atLimit()" (click)="add()">
+      <app-icon name="plus" [size]="16" />
+      Add another
+    </button>
+    <span class="emails__tip">Tip: paste a list of addresses to add them all at once.</span>
+  </div>
+
+  @if (policy()) {
+    <p class="emails__policy">
+      <app-icon name="shield-check" [size]="14" />
+      {{ policy() }}
+    </p>
+  }
+</div>

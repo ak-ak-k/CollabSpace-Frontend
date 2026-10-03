@@ -1,0 +1,55 @@
+<app-workspace-settings-note>
+  These are defaults for people who join {{ workspaceName() }}. Everyone can change them in
+  <a class="notifications__link" routerLink="/settings/notifications"
+    >their own notification settings</a
+  >.
+</app-workspace-settings-note>
+
+@if (preferences(); as settings) {
+  <fieldset class="notify">
+    <legend class="notify__legend">Notify new members about</legend>
+    @for (option of notifyOptions; track option.value) {
+      <label
+        class="notify__option"
+        [class.notify__option--selected]="option.value === settings.notifyDefault"
+      >
+        <input
+          class="notify__radio"
+          type="radio"
+          [name]="groupName"
+          [value]="option.value"
+          [checked]="option.value === settings.notifyDefault"
+          (change)="setNotifyDefault(option)"
+        />
+        <span class="notify__text">
+          <strong class="notify__label">{{ option.label }}</strong>
+          <span class="notify__description">{{ option.description }}</span>
+        </span>
+      </label>
+    }
+  </fieldset>
+
+  <ul class="notification-rows">
+    <li
+      appSettingRow
+      wrap
+      label="Email digest"
+      description="A summary of unread mentions and task updates."
+    >
+      <app-radio-group
+        label="Email digest"
+        hideLabel
+        [options]="digestOptions"
+        [value]="settings.digest"
+        (valueChange)="setDigest($event)"
+      />
+    </li>
+    <li
+      appSettingSwitch
+      label="Allow @everyone and @here"
+      description="When off, only owners and admins can notify a whole channel at once."
+      [checked]="settings.allowEveryone"
+      (checkedChange)="setAllowEveryone($event)"
+    ></li>
+  </ul>
+}

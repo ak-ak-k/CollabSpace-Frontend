@@ -1,3 +1,10 @@
+@use 'breakpoints';
+
+@mixin touch-input {
+  min-height: var(--composer-textarea-min-height-touch);
+  padding-block: var(--composer-textarea-padding-block-touch);
+}
+
 :host {
   display: block;
   flex: none;
@@ -39,6 +46,14 @@
 
   &::placeholder {
     color: var(--text-secondary);
+  }
+
+  @include breakpoints.tablet-and-down {
+    @include touch-input;
+  }
+
+  @include breakpoints.touch-device {
+    @include touch-input;
   }
 }
 

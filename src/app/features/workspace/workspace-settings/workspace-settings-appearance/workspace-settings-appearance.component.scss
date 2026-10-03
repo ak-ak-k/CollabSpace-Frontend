@@ -1,0 +1,20 @@
+@use 'touch';
+@use '../../../settings/settings-section';
+
+:host {
+  @include settings-section.section-host;
+}
+
+.appearance__link {
+  font-weight: var(--font-weight-semibold);
+
+  @include touch.on-touch {
+    position: relative;
+
+    @include touch.minimum-hit-area;
+  }
+}
+
+.appearance-rows {
+  @include settings-section.list(var(--rule-hairline));
+}

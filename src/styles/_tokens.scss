@@ -15,6 +15,16 @@
 @use 'tokens/composer';
 @use 'tokens/conversation';
 @use 'tokens/teams';
+@use 'tokens/tasks';
+@use 'tokens/files';
+@use 'tokens/notifications';
+@use 'tokens/settings';
+@use 'tokens/profile';
+@use 'tokens/workspace';
+@use 'tokens/workspace-switcher';
+@use 'tokens/workspace-dialogs';
+@use 'tokens/workspace-settings';
+@use 'tokens/density';
 
 :root {
   @include foundation.foundation;
@@ -31,6 +41,15 @@
   @include composer.composer-tokens;
   @include conversation.conversation-tokens;
   @include teams.teams-tokens;
+  @include tasks.tasks-tokens;
+  @include files.files-tokens;
+  @include notifications.notifications-tokens;
+  @include settings.settings-tokens;
+  @include profile.profile-tokens;
+  @include workspace.workspace-tokens;
+  @include workspace-switcher.workspace-switcher-tokens;
+  @include workspace-dialogs.workspace-dialog-tokens;
+  @include workspace-settings.workspace-settings-tokens;
 }
 
 :root,
@@ -46,4 +65,8 @@
   @include semantic.semantic-colors;
   @include identity.dark-identity;
   color-scheme: dark;
+}
+
+[data-density='compact'] {
+  @include density.compact-density;
 }

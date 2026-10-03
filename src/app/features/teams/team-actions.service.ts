@@ -5,23 +5,27 @@ import { DialogService } from '../../core/services/dialog.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ChatState } from '../../core/state/chat.state';
 import { WorkspaceState } from '../../core/state/workspace.state';
-import { CreateTeamDialogComponent } from './create-team-dialog/create-team-dialog.component';
-import { InviteDialogComponent } from './invite-dialog/invite-dialog.component';
+import { WorkspaceActions } from '../workspace/workspace-actions.service';
 
 @Service()
 export class TeamActions {
   private readonly workspace = inject(WorkspaceState);
+  private readonly workspaceActions = inject(WorkspaceActions);
   private readonly chat = inject(ChatState);
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
 
   createTeam(): void {
-    this.dialogs.open(CreateTeamDialogComponent, { size: 'md' });
+    this.workspaceActions.openCreateTeam();
   }
 
   invite(teamId: string): void {
-    this.dialogs.open(InviteDialogComponent, { size: 'md', data: { teamId } });
+    this.workspaceActions.openInvite(teamId);
+  }
+
+  createChannel(teamId: string | null = null): void {
+    this.workspaceActions.openCreateChannel(teamId);
   }
 
   manage(teamId: string): void {
@@ -49,10 +53,6 @@ export class TeamActions {
   async message(userId: string): Promise<void> {
     const conversationId = await this.chat.openDirectConversation(userId);
     await this.router.navigate(['/messages', conversationId]);
-  }
-
-  createChannel(): void {
-    this.toasts.show('Channel creation is coming soon to this prototype', { icon: 'info' });
   }
 
   download(name: string): void {

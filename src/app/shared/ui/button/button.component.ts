@@ -1,7 +1,7 @@
 import { booleanAttribute, Component, input } from '@angular/core';
 import { SpinnerComponent } from '../spinner/spinner.component';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = 'primary' | 'inverted' | 'secondary' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
 
 @Component({

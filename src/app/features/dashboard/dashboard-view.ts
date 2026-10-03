@@ -51,6 +51,7 @@ export interface StatInputs {
   readonly onlineMembers: number;
   readonly knownMembers: number;
   readonly workspace: Workspace | null;
+  readonly dataEmpty: boolean;
 }
 
 const UPCOMING_TASK_LIMIT = 5;
@@ -117,13 +118,16 @@ export const toActivity = (
     route: event.route,
   }));
 
-const busiestTeamCaption = (teams: readonly Team[]): string => {
+const busiestTeamCaption = (teams: readonly Team[], dataEmpty: boolean): string => {
   const busiest = toTeamActivity(teams)[0];
-  return busiest ? `${busiest.name} is the most active` : 'Create your first team';
+  if (dataEmpty) {
+    return 'Create your first team';
+  }
+  return busiest ? `${busiest.name} is the most active` : 'No teams yet';
 };
 
-const openTasksCaption = (tasks: readonly UpcomingTaskView[]): string => {
-  if (tasks.length === 0) {
+const openTasksCaption = (tasks: readonly UpcomingTaskView[], dataEmpty: boolean): string => {
+  if (dataEmpty) {
     return 'Board is empty';
   }
   const dueToday = `${tasksDueToday(tasks)} due today`;
@@ -137,7 +141,7 @@ export const toStats = (inputs: StatInputs): DashboardStat[] => [
     label: 'Active teams',
     icon: 'users',
     value: inputs.joinedTeams.length,
-    caption: busiestTeamCaption(inputs.joinedTeams),
+    caption: busiestTeamCaption(inputs.joinedTeams, inputs.dataEmpty),
     link: '/teams',
     tone: 'default',
   },
@@ -146,9 +150,9 @@ export const toStats = (inputs: StatInputs): DashboardStat[] => [
     label: 'Unread messages',
     icon: 'message-square',
     value: inputs.unreadMessages,
-    caption: inputs.unreadConversations
-      ? `Across ${plural(inputs.unreadConversations, 'conversation')}`
-      : 'No unread messages',
+    caption: inputs.dataEmpty
+      ? 'No messages yet'
+      : `Across ${plural(inputs.unreadConversations, 'conversation')}`,
     link: '/messages',
     tone: 'default',
   },
@@ -157,7 +161,7 @@ export const toStats = (inputs: StatInputs): DashboardStat[] => [
     label: 'Open tasks',
     icon: 'square-kanban',
     value: inputs.openTasks.length,
-    caption: openTasksCaption(inputs.openTasks),
+    caption: openTasksCaption(inputs.openTasks, inputs.dataEmpty),
     link: '/tasks',
     tone: overdueTasks(inputs.openTasks) > 0 ? 'danger' : 'default',
   },
@@ -167,7 +171,7 @@ export const toStats = (inputs: StatInputs): DashboardStat[] => [
     icon: 'activity',
     value: inputs.onlineMembers,
     caption: inputs.workspace ? `of ${inputs.knownMembers} in ${inputs.workspace.name}` : '',
-    link: '/settings/members',
+    link: '/workspace/members/online',
     tone: 'default',
   },
 ];

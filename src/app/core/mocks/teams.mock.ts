@@ -3,6 +3,7 @@ import { Team } from '../models/team';
 export const MOCK_TEAMS: readonly Team[] = [
   {
     id: 't-frontend',
+    workspaceId: 'w1',
     name: 'Frontend',
     code: 'FE',
     description: 'Web app, design-system implementation and performance.',
@@ -17,6 +18,7 @@ export const MOCK_TEAMS: readonly Team[] = [
   },
   {
     id: 't-platform',
+    workspaceId: 'w1',
     name: 'Platform',
     code: 'PL',
     description: 'APIs, infrastructure, reliability and on-call.',
@@ -31,6 +33,7 @@ export const MOCK_TEAMS: readonly Team[] = [
   },
   {
     id: 't-design',
+    workspaceId: 'w1',
     name: 'Design',
     code: 'DE',
     description: 'Product design, research and the Northstar design language.',
@@ -45,6 +48,7 @@ export const MOCK_TEAMS: readonly Team[] = [
   },
   {
     id: 't-mobile',
+    workspaceId: 'w1',
     name: 'Mobile',
     code: 'MO',
     description: 'iOS and Android apps, push notifications and offline sync.',
@@ -59,6 +63,7 @@ export const MOCK_TEAMS: readonly Team[] = [
   },
   {
     id: 't-growth',
+    workspaceId: 'w1',
     name: 'Growth',
     code: 'GR',
     description: 'Lifecycle marketing, onboarding experiments and analytics.',
@@ -73,6 +78,7 @@ export const MOCK_TEAMS: readonly Team[] = [
   },
   {
     id: 't-success',
+    workspaceId: 'w1',
     name: 'Customer Success',
     code: 'CS',
     description: 'Escalations, onboarding calls and customer feedback loops.',

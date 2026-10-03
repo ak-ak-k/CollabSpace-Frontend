@@ -1,5 +1,7 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { MessageView, ReplyPreview } from '../../../core/models/thread';
+import { PreferencesState } from '../../../core/state/preferences.state';
+import { WorkspaceState } from '../../../core/state/workspace.state';
 import { ComposerDrafts } from './composer-drafts';
 
 @Injectable()
@@ -10,6 +12,12 @@ export class ConversationSessionState {
   readonly replyTo = signal<MessageView | null>(null);
   readonly dockedDetailsOpen = signal(false);
   readonly drafts = new ComposerDrafts();
+  private readonly workspace = inject(WorkspaceState);
+
+  readonly enterToSend = inject(PreferencesState).enterToSend;
+  readonly archivedWorkspace = computed(() =>
+    this.workspace.isArchived() ? (this.workspace.currentWorkspace()?.name ?? '') : '',
+  );
 
   readonly searchTerm = computed(() => (this.searchOpen() ? this.query().trim() : ''));
   readonly searching = computed(() => this.searchTerm() !== '');

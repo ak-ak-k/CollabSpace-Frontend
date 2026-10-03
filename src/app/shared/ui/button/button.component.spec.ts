@@ -1,13 +1,13 @@
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ButtonComponent } from './button.component';
+import { ButtonComponent, ButtonVariant } from './button.component';
 
 @Component({
   imports: [ButtonComponent],
   template: `<button appButton [variant]="variant()" [busy]="busy()" block>Save</button>`,
 })
 class ButtonHostComponent {
-  readonly variant = signal<'primary' | 'secondary' | 'ghost'>('primary');
+  readonly variant = signal<ButtonVariant>('primary');
   readonly busy = signal(false);
 }
 
@@ -47,5 +47,14 @@ describe('ButtonComponent', () => {
 
     expect(button.classList.contains('button--ghost')).toBe(true);
     expect(button.classList.contains('button--primary')).toBe(false);
+  });
+
+  it('renders the inverted variant used for dark filled actions', async () => {
+    const { fixture, button } = await render();
+
+    fixture.componentInstance.variant.set('inverted');
+    await fixture.whenStable();
+
+    expect(button.classList.contains('button--inverted')).toBe(true);
   });
 });

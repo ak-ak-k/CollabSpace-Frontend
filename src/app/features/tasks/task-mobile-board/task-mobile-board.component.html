@@ -1,0 +1,30 @@
+<app-tabs
+  class="mobile__tabs"
+  label="Columns"
+  gap="md"
+  size="lg"
+  bleed
+  [tabs]="tabs()"
+  [active]="activeStatus()"
+  (activeChange)="select($event)"
+/>
+@if (column(); as current) {
+  <div class="mobile__panel" role="tabpanel" [attr.aria-label]="current.label">
+    @for (card of current.cards; track card.id) {
+      <button
+        type="button"
+        class="mobile__card"
+        [attr.aria-label]="card.accessibleLabel"
+        (click)="open.emit(card.id)"
+      >
+        <app-task-card [card]="card" />
+      </button>
+    } @empty {
+      <p class="mobile__empty">No tasks in {{ current.label }}.</p>
+    }
+    <button appButton type="button" block (click)="add.emit(current.status)">
+      <app-icon name="plus" [size]="16" />
+      Add to {{ current.label }}
+    </button>
+  </div>
+}

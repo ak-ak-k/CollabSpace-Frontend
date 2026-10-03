@@ -1,0 +1,25 @@
+@mixin tasks-tokens {
+  --tasks-header-padding: clamp(16px, 3vw, 32px);
+  --tasks-header-text-basis: 260px;
+  --tasks-search-basis: 220px;
+  --tasks-search-max-width: 320px;
+  --task-column-min-width: 272px;
+  --task-column-count: 5;
+  --task-column-empty-min-height: 88px;
+  --task-drop-indicator-height: var(--border-width-bar);
+  --task-card-title-line-height: 1.35;
+  --task-filter-avatar-size: 34px;
+  --task-filter-avatar-overlap: -6px;
+  --task-drawer-title-size: var(--font-size-25);
+  --task-drawer-field-min-width: 180px;
+  --task-description-min-height: 110px;
+  --task-label-chip-height: 28px;
+  --task-dot-backlog: var(--color-neutral-400);
+  --task-dot-todo: var(--color-neutral-700);
+  --task-dot-progress: var(--text-primary);
+  --task-dot-review: var(--warning);
+  --task-dot-done: var(--success);
+  --size-task-dot: var(--space-2);
+  --task-drag-duration: 250ms;
+  --task-column-add-size: 30px;
+}

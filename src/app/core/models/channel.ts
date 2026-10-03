@@ -7,3 +7,10 @@ export interface Channel {
   readonly isPrivate: boolean;
   readonly createdLabel: string;
 }
+
+export interface NewChannel {
+  readonly teamId: string;
+  readonly name: string;
+  readonly description: string;
+  readonly isPrivate: boolean;
+}

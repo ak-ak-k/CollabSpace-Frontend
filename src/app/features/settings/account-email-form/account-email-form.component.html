@@ -1,0 +1,17 @@
+<section class="account-email" aria-labelledby="settings-email-title">
+  <h3 id="settings-email-title" class="account-email__title">Email address</h3>
+  <form class="account-email__row" [formRoot]="emailForm">
+    <app-input
+      class="account-email__input"
+      label="Email address"
+      hideLabel
+      type="email"
+      autocomplete="email"
+      [formField]="emailForm.email"
+    />
+    <button appButton type="submit">Update email</button>
+  </form>
+  <p class="account-email__hint">
+    We’ll send a confirmation link to the new address before switching.
+  </p>
+</section>

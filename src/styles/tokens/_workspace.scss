@@ -1,0 +1,31 @@
+@mixin workspace-tokens {
+  --workspace-page-max-width: 1200px;
+  --workspace-page-padding: clamp(var(--space-4), 3vw, var(--space-10));
+  --workspace-header-text-basis: 300px;
+  --workspace-logo-size: 72px;
+  --workspace-logo-size-mobile: var(--size-avatar-56);
+  --workspace-logo-font-size: var(--font-size-25);
+  --workspace-logo-font-size-mobile: var(--font-size-20);
+  --workspace-title-size: clamp(var(--font-size-25), 3vw, var(--font-size-32));
+  --workspace-description-max-width: 640px;
+
+  --workspace-stat-columns-narrow: 2;
+  --workspace-stat-columns-wide: 4;
+  --workspace-overview-columns: minmax(0, 2fr) minmax(0, 1fr);
+
+  --workspace-members-search-basis: 260px;
+  --workspace-members-search-max-width: 420px;
+  --workspace-members-title-width: 24%;
+  --workspace-members-role-width: 104px;
+  --workspace-members-status-width: 136px;
+  --workspace-members-active-width: 140px;
+  --workspace-members-active-width-wide: 150px;
+  --workspace-members-actions-width: 56px;
+
+  --workspace-role-radio-size: 16px;
+
+  --workspace-profile-drawer-width: min(420px, 100vw);
+  --workspace-profile-bar-height: 60px;
+  --workspace-profile-avatar-size: 80px;
+  --workspace-profile-avatar-font-size: var(--font-size-28);
+}

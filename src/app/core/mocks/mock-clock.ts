@@ -1,6 +1,8 @@
 const MILLISECONDS_PER_MINUTE = 60_000;
 const MILLISECONDS_PER_DAY = 86_400_000;
 
+export const MINUTES_PER_DAY = 1440;
+
 const loadedAt = Date.now();
 
 const startOfToday = (): number => {

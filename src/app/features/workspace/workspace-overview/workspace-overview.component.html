@@ -1,0 +1,74 @@
+@switch (status()) {
+  @case ('loading') {
+    <app-skeleton layout="cards" compact label="Loading workspace" />
+  }
+  @case ('error') {
+    <app-empty-state
+      kind="error"
+      heading="Couldn’t load this workspace"
+      message="We couldn’t reach the workspace service. Nothing has changed — try again in a moment."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  }
+  @default {
+    <app-overview-stats [stats]="stats()" />
+
+    <div class="overview">
+      <section class="overview__quick" aria-labelledby="workspace-quick-heading">
+        <app-section-header headingId="workspace-quick-heading" heading="Quick actions" />
+        <div class="overview__actions">
+          @if (access().canInvite) {
+            <button
+              appButton
+              type="button"
+              variant="primary"
+              size="lg"
+              block
+              (click)="actions.openInvite()"
+            >
+              <app-icon name="user-plus" [size]="18" />
+              Invite members
+            </button>
+          }
+          @if (access().canCreateTeams) {
+            <button appButton type="button" size="lg" block (click)="actions.openCreateTeam()">
+              <app-icon name="users" [size]="18" />
+              Create team
+            </button>
+            <button appButton type="button" size="lg" block (click)="actions.openCreateChannel()">
+              <app-icon name="hash" [size]="18" />
+              Create channel
+            </button>
+          }
+          @if (locked()) {
+            <p class="overview__locked">
+              <app-icon class="overview__locked-icon" name="lock" [size]="16" />
+              Guests can’t invite people or create teams in {{ workspaceName() }}. Ask an admin if
+              you need access.
+            </p>
+          }
+        </div>
+      </section>
+
+      <app-overview-activity class="overview__activity" [items]="activity()" />
+
+      <app-overview-teams
+        class="overview__teams"
+        [teams]="teams()"
+        [canCreate]="access().canCreateTeams"
+        (createTeam)="actions.openCreateTeam()"
+      />
+
+      <section class="overview__details" aria-labelledby="workspace-details-heading">
+        <app-section-header headingId="workspace-details-heading" heading="Details" />
+        <dl class="details">
+          @for (detail of details(); track detail.term) {
+            <dt class="details__term">{{ detail.term }}</dt>
+            <dd class="details__value">{{ detail.value }}</dd>
+          }
+        </dl>
+      </section>
+    </div>
+  }
+}

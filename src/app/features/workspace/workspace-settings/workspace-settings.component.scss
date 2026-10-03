@@ -1,0 +1,40 @@
+@use 'breakpoints';
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.workspace-settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--workspace-settings-layout-gap);
+  min-width: 0;
+
+  @include breakpoints.desktop {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.workspace-settings__content {
+  --settings-section-title-size: var(--workspace-settings-title-size);
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  min-width: 0;
+  max-width: var(--workspace-settings-content-max-width);
+}
+
+.workspace-settings__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  align-self: flex-start;
+  min-height: var(--size-touch-target);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+}

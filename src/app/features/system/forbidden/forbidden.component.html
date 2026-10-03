@@ -1,0 +1,16 @@
+<app-system-page
+  kicker="Error 403"
+  icon="lock"
+  [heading]="heading()"
+  [message]="message()"
+  [lists]="lists"
+>
+  <button appButton type="button" variant="primary" size="lg" (click)="requestAccess()">
+    <app-icon name="send-horizontal" [size]="16" />
+    Request access
+  </button>
+  <a appButton size="lg" routerLink="/teams">
+    <app-icon name="arrow-left" [size]="16" />
+    Back to teams
+  </a>
+</app-system-page>

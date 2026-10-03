@@ -19,13 +19,9 @@
     />
   }
   @case ('empty') {
-    <app-empty-state
-      compact
-      [headingLevel]="3"
-      icon="users"
-      heading="No teams yet"
-      message="Create a team to see how active it is each week."
-    />
+    <p class="teams__none">
+      No teams in {{ workspaceName() }} yet. <a routerLink="/teams">Create a team</a>
+    </p>
   }
   @default {
     <ul class="teams">

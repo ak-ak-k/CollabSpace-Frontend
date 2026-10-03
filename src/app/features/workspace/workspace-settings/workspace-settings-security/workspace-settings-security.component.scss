@@ -1,0 +1,13 @@
+@use '../../../settings/settings-section';
+
+:host {
+  @include settings-section.section-host;
+}
+
+.security-rows {
+  @include settings-section.list(var(--rule-hairline));
+}
+
+.security__sign-out {
+  color: var(--danger);
+}

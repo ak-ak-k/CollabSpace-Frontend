@@ -1,0 +1,47 @@
+@switch (status()) {
+  @case ('loading') {
+    <app-skeleton layout="cards" [rows]="6" label="Loading integrations" />
+  }
+  @case ('error') {
+    <app-empty-state
+      kind="error"
+      [headingLevel]="3"
+      heading="Couldn’t load integrations"
+      actionLabel="Try again"
+      (action)="reload()"
+    />
+  }
+  @default {
+    <ul class="integrations">
+      @for (integration of integrations(); track integration.id) {
+        <li class="integrations__item">
+          <app-card class="integration">
+            <div cardTitle class="integration__header">
+              <span class="integration__tile" aria-hidden="true">
+                <app-icon [name]="integration.icon" [size]="20" />
+              </span>
+              <h3 class="integration__name">{{ integration.name }}</h3>
+              @if (integration.connected) {
+                <app-tag tone="outline">Connected</app-tag>
+              }
+            </div>
+            <p class="integration__description">{{ integration.description }}</p>
+            <div cardMeta>
+              <button
+                appButton
+                type="button"
+                size="sm"
+                [attr.aria-label]="
+                  (integration.connected ? 'Disconnect ' : 'Connect ') + integration.name
+                "
+                (click)="toggle(integration)"
+              >
+                {{ integration.connected ? 'Disconnect' : 'Connect' }}
+              </button>
+            </div>
+          </app-card>
+        </li>
+      }
+    </ul>
+  }
+}

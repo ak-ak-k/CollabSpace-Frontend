@@ -19,10 +19,11 @@ export class FilesData {
     return this.request.read(() => this.files, []);
   }
 
-  uploadFile(name: string): Promise<FileItem> {
+  uploadFile(name: string, workspaceId: string): Promise<FileItem> {
     return this.request.write(() => {
       const file: FileItem = {
         id: `f-new-${++this.uploadedFiles}`,
+        workspaceId,
         name,
         type: fileTypeOf(name),
         sizeLabel: UPLOADED_FILE_SIZE_LABEL,

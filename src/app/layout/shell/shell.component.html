@@ -1,4 +1,4 @@
-<a class="skip-link" href="#main" (click)="focusMain($event)">Skip to content</a>
+<a class="skip-link" href="#main" (click)="skipToMain($event)">Skip to content</a>
 
 <div class="shell">
   @if (!breakpoint.isMobile()) {
@@ -9,8 +9,9 @@
     @if (network.offline()) {
       <app-offline-banner (retry)="retryNetwork()" />
     }
+    <app-workspace-banner (resolved)="focusMain()" />
     @if (breakpoint.isMobile() && !immersive()) {
-      <app-mobile-header (menuRequested)="openDrawer()" (searchRequested)="search.open()" />
+      <app-mobile-header (searchRequested)="search.open()" />
     }
 
     <main class="shell__main" id="main" tabindex="-1" #main>

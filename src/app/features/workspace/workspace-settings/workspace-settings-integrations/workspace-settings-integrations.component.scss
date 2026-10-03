@@ -1,0 +1,55 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.integrations {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(100%, var(--workspace-settings-integration-card-min-width)), 1fr)
+  );
+  gap: var(--space-3);
+  margin: var(--space-0);
+  padding: var(--space-0);
+  list-style: none;
+}
+
+.integrations__item {
+  display: flex;
+  min-width: 0;
+}
+
+.integration {
+  flex: 1;
+  gap: var(--space-3);
+}
+
+.integration__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.integration__tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--workspace-settings-integration-tile-size);
+  height: var(--workspace-settings-integration-tile-size);
+  background: var(--text-primary);
+  color: var(--background);
+}
+
+.integration__name {
+  flex: 1;
+  min-width: 0;
+  margin: var(--space-0);
+  font-size: var(--font-size-16);
+}
+
+.integration__description {
+  margin: var(--space-0);
+  color: var(--text-secondary);
+  font-size: var(--font-size-14);
+}

@@ -1,0 +1,63 @@
+@use 'breakpoints';
+
+:host {
+  display: block;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.toolbar__search {
+  flex: 1 1 var(--tasks-search-basis);
+  max-width: var(--tasks-search-max-width);
+}
+
+.toolbar__people {
+  display: flex;
+  padding-left: calc(var(--task-filter-avatar-overlap) * -1);
+}
+
+.toolbar__person {
+  position: relative;
+  z-index: var(--z-base);
+  display: grid;
+  place-items: center;
+  width: var(--task-filter-avatar-size);
+  height: var(--task-filter-avatar-size);
+  margin-left: var(--task-filter-avatar-overlap);
+  padding: var(--space-0);
+  border: var(--space-0);
+  background: var(--background);
+  box-shadow: 0 0 0 var(--border-width-rule) var(--background);
+  cursor: pointer;
+
+  @include breakpoints.tablet-and-down {
+    width: var(--size-touch-target);
+    height: var(--size-touch-target);
+  }
+
+  @include breakpoints.touch-device {
+    width: var(--size-touch-target);
+    height: var(--size-touch-target);
+  }
+}
+
+.toolbar__person--on {
+  z-index: var(--z-raised);
+  box-shadow:
+    0 0 0 var(--border-width-rule) var(--background),
+    0 0 0 calc(var(--border-width-rule) * 2) var(--text-primary);
+}
+
+.toolbar__spacer {
+  flex: 1;
+}
+
+.toolbar__count {
+  color: var(--text-muted);
+  font-size: var(--font-size-13);
+}

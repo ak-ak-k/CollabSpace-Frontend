@@ -40,7 +40,7 @@ describe('ConfirmDialogComponent', () => {
   it('requests initial focus on Cancel for the danger tone', async () => {
     const host = await render(resolveConfirmData({ title: 'Delete?', body: 'Gone for good.' }));
 
-    expect(host.querySelector('[cdk-focus-initial]')?.textContent?.trim()).toBe('Cancel');
+    expect(host.querySelector('[cdkfocusinitial]')?.textContent?.trim()).toBe('Cancel');
     expect(host.classList.contains('confirm-dialog--neutral')).toBe(false);
   });
 
@@ -49,7 +49,7 @@ describe('ConfirmDialogComponent', () => {
       resolveConfirmData({ title: 'Sign out?', body: 'See you soon.', tone: 'neutral' }),
     );
 
-    expect(host.querySelector('[cdk-focus-initial]')?.textContent?.trim()).toBe('Confirm');
+    expect(host.querySelector('[cdkfocusinitial]')?.textContent?.trim()).toBe('Confirm');
     expect(host.classList.contains('confirm-dialog--neutral')).toBe(true);
   });
 
@@ -61,5 +61,24 @@ describe('ConfirmDialogComponent', () => {
     confirm.click();
 
     expect(close.mock.calls).toEqual([[false], [true]]);
+  });
+
+  it('keeps the confirm button disabled until the exact text is typed', async () => {
+    const host = await render(
+      resolveConfirmData({ title: 'Delete Acme?', body: 'Gone.', confirmText: 'Acme' }),
+    );
+    const input = host.querySelector('input') as HTMLInputElement;
+    const confirm = Array.from(host.querySelectorAll('button')).at(-1) as HTMLButtonElement;
+
+    expect(input.hasAttribute('cdkfocusinitial')).toBe(true);
+    expect(confirm.disabled).toBe(true);
+
+    input.value = 'Acme';
+    input.dispatchEvent(new Event('input'));
+    TestBed.tick();
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(confirm.disabled).toBe(false);
+    expect(close).toHaveBeenCalledWith(true);
   });
 });

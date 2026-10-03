@@ -1,0 +1,11 @@
+@if (banner(); as view) {
+  <div class="workspace-banner">
+    <app-icon [name]="view.icon" [size]="16" />
+    <span class="workspace-banner__message">{{ view.message }}</span>
+    @if (canAct()) {
+      <button type="button" class="workspace-banner__action" (click)="act(view.action)">
+        {{ view.actionLabel }}
+      </button>
+    }
+  </div>
+}

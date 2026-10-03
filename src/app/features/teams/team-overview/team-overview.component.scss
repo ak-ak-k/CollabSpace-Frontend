@@ -1,3 +1,5 @@
+@use 'touch';
+
 :host {
   display: block;
 }
@@ -95,6 +97,10 @@
   display: flex;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-1);
+
+  @include touch.on-touch {
+    position: relative;
+  }
 }
 
 .activity__text {
@@ -110,6 +116,10 @@
 .activity__object {
   color: var(--text-primary);
   font-weight: var(--font-weight-semibold);
+
+  @include touch.on-touch {
+    @include touch.stretched-hit-area;
+  }
 }
 
 .activity__when {

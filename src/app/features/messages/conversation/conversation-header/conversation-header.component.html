@@ -94,39 +94,41 @@
 </header>
 
 <ng-template #moreMenu>
-  <app-dropdown label="Conversation actions" width="md">
-    @if (compact()) {
-      <button appDropdownItem (triggered)="searchToggled.emit()">
-        <app-icon name="search" [size]="18" />
-        Search in conversation
+  <div appDropdownPanel="Conversation actions">
+    <app-dropdown label="Conversation actions" width="md">
+      @if (compact()) {
+        <button appDropdownItem (triggered)="searchToggled.emit()">
+          <app-icon name="search" [size]="18" />
+          Search in conversation
+        </button>
+      }
+      <button appDropdownItem (triggered)="starToggled.emit()">
+        <app-icon name="star" [size]="18" />
+        {{ starLabel() }}
       </button>
-    }
-    <button appDropdownItem (triggered)="starToggled.emit()">
-      <app-icon name="star" [size]="18" />
-      {{ starLabel() }}
-    </button>
-    <button appDropdownItem (triggered)="muteToggled.emit()">
-      <app-icon [name]="muted() ? 'bell' : 'bell-off'" [size]="18" />
-      {{ muted() ? 'Unmute' : 'Mute notifications' }}
-    </button>
-    <button appDropdownItem (triggered)="markedUnread.emit()">
-      <app-icon name="circle-dot" [size]="18" />
-      Mark as unread
-    </button>
-    <button appDropdownItem (triggered)="pinnedRequested.emit()">
-      <app-icon name="pin" [size]="18" />
-      View pinned messages
-    </button>
-    <button appDropdownItem (triggered)="linkCopied.emit()">
-      <app-icon name="link" [size]="18" />
-      Copy link
-    </button>
-    @if (view().type !== 'dm') {
-      <app-dropdown-divider />
-      <button appDropdownItem (triggered)="left.emit()">
-        <app-icon name="log-out" [size]="18" />
-        {{ leaveLabel() }}
+      <button appDropdownItem (triggered)="muteToggled.emit()">
+        <app-icon [name]="muted() ? 'bell' : 'bell-off'" [size]="18" />
+        {{ muted() ? 'Unmute' : 'Mute notifications' }}
       </button>
-    }
-  </app-dropdown>
+      <button appDropdownItem (triggered)="markedUnread.emit()">
+        <app-icon name="circle-dot" [size]="18" />
+        Mark as unread
+      </button>
+      <button appDropdownItem (triggered)="pinnedRequested.emit()">
+        <app-icon name="pin" [size]="18" />
+        View pinned messages
+      </button>
+      <button appDropdownItem (triggered)="linkCopied.emit()">
+        <app-icon name="link" [size]="18" />
+        Copy link
+      </button>
+      @if (view().type !== 'dm') {
+        <app-dropdown-divider />
+        <button appDropdownItem (triggered)="left.emit()">
+          <app-icon name="log-out" [size]="18" />
+          {{ leaveLabel() }}
+        </button>
+      }
+    </app-dropdown>
+  </div>
 </ng-template>

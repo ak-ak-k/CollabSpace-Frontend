@@ -1,6 +1,7 @@
 import { computed, DestroyRef, inject, Service, signal } from '@angular/core';
 import { SearchData, SearchGroup } from '../../../core/data/search.data';
 import { SearchFilter, SearchService } from '../../../core/services/search.service';
+import { WorkspaceState } from '../../../core/state/workspace.state';
 
 export const SEARCH_DEBOUNCE_MS = 220;
 
@@ -10,6 +11,7 @@ export type SearchStatus = 'idle' | 'searching' | 'refreshing' | 'failed' | 'emp
 export class SearchSession {
   private readonly data = inject(SearchData);
   private readonly initialFilter = inject(SearchService).filter();
+  private readonly workspace = inject(WorkspaceState);
 
   private pendingTimer: ReturnType<typeof setTimeout> | null = null;
   private latestRequest = 0;
@@ -73,7 +75,14 @@ export class SearchSession {
 
   private async run(request: number): Promise<void> {
     try {
-      this.finish(request, await this.data.search(this.term(), this.filter()), false);
+      this.finish(
+        request,
+        await this.data.search(this.term(), this.filter(), {
+          workspaceId: this.workspace.currentWorkspaceId(),
+          memberIds: this.workspace.memberIds(),
+        }),
+        false,
+      );
     } catch {
       this.finish(request, [], true);
     }

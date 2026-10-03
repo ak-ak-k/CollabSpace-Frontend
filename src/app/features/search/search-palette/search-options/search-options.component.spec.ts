@@ -47,7 +47,9 @@ describe('SearchOptionsComponent', () => {
   });
 
   it('groups the options under labelled headings and keeps buttons out of the listbox', async () => {
-    const sections = layOutSections(idleDrafts(['NS-142', 'Priya'], jumpCommands(false)));
+    const sections = layOutSections(
+      idleDrafts(['NS-142', 'Priya'], jumpCommands(false, 'Northstar Labs')),
+    );
     fixture.componentRef.setInput('sections', sections);
     await fixture.whenStable();
 
@@ -57,7 +59,7 @@ describe('SearchOptionsComponent', () => {
     );
 
     expect(headings.map((heading) => heading?.trim())).toEqual(['Recent searches', 'Jump to']);
-    expect(options().length).toBe(10);
+    expect(options().length).toBe(13);
     expect(listbox().querySelector('button')).toBeNull();
     expect(host.querySelectorAll('button').length).toBe(2);
   });

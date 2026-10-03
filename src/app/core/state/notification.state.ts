@@ -2,7 +2,8 @@ import { computed, effect, inject, Service, signal, untracked } from '@angular/c
 import { NotificationsData } from '../data/notifications.data';
 import { AppNotification, NotificationFilter } from '../models/notification';
 import { DataModeState } from './data-mode.state';
-import { Loadable } from './loadable';
+import { Loadable, settledStatus } from './loadable';
+import { WorkspaceState } from './workspace.state';
 
 const matches = (notification: AppNotification, filter: NotificationFilter): boolean =>
   filter === 'all' || notification.category === filter;
@@ -11,16 +12,21 @@ const matches = (notification: AppNotification, filter: NotificationFilter): boo
 export class NotificationState {
   private readonly data = inject(NotificationsData);
   private readonly dataMode = inject(DataModeState);
+  private readonly workspace = inject(WorkspaceState);
 
-  readonly notifications = signal<readonly AppNotification[]>([]);
+  private readonly allNotifications = signal<readonly AppNotification[]>([]);
 
   private readonly loader = new Loadable<readonly AppNotification[]>({
     fetch: () => this.data.getNotifications(),
-    store: (notifications) => this.notifications.set(notifications),
+    store: (notifications) => this.allNotifications.set(notifications),
     isEmpty: (notifications) => notifications.length === 0,
   });
 
-  readonly status = this.loader.status;
+  readonly notifications = computed(() =>
+    this.allNotifications().filter((notification) => this.workspace.contains(notification)),
+  );
+  readonly loadStatus = this.loader.status.asReadonly();
+  readonly status = settledStatus(this.loader.status, () => this.notifications().length === 0);
   readonly unread = computed(() =>
     this.notifications().filter((notification) => !notification.read),
   );
@@ -45,7 +51,7 @@ export class NotificationState {
   }
 
   async setRead(id: string, read: boolean): Promise<void> {
-    this.notifications.update((notifications) =>
+    this.allNotifications.update((notifications) =>
       notifications.map((notification) =>
         notification.id === id ? { ...notification, read } : notification,
       ),
@@ -54,17 +60,19 @@ export class NotificationState {
   }
 
   async markAllRead(filter: NotificationFilter): Promise<void> {
-    this.notifications.update((notifications) =>
+    this.allNotifications.update((notifications) =>
       notifications.map((notification) =>
-        matches(notification, filter) ? { ...notification, read: true } : notification,
+        this.workspace.contains(notification) && matches(notification, filter)
+          ? { ...notification, read: true }
+          : notification,
       ),
     );
-    await this.data.markAllRead(filter);
+    await this.data.markAllRead(filter, this.workspace.currentWorkspaceId());
   }
 
   async dismiss(id: string): Promise<AppNotification | null> {
     const dismissed = this.notifications().find((notification) => notification.id === id) ?? null;
-    this.notifications.update((notifications) =>
+    this.allNotifications.update((notifications) =>
       notifications.filter((notification) => notification.id !== id),
     );
     await this.data.dismiss(id);
@@ -72,7 +80,7 @@ export class NotificationState {
   }
 
   async restore(notification: AppNotification): Promise<void> {
-    this.notifications.update((notifications) =>
+    this.allNotifications.update((notifications) =>
       [...notifications, notification].sort((first, second) => second.createdAt - first.createdAt),
     );
     await this.data.restore(notification);

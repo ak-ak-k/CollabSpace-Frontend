@@ -14,6 +14,7 @@ export interface ToastOptions {
   readonly actionLabel?: string;
   readonly onAction?: () => void;
   readonly duration?: number;
+  readonly persistent?: boolean;
 }
 
 export const DEFAULT_TOAST_ICON: IconName = 'circle-check';
@@ -34,7 +35,9 @@ export class ToastService {
     const toast = this.createToast(message, options);
     this.visibleToasts.update((toasts) => [...toasts, toast]);
     this.dismissOverflow();
-    this.scheduleDismiss(toast.id, options.duration ?? DEFAULT_TOAST_DURATION_MS);
+    if (!options.persistent) {
+      this.scheduleDismiss(toast.id, options.duration ?? DEFAULT_TOAST_DURATION_MS);
+    }
     return toast.id;
   }
 

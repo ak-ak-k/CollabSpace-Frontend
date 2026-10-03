@@ -1,0 +1,94 @@
+@use 'touch';
+
+:host {
+  display: block;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-6);
+  padding-bottom: var(--space-6);
+  border-bottom: var(--rule-strong);
+}
+
+.header__avatar {
+  position: relative;
+  flex: none;
+}
+
+.header__status {
+  position: absolute;
+  right: var(--profile-avatar-offset);
+  bottom: var(--profile-avatar-offset);
+  width: var(--profile-status-size);
+  height: var(--profile-status-size);
+  box-shadow: 0 0 0 var(--profile-status-ring) var(--background);
+}
+
+.header__status--online {
+  background: var(--status-online);
+}
+
+.header__status--away {
+  background: var(--status-away);
+}
+
+.header__status--dnd {
+  background: var(--status-dnd);
+}
+
+.header__status--offline {
+  background: var(--status-offline);
+}
+
+.header__photo {
+  --icon-button-size: var(--size-control-sm);
+
+  position: absolute;
+  bottom: var(--profile-photo-inset);
+  left: var(--profile-photo-inset);
+  border: var(--border-width-hairline) solid var(--border);
+  background: var(--background);
+
+  @include touch.minimum-hit-area;
+}
+
+.header__identity {
+  display: flex;
+  flex: 1 1 var(--profile-identity-basis);
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.header__eyebrow {
+  color: var(--text-muted);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+}
+
+.header__name {
+  margin: var(--space-0);
+  font-size: var(--profile-name-size);
+}
+
+.header__meta {
+  margin: var(--space-0);
+  font-size: var(--font-size-16);
+}
+
+.header__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.header__actions {
+  display: flex;
+  gap: var(--space-2);
+}

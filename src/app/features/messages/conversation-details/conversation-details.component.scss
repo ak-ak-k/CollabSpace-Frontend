@@ -1,3 +1,5 @@
+@use 'touch';
+
 :host {
   display: flex;
   flex-direction: column;
@@ -100,6 +102,12 @@
 
   a {
     color: var(--text-primary);
+
+    @include touch.on-touch {
+      position: relative;
+
+      @include touch.minimum-hit-area;
+    }
   }
 }
 

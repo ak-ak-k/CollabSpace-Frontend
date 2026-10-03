@@ -1,0 +1,43 @@
+@if (variant() === 'sheet') {
+  <button
+    appIconButton
+    type="button"
+    size="lg"
+    aria-haspopup="menu"
+    [label]="label()"
+    [attr.aria-expanded]="sheetOpen()"
+    (click)="openSheet()"
+  >
+    <app-icon name="ellipsis-vertical" [size]="20" />
+  </button>
+} @else {
+  <button
+    appIconButton
+    type="button"
+    [label]="label()"
+    [cdkMenuTriggerFor]="menu"
+    [cdkMenuPosition]="positions"
+  >
+    <app-icon name="ellipsis" [size]="18" />
+  </button>
+}
+
+<ng-template #menu>
+  <div [appDropdownPanel]="label()">
+    <app-dropdown [label]="label()">
+      @for (item of items(); track item.kind) {
+        @if (item.danger) {
+          <app-dropdown-divider />
+        }
+        <button
+          appDropdownItem
+          [tone]="item.danger ? 'danger' : 'default'"
+          (triggered)="run(item.kind)"
+        >
+          <app-icon [name]="item.icon" [size]="16" />
+          {{ item.label }}
+        </button>
+      }
+    </app-dropdown>
+  </div>
+</ng-template>

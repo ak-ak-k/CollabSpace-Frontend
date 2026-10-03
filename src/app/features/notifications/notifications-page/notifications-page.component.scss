@@ -1,0 +1,32 @@
+:host {
+  display: block;
+  height: 100%;
+  min-width: 0;
+}
+
+.notifications {
+  --secondary-sidebar-width-desktop: var(--notifications-sidebar-width);
+
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  background: var(--background);
+}
+
+.notifications__main {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.notifications__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: var(--notifications-content-max-width);
+  padding: var(--page-padding);
+}
+
+.notifications__tabs {
+  --tab-font-size: var(--font-size-14);
+}

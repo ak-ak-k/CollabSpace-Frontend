@@ -1,0 +1,24 @@
+<app-secondary-sidebar label="File locations">
+  <div class="sidebar">
+    <p class="sidebar__label" id="files-sidebar-label">Files</p>
+    <ul class="sidebar__list" aria-labelledby="files-sidebar-label">
+      @for (folder of folders; track folder.id) {
+        <li>
+          <a
+            class="sidebar__link"
+            [class.sidebar__link--current]="folder.id === active()"
+            [routerLink]="['/files', folder.id]"
+            [attr.aria-current]="folder.id === active() ? 'page' : null"
+          >
+            <app-icon [name]="folder.icon" [size]="18" />
+            <span class="sidebar__text">{{ folder.label }}</span>
+            @if (counts(); as counts) {
+              <span class="sidebar__count">{{ counts[folder.id] }}</span>
+            }
+          </a>
+        </li>
+      }
+    </ul>
+  </div>
+  <app-files-storage sidebarFooter [usedBytes]="usedBytes()" />
+</app-secondary-sidebar>

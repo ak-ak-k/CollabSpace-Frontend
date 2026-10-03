@@ -5,6 +5,7 @@ export type NotificationCategory = 'mention' | 'message' | 'task' | 'team' | 'sy
 export type NotificationFilter = NotificationCategory | 'all';
 
 export interface AppNotification {
+  readonly workspaceId: string;
   readonly id: string;
   readonly category: NotificationCategory;
   readonly actorId: string | null;

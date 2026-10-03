@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.group__heading {
+  margin: var(--space-2) var(--space-0) var(--space-0);
+  padding-bottom: var(--space-2);
+  border-bottom: var(--rule-strong);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-heavy);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+}

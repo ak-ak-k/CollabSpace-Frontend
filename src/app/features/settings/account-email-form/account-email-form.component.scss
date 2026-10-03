@@ -1,0 +1,30 @@
+@use '../settings-section';
+
+:host {
+  display: block;
+}
+
+.account-email {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.account-email__title {
+  @include settings-section.subheading;
+}
+
+.account-email__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.account-email__input {
+  flex: 1 1 var(--settings-email-input-basis);
+}
+
+.account-email__hint {
+  @include settings-section.helper-text;
+}

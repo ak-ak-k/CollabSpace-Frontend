@@ -10,7 +10,9 @@ import { DialogService } from '../../core/services/dialog.service';
 import { SearchService } from '../../core/services/search.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ChatState } from '../../core/state/chat.state';
+import { InviteState } from '../../core/state/invite.state';
 import { NetworkState } from '../../core/state/network.state';
+import { PreferencesState } from '../../core/state/preferences.state';
 import { WorkspaceState } from '../../core/state/workspace.state';
 import { SearchPaletteComponent } from '../../features/search/search-palette/search-palette.component';
 import { OfflineBannerComponent } from '../../shared/components/offline-banner/offline-banner.component';
@@ -19,6 +21,7 @@ import { CurrentRoute } from '../current-route';
 import { DrawerMenuComponent } from '../drawer-menu/drawer-menu.component';
 import { MobileHeaderComponent } from '../mobile-header/mobile-header.component';
 import { RailComponent } from '../rail/rail.component';
+import { WorkspaceBannerComponent } from '../workspace-banner/workspace-banner.component';
 import { isPaletteShortcut, isQuickSearchKey, isTypingTarget } from './shortcuts';
 
 const TITLE_SEPARATOR = ' · ';
@@ -31,6 +34,7 @@ const TITLE_SEPARATOR = ' · ';
     MobileHeaderComponent,
     BottomNavComponent,
     OfflineBannerComponent,
+    WorkspaceBannerComponent,
     SearchPaletteComponent,
   ],
   templateUrl: './shell.component.html',
@@ -44,6 +48,7 @@ export class ShellComponent {
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
   private readonly chat = inject(ChatState);
+  private readonly invites = inject(InviteState);
   private readonly announcer = inject(LiveAnnouncer);
   private readonly title = inject(Title);
   private readonly route = inject(CurrentRoute);
@@ -60,6 +65,7 @@ export class ShellComponent {
   protected readonly immersive = () => this.breakpoint.isMobile() && this.route.inConversation();
 
   constructor() {
+    inject(PreferencesState);
     effect(() => this.reactToNetwork(this.network.online()));
     effect(() => {
       const message = this.chat.incomingMessage();
@@ -73,8 +79,12 @@ export class ShellComponent {
     });
   }
 
-  protected focusMain(event: Event): void {
+  protected skipToMain(event: Event): void {
     event.preventDefault();
+    this.focusMain();
+  }
+
+  protected focusMain(): void {
     this.main().nativeElement.focus();
   }
 
@@ -108,7 +118,8 @@ export class ShellComponent {
 
   private welcomeBack(): void {
     this.chat.flushQueue();
-    this.toasts.show('Back online — queued messages sent', { icon: 'wifi' });
+    void this.invites.flushQueued();
+    this.toasts.show('Back online — queued messages and invitations sent', { icon: 'wifi' });
   }
 
   private warnOffline(): void {
@@ -117,7 +128,11 @@ export class ShellComponent {
 
   private showIncoming(message: Message): void {
     const conversation = this.chat.conversation(message.conversationId);
-    if (!conversation || this.chat.mutedIds().has(conversation.id)) {
+    const hidden =
+      !conversation ||
+      this.chat.mutedIds().has(conversation.id) ||
+      !this.chat.inCurrentWorkspace(conversation.id);
+    if (hidden) {
       return;
     }
     const author = firstNameOf(this.workspace.user(message.authorId)?.name ?? 'Someone');

@@ -4,6 +4,7 @@ import { minutesAgo } from './mock-clock';
 export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
   {
     id: 'n1',
+    workspaceId: 'w1',
     category: 'message',
     actorId: 'u1',
     text: 'sent you a message',
@@ -14,6 +15,7 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
   },
   {
     id: 'n2',
+    workspaceId: 'w1',
     category: 'mention',
     actorId: 'u4',
     text: 'mentioned you in #frontend',
@@ -24,6 +26,7 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
   },
   {
     id: 'n3',
+    workspaceId: 'w1',
     category: 'task',
     actorId: 'u7',
     text: 'assigned you NS-141',
@@ -34,6 +37,7 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
   },
   {
     id: 'n4',
+    workspaceId: 'w1',
     category: 'team',
     actorId: 'u4',
     text: 'added you to Platform',
@@ -44,6 +48,7 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
   },
   {
     id: 'n5',
+    workspaceId: 'w1',
     category: 'mention',
     actorId: 'u5',
     text: 'mentioned you in #design-system',
@@ -54,6 +59,7 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
   },
   {
     id: 'n6',
+    workspaceId: 'w1',
     category: 'task',
     actorId: 'u1',
     text: 'moved NS-142 to In progress',
@@ -64,6 +70,7 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
   },
   {
     id: 'n7',
+    workspaceId: 'w1',
     category: 'system',
     actorId: null,
     text: 'Scheduled maintenance',
@@ -74,6 +81,7 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
   },
   {
     id: 'n8',
+    workspaceId: 'w1',
     category: 'message',
     actorId: 'u2',
     text: 'shared a file with you',
@@ -84,6 +92,7 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
   },
   {
     id: 'n9',
+    workspaceId: 'w1',
     category: 'team',
     actorId: 'u8',
     text: 'created #api-v2 in Platform',
@@ -94,6 +103,7 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
   },
   {
     id: 'n10',
+    workspaceId: 'w1',
     category: 'task',
     actorId: 'u3',
     text: 'commented on NS-153',
@@ -104,6 +114,7 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
   },
   {
     id: 'n11',
+    workspaceId: 'w1',
     category: 'system',
     actorId: null,
     text: 'New sign-in on Windows · Edge',
@@ -114,6 +125,7 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
   },
   {
     id: 'n12',
+    workspaceId: 'w1',
     category: 'mention',
     actorId: 'u10',
     text: 'mentioned you in #support-escalations',

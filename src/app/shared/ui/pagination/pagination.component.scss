@@ -1,3 +1,5 @@
+@use 'breakpoints';
+
 :host {
   display: block;
 }
@@ -21,4 +23,44 @@
 .pagination__controls {
   display: flex;
   gap: var(--space-1);
+}
+
+.pagination__step,
+.pagination__page {
+  border: var(--border-width-hairline) solid var(--border-control);
+}
+
+.pagination__page {
+  display: grid;
+  place-items: center;
+  min-width: var(--size-control-md);
+  height: var(--size-control-md);
+  padding: var(--space-0) var(--space-2);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover);
+  }
+
+  @include breakpoints.tablet-and-down {
+    min-width: var(--size-touch-target);
+    height: var(--size-touch-target);
+  }
+
+  @include breakpoints.touch-device {
+    min-width: var(--size-touch-target);
+    height: var(--size-touch-target);
+  }
+}
+
+.pagination__page--current,
+.pagination__page--current:hover {
+  border-color: var(--text-primary);
+  background: var(--text-primary);
+  color: var(--background);
 }

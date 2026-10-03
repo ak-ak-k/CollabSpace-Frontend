@@ -109,11 +109,14 @@ export const injectDirectConversationBootstrap = (
     return userId && workspace.user(userId) ? userId : null;
   });
   const pending = computed(
-    () => partnerId() !== null && chat.conversation(conversationId()) === null,
+    () =>
+      chat.status() === 'ready' &&
+      partnerId() !== null &&
+      chat.conversation(conversationId()) === null,
   );
   effect(() => {
     const userId = partnerId();
-    if (userId && pending() && chat.status() === 'ready') {
+    if (userId && pending()) {
       untracked(() => void chat.openDirectConversation(userId));
     }
   });

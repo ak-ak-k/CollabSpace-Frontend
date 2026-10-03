@@ -1,0 +1,14 @@
+<ul class="security-list">
+  <li
+    appSettingSwitch
+    label="Two-step verification"
+    description="Require a code from your authenticator app when signing in."
+    [(checked)]="twoFactor"
+    (checkedChange)="setTwoFactor($event)"
+  ></li>
+  <li appSettingRow label="Password" description="Last changed 3 months ago">
+    <a appButton size="sm" aria-label="Change password" [routerLink]="accountLink">Change</a>
+  </li>
+</ul>
+
+<app-session-list />

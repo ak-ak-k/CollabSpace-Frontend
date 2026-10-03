@@ -27,6 +27,7 @@
 
 :host(.tabs--lg) {
   --tab-base-height: var(--size-tab-lg);
+  --tab-font-size: var(--font-size-14);
 }
 
 :host(.tabs--gap-lg) {
@@ -34,7 +35,8 @@
   --tab-font-size: var(--font-size-14);
 }
 
-:host(.tabs--gap-lg) .tab__count {
+:host(.tabs--gap-lg) .tab__count,
+:host(.tabs--lg) .tab__count {
   color: var(--text-muted);
   font-size: var(--font-size-12);
   font-weight: var(--font-weight-regular);

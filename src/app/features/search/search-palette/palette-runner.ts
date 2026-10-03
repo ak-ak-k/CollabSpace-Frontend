@@ -1,4 +1,4 @@
-import { inject, Service } from '@angular/core';
+import { inject, Injector, Service } from '@angular/core';
 import { Router } from '@angular/router';
 import { SearchTarget } from '../../../core/data/search.data';
 import { DialogService } from '../../../core/services/dialog.service';
@@ -10,6 +10,7 @@ export class PaletteRunner {
   private readonly router = inject(Router);
   private readonly dialogs = inject(DialogService);
   private readonly theme = inject(ThemeState);
+  private readonly injector = inject(Injector);
 
   open(target: SearchTarget): void {
     void this.router.navigate([target.path], { queryParams: target.queryParams });
@@ -38,8 +39,7 @@ export class PaletteRunner {
   }
 
   private async invitePeople(): Promise<void> {
-    const { InviteDialogComponent } =
-      await import('../../teams/invite-dialog/invite-dialog.component');
-    this.dialogs.open(InviteDialogComponent, { size: 'md' });
+    const { WorkspaceActions } = await import('../../workspace/workspace-actions.service');
+    this.injector.get(WorkspaceActions).openInvite();
   }
 }

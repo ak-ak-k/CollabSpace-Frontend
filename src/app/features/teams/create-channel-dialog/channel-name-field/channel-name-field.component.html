@@ -1,0 +1,30 @@
+<label class="field__label" [attr.for]="controlId">{{ label() }}</label>
+
+<div class="field__body">
+  <span class="field__prefix" aria-hidden="true">#</span>
+  <input
+    #control
+    class="field__control"
+    autocomplete="off"
+    spellcheck="false"
+    [class.field__control--invalid]="error().invalid"
+    [id]="controlId"
+    [value]="value()"
+    [disabled]="disabled()"
+    [attr.name]="name() || null"
+    [attr.placeholder]="placeholder() || null"
+    [attr.maxlength]="maxlength() ?? null"
+    [attr.aria-required]="required() ? 'true' : null"
+    [attr.aria-invalid]="error().invalid ? 'true' : null"
+    [attr.aria-describedby]="describedBy()"
+    (input)="onInput(control)"
+    (blur)="touch.emit()"
+  />
+</div>
+
+@if (hint()) {
+  <p class="field__hint" [attr.id]="hintId">{{ hint() }}</p>
+}
+@if (error().message) {
+  <app-field-error [attr.id]="errorId" [message]="error().message" />
+}

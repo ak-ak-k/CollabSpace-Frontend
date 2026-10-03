@@ -1,0 +1,21 @@
+<section class="section" aria-labelledby="profile-details-heading">
+  <h2 class="section__heading" id="profile-details-heading">Details</h2>
+  @if (editing()) {
+    <app-input label="Phone" type="tel" autocomplete="tel" [formField]="form().phone" />
+    <app-input label="Location" [formField]="form().location" />
+    <app-select label="Timezone" [options]="timeZoneOptions" [formField]="form().timeZone" />
+  } @else {
+    <dl class="details">
+      @for (detail of details(); track detail.label) {
+        <dt class="details__label">{{ detail.label }}</dt>
+        <dd class="details__value">
+          @if (detail.link; as link) {
+            <a [href]="link">{{ detail.value }}</a>
+          } @else {
+            {{ detail.value }}
+          }
+        </dd>
+      }
+    </dl>
+  }
+</section>

@@ -77,6 +77,20 @@ describe('MessageComposerComponent', () => {
     expect(sendButton.disabled).toBe(false);
   });
 
+  it('turns read-only while the workspace is archived', async () => {
+    const { fixture, textarea, sendButton } = await render();
+    let sends = 0;
+    fixture.componentInstance.send.subscribe(() => sends++);
+    fixture.componentRef.setInput('archivedWorkspace', 'Northstar Labs');
+    await type(fixture, textarea, 'Hi');
+
+    press(textarea, 'Enter');
+
+    expect(textarea.placeholder).toBe('Northstar Labs is archived — read-only');
+    expect(sendButton.disabled).toBe(true);
+    expect(sends).toBe(0);
+  });
+
   it('asks to edit the last message on ArrowUp in an empty draft', async () => {
     const { fixture, textarea } = await render();
     let requested = 0;
@@ -93,7 +107,7 @@ describe('MessageComposerComponent', () => {
 
     const listbox = host.querySelector('[role="listbox"]');
     expect(listbox?.textContent).toContain('Ananya Singh');
-    expect(textarea.getAttribute('aria-expanded')).toBe('true');
+    expect(textarea.hasAttribute('role')).toBe(false);
     expect(textarea.getAttribute('aria-controls')).toBe(listbox?.id);
 
     press(textarea, 'Enter');

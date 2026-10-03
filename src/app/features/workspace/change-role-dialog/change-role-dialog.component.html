@@ -1,0 +1,63 @@
+<form class="change-role" (submit)="save($event)">
+  <app-modal heading="Change role" size="md" [description]="subtitle()">
+    <fieldset class="change-role__choices">
+      <legend class="visually-hidden">Role in {{ workspaceName() }}</legend>
+      @for (option of choices(); track option.role) {
+        <label
+          class="change-role__choice"
+          [class.change-role__choice--selected]="choice() === option.role"
+          [class.change-role__choice--disabled]="option.disabled"
+        >
+          <input
+            type="radio"
+            class="change-role__radio"
+            name="workspace-role"
+            [value]="option.role"
+            [checked]="choice() === option.role"
+            [disabled]="option.disabled"
+            [attr.cdkFocusInitial]="option.current ? '' : null"
+            [attr.aria-labelledby]="idPrefix + '-' + option.role + '-label'"
+            [attr.aria-describedby]="descriptionIds(option)"
+            (change)="choice.set(option.role)"
+          />
+          <span class="change-role__text">
+            <span class="change-role__label">
+              <span [id]="idPrefix + '-' + option.role + '-label'">{{ option.label }}</span>
+              @if (option.current) {
+                <app-tag class="change-role__current">Current</app-tag>
+              }
+            </span>
+            <span
+              class="change-role__description"
+              [id]="idPrefix + '-' + option.role + '-description'"
+            >
+              {{ option.description }}
+            </span>
+            @if (option.disabled) {
+              <span class="change-role__note" [id]="idPrefix + '-' + option.role + '-note'">
+                Only owners can make someone an Owner.
+              </span>
+            }
+          </span>
+        </label>
+      }
+    </fieldset>
+
+    @if (promotesToOwner()) {
+      <div class="change-role__warning" role="note">
+        <app-icon class="change-role__warning-icon" name="crown" [size]="16" />
+        <span>
+          Owners have full access, including billing, security and deleting
+          {{ workspaceName() }}. You’ll stay an Owner too.
+        </span>
+      </div>
+    }
+
+    <ng-container modalActions>
+      <button appButton type="button" (click)="cancel()">Cancel</button>
+      <button appButton type="submit" variant="primary" [disabled]="unchanged()">
+        {{ saveLabel() }}
+      </button>
+    </ng-container>
+  </app-modal>
+</form>

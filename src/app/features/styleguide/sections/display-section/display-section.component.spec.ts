@@ -41,7 +41,7 @@ describe('DisplaySectionComponent', () => {
 
     expect(host.querySelectorAll('tbody tr').length).toBe(7);
     expect(host.querySelector('app-pagination [role="status"]')?.textContent?.trim()).toBe(
-      '9–15 of 15',
+      'Showing 9–15 of 15',
     );
   });
 });

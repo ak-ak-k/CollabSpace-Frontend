@@ -13,6 +13,7 @@ import {
 import { TeamPrivacy } from '../../../core/models/team';
 import { ToastService } from '../../../core/services/toast.service';
 import { ChatState } from '../../../core/state/chat.state';
+import { WorkspaceActivityState } from '../../../core/state/workspace-activity.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
@@ -56,6 +57,7 @@ export class CreateTeamDialogComponent {
   private readonly dialogRef = inject<DialogRef<void>>(DialogRef);
   private readonly workspace = inject(WorkspaceState);
   private readonly chat = inject(ChatState);
+  private readonly activity = inject(WorkspaceActivityState);
   private readonly router = inject(Router);
   private readonly toasts = inject(ToastService);
 
@@ -110,6 +112,12 @@ export class CreateTeamDialogComponent {
       privacy: privacyOf(this.draft().privacy),
     });
     this.chat.addChannel(channel);
+    this.activity.record({
+      kind: 'team',
+      verb: 'created',
+      object: `the ${name} team`,
+      route: `/teams/${team.id}`,
+    });
     this.dialogRef.close();
     await this.router.navigate(['/teams', team.id]);
     this.toasts.show(`Team “${name}” created — #general is ready`, { icon: 'users' });

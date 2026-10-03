@@ -22,7 +22,7 @@ describe('PaginationComponent', () => {
     await render({ total: 15 });
 
     expect(host.querySelector('nav')?.getAttribute('aria-label')).toBe('Pagination');
-    expect(host.querySelector('[role="status"]')?.textContent?.trim()).toBe('1–8 of 15');
+    expect(host.querySelector('[role="status"]')?.textContent?.trim()).toBe('Showing 1–8 of 15');
     expect(button('Previous page').disabled).toBe(true);
     expect(button('Next page').disabled).toBe(false);
   });
@@ -34,7 +34,7 @@ describe('PaginationComponent', () => {
     await fixture.whenStable();
 
     expect(fixture.componentInstance.page()).toBe(2);
-    expect(host.querySelector('[role="status"]')?.textContent?.trim()).toBe('9–15 of 15');
+    expect(host.querySelector('[role="status"]')?.textContent?.trim()).toBe('Showing 9–15 of 15');
     expect(button('Next page').disabled).toBe(true);
   });
 
@@ -49,5 +49,17 @@ describe('PaginationComponent', () => {
     await render({ total: 8 });
 
     expect(host.querySelector('nav')).toBeNull();
+  });
+
+  it('offers numbered page buttons that mark the current page', async () => {
+    fixture.componentRef.setInput('pageNumbers', true);
+    await render({ total: 15 });
+
+    const second = host.querySelector<HTMLButtonElement>('[aria-label="Page 2"]');
+    second?.click();
+    await fixture.whenStable();
+
+    expect(second?.getAttribute('aria-current')).toBe('page');
+    expect(host.querySelector('[role="status"]')?.textContent?.trim()).toBe('Showing 9–15 of 15');
   });
 });

@@ -1,0 +1,26 @@
+@use '../settings-section';
+
+:host {
+  @include settings-section.row;
+}
+
+.setting-row__text {
+  @include settings-section.row-text;
+}
+
+.setting-row__label {
+  @include settings-section.row-label;
+}
+
+.setting-row__description {
+  @include settings-section.helper-text;
+}
+
+:host(.setting-row--wrap) {
+  flex-wrap: wrap;
+  gap: var(--space-3);
+
+  .setting-row__text {
+    flex: 1 1 var(--settings-row-text-basis);
+  }
+}

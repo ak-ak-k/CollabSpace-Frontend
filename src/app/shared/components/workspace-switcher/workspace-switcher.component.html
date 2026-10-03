@@ -1,0 +1,116 @@
+<div class="workspace-switcher__header">
+  @if (current(); as workspace) {
+    <span class="workspace-switcher__tile workspace-switcher__tile--large" aria-hidden="true">
+      @if (workspace.logoUrl; as logo) {
+        <img class="workspace-switcher__logo" [src]="logo" alt="" />
+      } @else {
+        {{ workspace.code }}
+      }
+    </span>
+  }
+  <span class="workspace-switcher__identity">
+    <span class="workspace-switcher__name truncate" [id]="nameId">{{ currentName() }}</span>
+    <span class="workspace-switcher__meta truncate">{{ currentMeta() }}</span>
+  </span>
+  @if (sheet) {
+    <button
+      appIconButton
+      type="button"
+      size="lg"
+      class="workspace-switcher__close"
+      label="Close workspace menu"
+      (click)="close()"
+    >
+      <app-icon name="x" [size]="20" />
+    </button>
+  }
+</div>
+
+<div
+  cdkMenu
+  class="workspace-switcher__menu"
+  aria-label="Workspace menu"
+  [attr.cdkFocusInitial]="sheet ? '' : null"
+  (focus)="focusFirstItem()"
+>
+  <div class="workspace-switcher__section">
+    <a
+      appDropdownItem
+      class="workspace-switcher__item"
+      routerLink="/workspace"
+      (triggered)="close()"
+    >
+      <app-icon name="building-2" [size]="18" />
+      Workspace overview
+    </a>
+    <a
+      appDropdownItem
+      class="workspace-switcher__item"
+      routerLink="/workspace/members"
+      (triggered)="close()"
+    >
+      <app-icon name="users" [size]="18" />
+      <span class="workspace-switcher__link">
+        Members
+        <span class="workspace-switcher__hint">{{ current()?.memberCount }}</span>
+      </span>
+    </a>
+    <a
+      appDropdownItem
+      class="workspace-switcher__item"
+      [routerLink]="settingsRoute()"
+      (triggered)="close()"
+    >
+      <app-icon name="settings" [size]="18" />
+      Workspace settings
+    </a>
+    @if (canInvite()) {
+      <button appDropdownItem type="button" class="workspace-switcher__item" (triggered)="invite()">
+        <app-icon name="user-plus" [size]="18" />
+        Invite people
+      </button>
+    }
+  </div>
+
+  <div class="workspace-switcher__section workspace-switcher__section--workspaces">
+    <app-dropdown-heading class="workspace-switcher__heading">My workspaces</app-dropdown-heading>
+    @for (workspace of workspaces(); track workspace.id) {
+      <button
+        appDropdownItem
+        type="button"
+        class="workspace-switcher__workspace"
+        [class.workspace-switcher__workspace--current]="workspace.current"
+        [selected]="workspace.current"
+        (triggered)="pick(workspace)"
+      >
+        <span class="workspace-switcher__option">
+          <span class="workspace-switcher__tile" aria-hidden="true">
+            @if (workspace.logoUrl; as logo) {
+              <img class="workspace-switcher__logo" [src]="logo" alt="" />
+            } @else {
+              {{ workspace.code }}
+            }
+          </span>
+          <span class="workspace-switcher__option-text">
+            <span class="workspace-switcher__option-name truncate">{{ workspace.name }}</span>
+            <span class="workspace-switcher__meta">
+              {{ roleLabels[workspace.myRole] }} · {{ workspace.memberCount | count: 'member' }}
+            </span>
+          </span>
+        </span>
+      </button>
+    }
+  </div>
+
+  <div class="workspace-switcher__section">
+    <button
+      appDropdownItem
+      type="button"
+      class="workspace-switcher__item"
+      (triggered)="createWorkspace()"
+    >
+      <app-icon name="plus" [size]="18" />
+      Create workspace
+    </button>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<div class="editor">
+  <div>
+    <label class="visually-hidden" [for]="titleId()">Task title</label>
+    <textarea
+      #titleField
+      class="editor__title"
+      rows="2"
+      [id]="titleId()"
+      [value]="titleDraft()"
+      (input)="titleDraft.set(titleField.value)"
+      (blur)="saveTitle()"
+    ></textarea>
+  </div>
+
+  <div class="editor__fields">
+    <app-select
+      label="Status"
+      [options]="statusOptions"
+      [value]="task().status"
+      (valueChange)="changeStatus($event)"
+    />
+    <app-select
+      label="Priority"
+      [options]="priorityOptions"
+      [value]="task().priority"
+      (valueChange)="changePriority($event)"
+    />
+    <app-select
+      label="Assignee"
+      [options]="assigneeOptions()"
+      [value]="task().assigneeId ?? ''"
+      (valueChange)="changeAssignee($event)"
+    />
+    <app-input
+      label="Due date"
+      type="date"
+      [value]="dueValue()"
+      (valueChange)="changeDue($event)"
+    />
+  </div>
+
+  <fieldset class="editor__labels">
+    <legend class="editor__caption">Labels</legend>
+    <div class="editor__chips">
+      @for (label of labels; track label) {
+        <button
+          type="button"
+          class="editor__chip"
+          [class.editor__chip--on]="task().labels.includes(label)"
+          [attr.aria-pressed]="task().labels.includes(label)"
+          (click)="toggleLabel(label)"
+        >
+          @if (task().labels.includes(label)) {
+            <app-icon name="check" [size]="12" />
+          }
+          {{ label }}
+        </button>
+      }
+    </div>
+  </fieldset>
+
+  <app-textarea
+    label="Description"
+    placeholder="Add context, acceptance criteria or links"
+    [rows]="4"
+    [value]="descriptionDraft()"
+    (valueChange)="descriptionDraft.set($event)"
+    (touch)="saveDescription()"
+  />
+</div>

@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { DIALOG_INITIAL_FOCUS } from './dialog-panel';
 
-const REQUESTED_FOCUS_SELECTOR = '[cdkFocusInitial], [cdk-focus-initial]';
+const REQUESTED_FOCUS_SELECTOR = '[cdkFocusInitial]';
 const FIRST_FIELD_SELECTOR =
   'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])';
 

@@ -6,6 +6,10 @@
   --composer-chip-max-width: 260px;
   --composer-textarea-min-height: var(--size-control-md);
   --composer-textarea-padding-block: 9px;
+  --composer-textarea-min-height-touch: var(--size-touch-target);
+  --composer-textarea-padding-block-touch: calc(
+    (var(--size-touch-target) - var(--font-size-15) * var(--line-height-input)) / 2
+  );
   --composer-textarea-padding-inline: var(--space-1);
   --composer-option-height: var(--size-control-md);
   --composer-send-width: var(--size-control-lg);

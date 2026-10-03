@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { computed, Signal, signal } from '@angular/core';
 import { LoadStatus } from '../models/load-status';
 
 export interface LoadableOptions<T> {
@@ -30,3 +30,15 @@ export class Loadable<T> {
     }
   }
 }
+
+export const settledStatus = (
+  status: Signal<LoadStatus>,
+  isEmpty: () => boolean,
+): Signal<LoadStatus> =>
+  computed(() => {
+    const value = status();
+    if (value !== 'ready' && value !== 'empty') {
+      return value;
+    }
+    return isEmpty() ? 'empty' : 'ready';
+  });

@@ -1,6 +1,7 @@
 <div class="directory">
   <header class="directory__header">
     <div class="directory__heading">
+      <app-breadcrumb [items]="breadcrumb()" />
       <h1 class="directory__title">Teams</h1>
       <p class="directory__subtitle">{{ subtitle() }}</p>
     </div>
@@ -53,7 +54,7 @@
         icon="users"
         heading="No teams yet"
         message="Teams group people, channels and files around a shared goal."
-        actionLabel="Create team"
+        [actionLabel]="canCreateTeams() ? 'Create team' : ''"
         (action)="actions.createTeam()"
       />
     }

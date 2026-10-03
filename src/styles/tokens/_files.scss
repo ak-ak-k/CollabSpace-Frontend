@@ -1,0 +1,14 @@
+@mixin files-tokens {
+  --files-page-max-width: 1200px;
+  --files-sidebar-width: 248px;
+  --files-sidebar-link-height: 42px;
+  --files-header-text-basis: 240px;
+  --files-search-basis: 220px;
+  --files-search-max-width: 360px;
+  --files-tile-size-sm: 36px;
+  --files-tile-size-md: 40px;
+  --files-preview-aspect-ratio: 16 / 10;
+  --files-card-min-width: 220px;
+  --files-name-column-width: 44%;
+  --files-storage-bar-height: 8px;
+}

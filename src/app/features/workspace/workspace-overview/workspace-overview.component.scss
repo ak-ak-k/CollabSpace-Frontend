@@ -1,0 +1,82 @@
+@use 'breakpoints';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.overview {
+  display: grid;
+  grid-template-areas:
+    'quick'
+    'activity'
+    'teams'
+    'details';
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--page-gap);
+
+  @include breakpoints.desktop {
+    grid-template-areas:
+      'activity quick'
+      'activity teams'
+      'activity details';
+    grid-template-columns: var(--workspace-overview-columns);
+  }
+}
+
+.overview__quick {
+  grid-area: quick;
+  min-width: 0;
+}
+
+.overview__activity {
+  grid-area: activity;
+}
+
+.overview__teams {
+  grid-area: teams;
+}
+
+.overview__details {
+  grid-area: details;
+  min-width: 0;
+}
+
+.overview__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+}
+
+.overview__locked {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-0);
+  color: var(--text-secondary);
+  font-size: var(--font-size-14);
+}
+
+.overview__locked-icon {
+  margin-top: var(--space-0-5);
+}
+
+.details {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2) var(--space-4);
+  margin: var(--space-0);
+  padding-top: var(--space-3);
+  font-size: var(--font-size-14);
+}
+
+.details__term {
+  color: var(--text-secondary);
+}
+
+.details__value {
+  margin: var(--space-0);
+  overflow-wrap: anywhere;
+}

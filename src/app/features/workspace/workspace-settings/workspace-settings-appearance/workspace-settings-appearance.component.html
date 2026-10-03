@@ -1,0 +1,27 @@
+<app-workspace-settings-note>
+  Defaults for new members. Everyone can override them in
+  <a class="appearance__link" routerLink="/settings/appearance">their own appearance settings</a>.
+</app-workspace-settings-note>
+
+@if (preferences(); as settings) {
+  <ul class="appearance-rows">
+    <li appSettingRow wrap label="Default theme">
+      <app-radio-group
+        label="Default theme"
+        hideLabel
+        [options]="themeOptions"
+        [value]="settings.defaultTheme"
+        (valueChange)="setTheme($event)"
+      />
+    </li>
+    <li appSettingRow wrap label="Default density">
+      <app-radio-group
+        label="Default density"
+        hideLabel
+        [options]="densityOptions"
+        [value]="settings.defaultDensity"
+        (valueChange)="setDensity($event)"
+      />
+    </li>
+  </ul>
+}

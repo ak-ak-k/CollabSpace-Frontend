@@ -1,0 +1,35 @@
+<app-workspace-logo-field />
+
+<form class="general" novalidate aria-label="Workspace details" (submit)="submit($event)">
+  <app-input
+    label="Workspace name"
+    autocomplete="organization"
+    [maxlength]="nameMaxLength"
+    [formField]="generalForm.name"
+  />
+  <app-textarea
+    label="Description"
+    [rows]="2"
+    [maxlength]="descriptionMaxLength"
+    [hint]="descriptionHint()"
+    [formField]="generalForm.description"
+  />
+  <app-settings-url-field
+    label="Workspace URL"
+    [suffix]="urlSuffix"
+    hint="Changing it breaks old links — we’ll redirect them for 30 days."
+    [formField]="generalForm.slug"
+  />
+  <app-select
+    class="general__channel"
+    label="Default channel for new members"
+    [options]="channelOptions()"
+    [formField]="generalForm.defaultChannelId"
+  />
+  <div class="general__actions">
+    <button appButton type="submit" variant="primary" [disabled]="!dirty()">Save changes</button>
+    @if (dirty()) {
+      <button appButton type="button" (click)="discard()">Discard</button>
+    }
+  </div>
+</form>

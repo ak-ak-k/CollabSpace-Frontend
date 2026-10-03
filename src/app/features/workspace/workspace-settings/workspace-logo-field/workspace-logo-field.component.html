@@ -1,0 +1,29 @@
+<span class="logo__tile" aria-hidden="true">
+  @if (logoUrl(); as url) {
+    <img class="logo__image" [src]="url" alt="" />
+  } @else {
+    {{ code() }}
+  }
+</span>
+<div class="logo__text">
+  <strong class="logo__title">Workspace logo</strong>
+  <span class="logo__hint">Square image, at least 256 × 256 px. PNG or JPG, up to 2 MB.</span>
+  <div class="logo__actions">
+    <button appButton type="button" (click)="pick()">
+      <app-icon name="image-plus" [size]="16" />
+      {{ pickLabel() }}
+    </button>
+    @if (logoUrl()) {
+      <button appButton type="button" variant="ghost" (click)="remove()">Remove</button>
+    }
+  </div>
+  <input
+    #fileInput
+    class="logo__input"
+    type="file"
+    accept="image/png, image/jpeg, image/webp, image/svg+xml"
+    tabindex="-1"
+    aria-hidden="true"
+    (change)="useFile(fileInput)"
+  />
+</div>

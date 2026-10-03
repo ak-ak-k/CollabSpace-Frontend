@@ -1,0 +1,40 @@
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.mobile__tabs {
+  --tabs-bleed: var(--space-0);
+
+  flex: none;
+  padding-inline: var(--space-4);
+}
+
+.mobile__panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  padding: var(--space-4);
+  overflow-y: auto;
+}
+
+.mobile__card {
+  display: block;
+  width: 100%;
+  padding: var(--space-0);
+  border: var(--space-0);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mobile__empty {
+  margin: var(--space-0);
+  padding: var(--space-6) var(--space-0);
+  color: var(--text-muted);
+  font-size: var(--font-size-14);
+}

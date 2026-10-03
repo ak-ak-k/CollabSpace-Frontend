@@ -1,0 +1,38 @@
+@use '../settings-section';
+
+:host {
+  @include settings-section.section-host;
+}
+
+.identity__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.identity__text {
+  display: flex;
+  flex: 1 1 var(--settings-identity-text-basis);
+  flex-direction: column;
+  min-width: 0;
+}
+
+.identity__name {
+  font-size: var(--font-size-17);
+}
+
+.identity__meta {
+  color: var(--text-secondary);
+  font-size: var(--font-size-14);
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.profile-form__fields {
+  @include settings-section.field-grid(var(--settings-profile-field-min-width));
+}

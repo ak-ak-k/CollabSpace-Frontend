@@ -1,0 +1,11 @@
+<app-account-email-form />
+<app-account-password-form />
+<app-danger-zone
+  heading="Delete account"
+  description="Permanently remove your account and personal data. Messages you sent stay with the workspace."
+>
+  <button appButton type="button" variant="primary" (click)="deleteAccount()">
+    <app-icon name="trash-2" [size]="16" />
+    Delete account
+  </button>
+</app-danger-zone>

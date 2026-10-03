@@ -1,0 +1,34 @@
+@use '../../../../shared/ui/input/field/field';
+
+:host {
+  @include field.host;
+}
+
+.field__label {
+  @include field.label;
+}
+
+.field__body {
+  @include field.body;
+}
+
+.field__prefix {
+  @include field.leading-icon;
+
+  color: var(--text-muted);
+  font-weight: var(--font-weight-heavy);
+}
+
+.field__control {
+  @include field.control;
+
+  padding-left: calc(var(--field-padding-inline) + var(--channel-name-prefix-width));
+}
+
+.field__control--invalid {
+  @include field.control-invalid;
+}
+
+.field__hint {
+  @include field.message;
+}

@@ -8,12 +8,10 @@
         <router-outlet />
       } @else {
         <app-empty-state
+          class="messages__placeholder"
           icon="message-square"
           heading="No conversation selected"
           message="Pick a conversation from the list, or start a new one."
-          actionLabel="Start a conversation"
-          actionIcon="square-pen"
-          (action)="search.open('people')"
         />
       }
     </div>

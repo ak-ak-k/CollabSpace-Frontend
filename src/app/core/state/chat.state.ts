@@ -8,7 +8,8 @@ import {
   untracked,
   WritableSignal,
 } from '@angular/core';
-import { ChatData, ChatEvent, ChatSnapshot } from '../data/chat.data';
+import { ChatEvent, ChatSnapshot } from '../data/chat-events';
+import { ChatData } from '../data/chat.data';
 import { CURRENT_USER_ID } from '../mocks/users.mock';
 import { Channel } from '../models/channel';
 import { Conversation, ConversationPreview } from '../models/conversation';
@@ -24,7 +25,7 @@ import {
 } from './chat-mutations';
 import { buildPreview, PreviewContext } from './conversation-preview';
 import { DataModeState } from './data-mode.state';
-import { Loadable } from './loadable';
+import { Loadable, settledStatus } from './loadable';
 import { WorkspaceState } from './workspace.state';
 
 const INITIAL_TYPING_DURATION = 7000;
@@ -64,16 +65,26 @@ export class ChatState {
     typingUserIds: this.typingUserIds(),
   }));
 
+  private readonly scopedConversations = computed(() =>
+    this.conversations().filter((conversation) =>
+      this.workspace.containsConversation(conversation),
+    ),
+  );
+  private readonly scopedUnreadCounts = computed(() =>
+    this.scopedConversations().map((conversation) => this.unreadCounts()[conversation.id] ?? 0),
+  );
+
   readonly previews = computed<readonly ConversationPreview[]>(() =>
-    this.conversations()
+    this.scopedConversations()
       .filter((conversation) => conversation.type !== 'channel')
       .map((conversation) => buildPreview(conversation, this.previewContext()))
       .sort((first, second) => second.lastMessageAt - first.lastMessageAt),
   );
 
-  readonly unreadTotal = computed(() => sum(Object.values(this.unreadCounts())));
+  readonly inboxStatus = settledStatus(this.status, () => this.previews().length === 0);
+  readonly unreadTotal = computed(() => sum(this.scopedUnreadCounts()));
   readonly unreadConversationCount = computed(
-    () => Object.values(this.unreadCounts()).filter((count) => count > 0).length,
+    () => this.scopedUnreadCounts().filter((count) => count > 0).length,
   );
   readonly unreadDirectTotal = computed(() =>
     sum(this.previews().map((preview) => preview.unreadCount)),
@@ -94,6 +105,11 @@ export class ChatState {
 
   conversation(conversationId: string): Conversation | null {
     return this.conversations().find((candidate) => candidate.id === conversationId) ?? null;
+  }
+
+  inCurrentWorkspace(conversationId: string): boolean {
+    const conversation = this.conversation(conversationId);
+    return !!conversation && this.workspace.containsConversation(conversation);
   }
 
   preview(conversationId: string): ConversationPreview | null {
@@ -134,7 +150,10 @@ export class ChatState {
   }
 
   async openDirectConversation(userId: string): Promise<string> {
-    const conversation = await this.data.ensureDirectConversation(userId);
+    const conversation = await this.data.ensureDirectConversation(
+      userId,
+      this.workspace.currentWorkspaceId(),
+    );
     if (!this.conversation(conversation.id)) {
       this.conversations.update((conversations) => [...conversations, conversation]);
     }
@@ -142,7 +161,7 @@ export class ChatState {
   }
 
   async createGroup(name: string, memberIds: readonly string[]): Promise<string> {
-    const group = await this.data.createGroup(name, memberIds);
+    const group = await this.data.createGroup(name, memberIds, this.workspace.currentWorkspaceId());
     this.conversations.update((conversations) => [...conversations, group]);
     return group.id;
   }

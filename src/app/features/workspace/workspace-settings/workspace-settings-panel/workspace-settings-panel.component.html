@@ -1,0 +1,33 @@
+@if (section().id === ownerSection) {
+  <app-workspace-settings-danger />
+} @else {
+  @if (readOnlyNote()) {
+    <app-workspace-settings-note kind="locked">{{ readOnlyNote() }}</app-workspace-settings-note>
+  }
+  <fieldset class="panel__fieldset" [disabled]="!!readOnlyNote()">
+    <legend class="visually-hidden">{{ section().label }}</legend>
+    @switch (section().id) {
+      @case ('general') {
+        <app-workspace-settings-general />
+      }
+      @case ('members') {
+        <app-workspace-settings-members />
+      }
+      @case ('roles') {
+        <app-workspace-settings-roles />
+      }
+      @case ('notifications') {
+        <app-workspace-settings-notifications />
+      }
+      @case ('appearance') {
+        <app-workspace-settings-appearance />
+      }
+      @case ('security') {
+        <app-workspace-settings-security />
+      }
+      @case ('integrations') {
+        <app-workspace-settings-integrations />
+      }
+    }
+  </fieldset>
+}

@@ -2,9 +2,10 @@
   <button
     type="button"
     class="mobile-header__menu"
-    aria-label="Open menu"
-    aria-haspopup="dialog"
-    (click)="menuRequested.emit()"
+    aria-haspopup="menu"
+    [attr.aria-expanded]="switcherSheet.isOpen()"
+    [attr.aria-label]="workspaceLabel()"
+    (click)="switcherSheet.open()"
   >
     <app-brand-mark size="sm" />
     <span class="mobile-header__workspace truncate">{{ workspaceName() }}</span>

@@ -1,0 +1,38 @@
+@switch (status()) {
+  @case ('loading') {
+    <div class="profile"><app-skeleton layout="detail" label="Loading your profile" /></div>
+  }
+  @case ('error') {
+    <div class="profile">
+      <app-empty-state
+        kind="error"
+        heading="Couldn’t load your profile"
+        actionLabel="Try again"
+        (action)="reload()"
+      />
+    </div>
+  }
+  @default {
+    @if (user(); as me) {
+      <div class="profile">
+        <app-profile-header
+          [user]="me"
+          [statusMessage]="statusMessage()"
+          [editing]="editing()"
+          [saving]="profileForm().submitting()"
+          (edit)="startEdit()"
+          (cancel)="cancelEdit()"
+          (save)="saveChanges()"
+          (changePhoto)="changePhoto()"
+        />
+        <div class="profile__grid">
+          <app-profile-about [bio]="me.bio ?? ''" [editing]="editing()" [form]="profileForm" />
+          <app-profile-details [details]="details()" [editing]="editing()" [form]="profileForm" />
+          <app-profile-status [user]="me" />
+          <app-profile-preferences />
+        </div>
+        <app-profile-teams [teams]="teams()" />
+      </div>
+    }
+  }
+}

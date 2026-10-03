@@ -15,7 +15,12 @@
           }
           <span>{{ tab.label }}</span>
           @if (hasCount(tab)) {
-            <span class="tab__count">{{ tab.count }}</span>
+            <span class="tab__count"
+              >{{ tab.count }}
+              @if (tab.countLabel) {
+                <span class="visually-hidden">{{ tab.countLabel }}</span>
+              }
+            </span>
           }
         </a>
       }
@@ -43,7 +48,12 @@
           }
           <span>{{ tab.label }}</span>
           @if (hasCount(tab)) {
-            <span class="tab__count">{{ tab.count }}</span>
+            <span class="tab__count"
+              >{{ tab.count }}
+              @if (tab.countLabel) {
+                <span class="visually-hidden">{{ tab.countLabel }}</span>
+              }
+            </span>
           }
         </button>
       }

@@ -1,0 +1,58 @@
+@use 'breakpoints';
+
+:host {
+  display: block;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(var(--workspace-stat-columns-narrow), minmax(0, 1fr));
+  gap: var(--border-width-rule);
+  border-block: var(--rule-strong);
+  background: var(--border);
+
+  @include breakpoints.desktop {
+    grid-template-columns: repeat(var(--workspace-stat-columns-wide), minmax(0, 1fr));
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--background);
+  color: var(--text-primary);
+  text-decoration: none;
+  outline-offset: calc(var(--border-width-rule) * -1);
+
+  &:hover {
+    background: linear-gradient(var(--hover), var(--hover)), var(--background);
+  }
+}
+
+.stat__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+}
+
+.stat__value {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-42);
+  font-weight: var(--font-weight-heavy);
+  letter-spacing: var(--letter-spacing-stat);
+  line-height: var(--line-height-stat);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat__caption {
+  color: var(--text-secondary);
+  font-size: var(--font-size-13);
+}

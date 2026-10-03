@@ -58,30 +58,18 @@
     </div>
   </div>
 
-  <section class="drawer-menu__section" aria-labelledby="drawer-workspaces-heading">
-    <h3 class="caps-label drawer-menu__heading" id="drawer-workspaces-heading">Workspaces</h3>
-    @for (workspace of workspaces(); track workspace.id) {
-      <button
-        type="button"
-        class="drawer-menu__row drawer-menu__row--plain"
-        [attr.aria-pressed]="workspace.id === currentWorkspaceId()"
-        (click)="pickWorkspace(workspace)"
-      >
-        <app-avatar
-          variant="inverted"
-          [name]="workspace.name"
-          [text]="workspace.code"
-          [size]="32"
-        />
-        <span class="drawer-menu__row-label drawer-menu__row-label--small">
-          {{ workspace.name }}
-        </span>
-        @if (workspace.id === currentWorkspaceId()) {
-          <app-icon name="check" [size]="18" />
-        }
-      </button>
-    }
-  </section>
+  <button type="button" class="drawer-menu__row" aria-haspopup="menu" (click)="switchWorkspace()">
+    <app-icon name="chevrons-up-down" [size]="20" />
+    <span class="drawer-menu__row-label">Switch workspace</span>
+    <span class="drawer-menu__count">{{ workspaceCount() | count: 'workspace' }}</span>
+  </button>
+
+  @if (installer.canInstall()) {
+    <button type="button" class="drawer-menu__row" (click)="install()">
+      <app-icon name="download" [size]="20" />
+      <span class="drawer-menu__row-label">Install CollabSpace</span>
+    </button>
+  }
 
   <button drawerFooter appButton type="button" block size="lg" (click)="signOut()">
     <app-icon name="log-out" [size]="18" />

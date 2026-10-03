@@ -1,0 +1,32 @@
+@use '../settings-section';
+
+:host {
+  @include settings-section.section-host;
+}
+
+.density {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: var(--rule-hairline);
+}
+
+.density__text {
+  @include settings-section.row-text;
+
+  flex: 1 1 var(--settings-row-text-basis);
+}
+
+.density__label {
+  @include settings-section.row-label;
+}
+
+.density__description {
+  @include settings-section.helper-text;
+}
+
+.appearance-switches {
+  @include settings-section.list(var(--rule-hairline));
+}

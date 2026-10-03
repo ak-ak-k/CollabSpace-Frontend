@@ -80,4 +80,14 @@ describe('SearchData', () => {
       after: '',
     });
   });
+
+  it('limits results to the workspace it is asked about', async () => {
+    const scope = { workspaceId: 'w2', memberIds: new Set(['u0', 'u2', 'u24']) };
+
+    const people = await data.search('priya', 'people', scope);
+    const tasks = await data.search('ns-142', 'tasks', scope);
+
+    expect(people[0]?.items.map((item) => item.id)).toEqual(['u2']);
+    expect(tasks).toEqual([]);
+  });
 });

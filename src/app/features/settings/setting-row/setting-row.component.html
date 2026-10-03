@@ -1,0 +1,7 @@
+<span class="setting-row__text">
+  <strong class="setting-row__label">{{ label() }}</strong>
+  @if (description()) {
+    <span class="setting-row__description">{{ description() }}</span>
+  }
+</span>
+<ng-content />

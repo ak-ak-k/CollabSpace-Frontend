@@ -1,0 +1,34 @@
+<button
+  appIconButton
+  type="button"
+  [size]="size()"
+  [label]="'More actions for ' + file().name"
+  [cdkMenuTriggerFor]="menu"
+  [cdkMenuPosition]="positions"
+>
+  <app-icon name="ellipsis-vertical" [size]="iconSize()" />
+</button>
+
+<ng-template #menu>
+  <div [appDropdownPanel]="'Actions for ' + file().name">
+    <app-dropdown [label]="'Actions for ' + file().name">
+      @if (includeDownload()) {
+        <button appDropdownItem (triggered)="action.emit('download')">
+          <app-icon name="download" [size]="18" />
+          Download
+        </button>
+      }
+      <button appDropdownItem (triggered)="action.emit('share')">
+        <app-icon name="share-2" [size]="18" />
+        Share
+      </button>
+      @if (file().mine) {
+        <app-dropdown-divider />
+        <button appDropdownItem (triggered)="action.emit('remove')">
+          <app-icon name="trash-2" [size]="18" />
+          Delete
+        </button>
+      }
+    </app-dropdown>
+  </div>
+</ng-template>

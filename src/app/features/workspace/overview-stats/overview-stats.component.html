@@ -1,0 +1,12 @@
+<section class="stats" aria-label="Workspace at a glance">
+  @for (stat of stats(); track stat.id) {
+    <a class="stat" [routerLink]="stat.link">
+      <span class="stat__label">
+        <app-icon [name]="stat.icon" [size]="14" />
+        {{ stat.label }}
+      </span>
+      <span class="stat__value">{{ stat.value }}</span>
+      <span class="stat__caption">{{ stat.caption }}</span>
+    </a>
+  }
+</section>

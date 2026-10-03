@@ -1,0 +1,29 @@
+<div class="toolbar" role="group" aria-label="File filters">
+  <app-search-input
+    class="toolbar__search"
+    label="Search files"
+    placeholder="Search files"
+    [(value)]="query"
+  />
+  <div class="toolbar__selects">
+    <app-select class="toolbar__select" label="Type" [options]="typeOptions" [(value)]="type" />
+    @if (showSort()) {
+      <app-select
+        class="toolbar__select"
+        label="Sort"
+        [options]="sortOptions"
+        [value]="sortValue()"
+        (valueChange)="selectSort($event)"
+      />
+    }
+  </div>
+  @if (showLayout()) {
+    <app-radio-group
+      class="toolbar__layout"
+      label="Layout"
+      hideLabel
+      [options]="layoutOptions"
+      [(value)]="layout"
+    />
+  }
+</div>

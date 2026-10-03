@@ -5,6 +5,7 @@
       <button
         appIconButton
         type="button"
+        class="pagination__step"
         label="Previous page"
         size="md"
         [disabled]="onFirstPage()"
@@ -12,9 +13,24 @@
       >
         <app-icon name="chevron-left" [size]="18" />
       </button>
+      @if (pageNumbers()) {
+        @for (number of pages(); track number) {
+          <button
+            type="button"
+            class="pagination__page"
+            [class.pagination__page--current]="number === currentPage()"
+            [attr.aria-current]="number === currentPage() ? 'page' : null"
+            [attr.aria-label]="'Page ' + number"
+            (click)="show(number)"
+          >
+            {{ number }}
+          </button>
+        }
+      }
       <button
         appIconButton
         type="button"
+        class="pagination__step"
         label="Next page"
         size="md"
         [disabled]="onLastPage()"

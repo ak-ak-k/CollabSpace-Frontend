@@ -1,0 +1,53 @@
+<section aria-labelledby="workspace-activity-heading">
+  <app-section-header
+    headingId="workspace-activity-heading"
+    heading="Recent activity"
+    [caption]="caption()"
+  />
+
+  @if (items().length === 0) {
+    <app-empty-state
+      compact
+      [headingLevel]="3"
+      icon="activity"
+      heading="No activity yet"
+      message="New members, teams, channels and role changes will show up here."
+    />
+  } @else {
+    <ol class="events">
+      @for (event of shown(); track event.id) {
+        <li class="event">
+          <app-avatar
+            [name]="event.actorName"
+            [text]="event.avatarText"
+            [seed]="event.seed"
+            [size]="32"
+          />
+          <span class="event__body">
+            <span class="event__sentence">
+              <strong class="event__actor">{{ event.actorName }}</strong>
+              {{ event.verb }}
+              <a class="event__object" [routerLink]="event.route">{{ event.object }}</a>
+            </span>
+            <span class="event__meta">
+              <app-icon [name]="event.icon" [size]="13" />
+              {{ event.when }}
+            </span>
+          </span>
+        </li>
+      }
+    </ol>
+    @if (canExpand()) {
+      <button
+        appButton
+        type="button"
+        variant="ghost"
+        class="events__toggle"
+        [attr.aria-expanded]="expanded()"
+        (click)="toggle()"
+      >
+        {{ toggleLabel() }}
+      </button>
+    }
+  }
+</section>

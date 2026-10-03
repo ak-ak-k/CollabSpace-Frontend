@@ -9,6 +9,7 @@ export interface ConfirmOptions {
   readonly cancelLabel?: string;
   readonly icon?: IconName;
   readonly tone?: ConfirmTone;
+  readonly confirmText?: string;
 }
 
 export type ConfirmDialogData = Required<ConfirmOptions>;
@@ -30,6 +31,7 @@ export function resolveConfirmData(options: ConfirmOptions): ConfirmDialogData {
     cancelLabel: options.cancelLabel ?? DEFAULT_CANCEL_LABEL,
     icon: options.icon ?? DEFAULT_ICONS[tone],
     tone,
+    confirmText: options.confirmText ?? '',
   };
 }
 
@@ -39,4 +41,8 @@ export function confirmTitleId(dialogId: string): string {
 
 export function confirmBodyId(dialogId: string): string {
   return `${dialogId}-body`;
+}
+
+export function confirmTypeId(dialogId: string): string {
+  return `${dialogId}-type`;
 }

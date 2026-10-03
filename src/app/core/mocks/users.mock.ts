@@ -1,9 +1,10 @@
 import { User } from '../models/user';
 import { minutesAgo } from './mock-clock';
+import { MOCK_WORKSPACE_MEMBERS } from './workspace-members.mock';
 
 export const CURRENT_USER_ID = 'u0';
 
-export const MOCK_USERS: readonly User[] = [
+const CORE_TEAM: readonly User[] = [
   {
     id: 'u0',
     name: 'Aarav Shah',
@@ -15,7 +16,7 @@ export const MOCK_USERS: readonly User[] = [
     timeZone: 'Asia/Kolkata',
     timeZoneLabel: 'IST · UTC+5:30',
     location: 'Bengaluru, India',
-    role: 'admin',
+    role: 'owner',
     joinedLabel: 'Mar 2022',
     bio: 'Leading Atlas, our customer workspace product. Previously design systems at a fintech. Ask me about roadmaps, release planning and good coffee in Indiranagar.',
   },
@@ -30,6 +31,7 @@ export const MOCK_USERS: readonly User[] = [
     timeZoneLabel: 'IST · UTC+5:30',
     location: 'Pune, India',
     role: 'member',
+    joinedLabel: 'Jun 2022',
   },
   {
     id: 'u2',
@@ -38,10 +40,12 @@ export const MOCK_USERS: readonly User[] = [
     department: 'Design',
     email: 'priya@northstar.io',
     status: 'away',
+    lastActiveAt: minutesAgo(36),
     timeZone: 'Asia/Kolkata',
     timeZoneLabel: 'IST · UTC+5:30',
     location: 'Bengaluru, India',
     role: 'member',
+    joinedLabel: 'Sep 2022',
   },
   {
     id: 'u3',
@@ -55,6 +59,7 @@ export const MOCK_USERS: readonly User[] = [
     timeZoneLabel: 'SGT · UTC+8',
     location: 'Singapore',
     role: 'member',
+    joinedLabel: 'Jan 2023',
   },
   {
     id: 'u4',
@@ -67,6 +72,7 @@ export const MOCK_USERS: readonly User[] = [
     timeZoneLabel: 'IST · UTC+5:30',
     location: 'Hyderabad, India',
     role: 'admin',
+    joinedLabel: 'Mar 2022',
   },
   {
     id: 'u5',
@@ -79,6 +85,7 @@ export const MOCK_USERS: readonly User[] = [
     timeZoneLabel: 'IST · UTC+5:30',
     location: 'Chennai, India',
     role: 'member',
+    joinedLabel: 'Jun 2022',
   },
   {
     id: 'u6',
@@ -91,6 +98,7 @@ export const MOCK_USERS: readonly User[] = [
     timeZoneLabel: 'IST · UTC+5:30',
     location: 'Kochi, India',
     role: 'member',
+    joinedLabel: 'Sep 2022',
   },
   {
     id: 'u7',
@@ -104,6 +112,7 @@ export const MOCK_USERS: readonly User[] = [
     timeZoneLabel: 'BST · UTC+1',
     location: 'London, UK',
     role: 'member',
+    joinedLabel: 'Jan 2023',
   },
   {
     id: 'u8',
@@ -115,7 +124,8 @@ export const MOCK_USERS: readonly User[] = [
     timeZone: 'Asia/Kolkata',
     timeZoneLabel: 'IST · UTC+5:30',
     location: 'Gurugram, India',
-    role: 'member',
+    role: 'admin',
+    joinedLabel: 'Mar 2022',
   },
   {
     id: 'u9',
@@ -124,10 +134,12 @@ export const MOCK_USERS: readonly User[] = [
     department: 'Marketing',
     email: 'meera@northstar.io',
     status: 'away',
+    lastActiveAt: minutesAgo(99),
     timeZone: 'Asia/Kolkata',
     timeZoneLabel: 'IST · UTC+5:30',
     location: 'Mumbai, India',
     role: 'member',
+    joinedLabel: 'Jun 2022',
   },
   {
     id: 'u10',
@@ -140,6 +152,7 @@ export const MOCK_USERS: readonly User[] = [
     timeZoneLabel: 'GST · UTC+4',
     location: 'Dubai, UAE',
     role: 'member',
+    joinedLabel: 'Sep 2022',
   },
   {
     id: 'u11',
@@ -153,5 +166,8 @@ export const MOCK_USERS: readonly User[] = [
     timeZoneLabel: 'IST · UTC+5:30',
     location: 'Goa, India',
     role: 'guest',
+    joinedLabel: 'Jan 2023',
   },
 ];
+
+export const MOCK_USERS: readonly User[] = [...CORE_TEAM, ...MOCK_WORKSPACE_MEMBERS];

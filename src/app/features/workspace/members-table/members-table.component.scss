@@ -1,0 +1,148 @@
+@use 'breakpoints';
+
+@mixin cell-wide-target {
+  &::before {
+    position: absolute;
+    inset: var(--space-0);
+    content: '';
+  }
+}
+
+:host {
+  display: block;
+}
+
+.table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: var(--font-size-14);
+}
+
+.table__col--title {
+  width: var(--workspace-members-title-width);
+}
+
+.table__col--role {
+  width: var(--workspace-members-role-width);
+}
+
+.table__col--status {
+  width: var(--workspace-members-status-width);
+}
+
+.table__col--active {
+  width: var(--workspace-members-active-width);
+}
+
+:host(.members-table--wide) .table__col--active {
+  width: var(--workspace-members-active-width-wide);
+}
+
+.table__col--actions {
+  width: var(--workspace-members-actions-width);
+}
+
+th {
+  padding: var(--space-2);
+  border-bottom: var(--rule-strong);
+  color: var(--text-secondary);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-caps);
+  text-align: start;
+  text-transform: uppercase;
+}
+
+td {
+  padding: var(--space-2);
+  border-bottom: var(--rule-hairline);
+  vertical-align: middle;
+}
+
+tbody tr:hover {
+  background: var(--hover);
+}
+
+.table__person {
+  position: relative;
+  padding-block: var(--space-3);
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.person__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.person__name {
+  max-width: 100%;
+  padding: var(--space-0);
+  border: var(--space-0);
+  background: none;
+  color: var(--text-primary);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-heavy);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include breakpoints.tablet-and-down {
+    @include cell-wide-target;
+  }
+
+  @include breakpoints.touch-device {
+    @include cell-wide-target;
+  }
+}
+
+.person__line {
+  display: block;
+  max-width: 100%;
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+}
+
+.table__title {
+  font-size: var(--font-size-13);
+
+  .truncate {
+    display: block;
+  }
+}
+
+.table__status {
+  font-size: var(--font-size-13);
+  white-space: nowrap;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+
+.table__active {
+  color: var(--text-secondary);
+  font-size: var(--font-size-13);
+
+  .truncate {
+    display: block;
+  }
+}
+
+.table__actions {
+  text-align: right;
+}

@@ -1,0 +1,42 @@
+@use 'touch';
+@use '../profile-section';
+
+:host {
+  display: block;
+}
+
+.section {
+  @include profile-section.section;
+}
+
+.section__heading {
+  @include profile-section.heading;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: minmax(var(--profile-detail-label-min), auto) 1fr;
+  gap: var(--space-3) var(--space-4);
+  margin: var(--space-0);
+  font-size: var(--font-size-14);
+}
+
+.details__label {
+  color: var(--text-muted);
+}
+
+.details__value {
+  min-width: 0;
+  margin: var(--space-0);
+  overflow-wrap: anywhere;
+
+  a {
+    color: var(--text-primary);
+
+    @include touch.on-touch {
+      position: relative;
+
+      @include touch.minimum-hit-area;
+    }
+  }
+}

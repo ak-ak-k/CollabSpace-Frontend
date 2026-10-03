@@ -1,0 +1,50 @@
+@if (preferences(); as settings) {
+  <ul class="security-rows">
+    <li
+      appSettingSwitch
+      label="Require two-step verification"
+      description="Everyone needs an authenticator app to sign in. People without it set it up at their next sign-in."
+      [(checked)]="requireTwoFactor"
+      (checkedChange)="setTwoFactor($event)"
+    ></li>
+    <li
+      appSettingSwitch
+      label="Email and password sign-in"
+      description="People sign in with their work email and a password."
+      [(checked)]="passwordSignIn"
+      (checkedChange)="setPasswordSignIn($event)"
+    ></li>
+    <li
+      appSettingSwitch
+      label="Google sign-in"
+      description="People sign in with their Google Workspace account."
+      [(checked)]="googleSignIn"
+      (checkedChange)="setGoogleSignIn($event)"
+    ></li>
+    <li
+      appSettingRow
+      wrap
+      label="Session length"
+      description="How long people stay signed in without activity."
+    >
+      <app-select
+        label="Session length"
+        hideLabel
+        [options]="sessionOptions"
+        [value]="settings.sessionLength"
+        (valueChange)="setSessionLength($event)"
+      />
+    </li>
+    <li
+      appSettingRow
+      wrap
+      label="Sign everyone out"
+      description="Ends every session on every device. Use it if a device is lost."
+    >
+      <button appButton type="button" class="security__sign-out" (click)="signEveryoneOut()">
+        <app-icon name="log-out" [size]="16" />
+        Sign everyone out
+      </button>
+    </li>
+  </ul>
+}

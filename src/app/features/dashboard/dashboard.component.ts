@@ -1,16 +1,16 @@
 import { Component, computed, inject } from '@angular/core';
-import { FilesData } from '../../core/data/files.data';
 import { LoadStatus } from '../../core/models/load-status';
 import { firstNameOf } from '../../core/models/user';
 import { DialogService } from '../../core/services/dialog.service';
 import { SearchService } from '../../core/services/search.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ChatState } from '../../core/state/chat.state';
+import { FileState } from '../../core/state/file.state';
 import { NotificationState } from '../../core/state/notification.state';
 import { TaskState } from '../../core/state/task.state';
 import { WorkspaceState } from '../../core/state/workspace.state';
 import { TaskDialogComponent } from '../tasks/task-dialog/task-dialog.component';
-import { InviteDialogComponent } from '../teams/invite-dialog/invite-dialog.component';
+import { WorkspaceActions } from '../workspace/workspace-actions.service';
 import {
   byDueDate,
   tasksDueToday,
@@ -39,6 +39,9 @@ const availabilityOf = (status: LoadStatus): StatAvailability => AVAILABILITY[st
 const firstUnsettled = (statuses: readonly LoadStatus[]): LoadStatus =>
   statuses.find((status) => status !== 'ready') ?? 'ready';
 
+const emptyWhenNone = (status: LoadStatus, count: number): LoadStatus =>
+  status === 'ready' && count === 0 ? 'empty' : status;
+
 @Component({
   selector: 'app-dashboard',
   imports: [
@@ -57,22 +60,22 @@ export class DashboardComponent {
   private readonly chat = inject(ChatState);
   private readonly tasks = inject(TaskState);
   private readonly notifications = inject(NotificationState);
-  private readonly files = inject(FilesData);
+  private readonly files = inject(FileState);
   private readonly search = inject(SearchService);
   private readonly dialogs = inject(DialogService);
+  private readonly workspaceActions = inject(WorkspaceActions);
   private readonly toasts = inject(ToastService);
 
   protected readonly workspaceStatus = this.workspace.status;
-  protected readonly taskStatus = this.tasks.status;
   protected readonly conversationStatus = computed(() =>
-    firstUnsettled([this.workspace.status(), this.chat.status()]),
+    firstUnsettled([this.workspace.status(), this.chat.inboxStatus()]),
   );
   protected readonly overallStatus = computed(() =>
     firstUnsettled([
-      this.workspace.status(),
+      this.workspace.loadStatus(),
       this.chat.status(),
-      this.tasks.status(),
-      this.notifications.status(),
+      this.tasks.loadStatus(),
+      this.notifications.loadStatus(),
     ]),
   );
   protected readonly statAvailability = computed(() => availabilityOf(this.overallStatus()));
@@ -81,6 +84,7 @@ export class DashboardComponent {
     firstNameOf(this.workspace.currentUser()?.name ?? ''),
   );
   protected readonly unreadMentions = this.notifications.unreadMentionCount;
+  protected readonly workspaceName = computed(() => this.workspace.currentWorkspace()?.name ?? '');
 
   protected readonly conversations = computed(() =>
     this.chat.previews().slice(0, RECENT_CONVERSATION_LIMIT),
@@ -91,10 +95,16 @@ export class DashboardComponent {
     ),
   );
   protected readonly upcoming = computed(() => upcomingTasks(this.openTasks()));
+  protected readonly taskStatus = computed(() =>
+    emptyWhenNone(this.tasks.status(), this.upcoming().length),
+  );
   protected readonly dueToday = computed(() => tasksDueToday(this.openTasks()));
   protected readonly teams = computed(() => toTeamActivity(this.workspace.teams()));
   protected readonly activity = computed(() =>
     toActivity(this.workspace.recentActivity(), (userId) => this.workspace.user(userId)),
+  );
+  protected readonly activityStatus = computed(() =>
+    emptyWhenNone(this.workspace.status(), this.activity().length),
   );
   protected readonly stats = computed(() =>
     toStats({
@@ -103,8 +113,9 @@ export class DashboardComponent {
       unreadConversations: this.chat.unreadConversationCount(),
       openTasks: this.openTasks(),
       onlineMembers: this.workspace.onlineUserCount(),
-      knownMembers: this.workspace.users().length,
+      knownMembers: this.workspace.members().length,
       workspace: this.workspace.currentWorkspace(),
+      dataEmpty: this.overallStatus() === 'empty',
     }),
   );
 
@@ -117,12 +128,12 @@ export class DashboardComponent {
   }
 
   protected invitePeople(): void {
-    this.dialogs.open(InviteDialogComponent, { size: 'md' });
+    this.workspaceActions.openInvite();
   }
 
   protected async upload(fileNames: readonly string[]): Promise<void> {
     for (const fileName of fileNames) {
-      await this.files.uploadFile(fileName);
+      await this.files.upload(fileName);
       this.toasts.show(`${fileName} uploaded`, { icon: 'upload' });
     }
   }

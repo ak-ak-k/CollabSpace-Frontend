@@ -1,4 +1,4 @@
-import { Component, computed, effect, input, model } from '@angular/core';
+import { booleanAttribute, Component, computed, effect, input, model } from '@angular/core';
 import { IconButtonComponent } from '../icon-button/icon-button.component';
 import { IconComponent } from '../icon/icon.component';
 
@@ -17,6 +17,7 @@ export class PaginationComponent {
   readonly total = input.required<number>();
   readonly pageSize = input(DEFAULT_PAGE_SIZE);
   readonly label = input('Pagination');
+  readonly pageNumbers = input(false, { transform: booleanAttribute });
   readonly page = model(FIRST_PAGE);
 
   protected readonly visible = computed(() => this.total() > this.rowsPerPage());
@@ -28,8 +29,12 @@ export class PaginationComponent {
   protected readonly summary = computed(() => {
     const firstRow = (this.currentPage() - FIRST_PAGE) * this.rowsPerPage() + 1;
     const lastRow = Math.min(this.currentPage() * this.rowsPerPage(), this.total());
-    return `${firstRow}${RANGE_SEPARATOR}${lastRow} of ${this.total()}`;
+    return `Showing ${firstRow}${RANGE_SEPARATOR}${lastRow} of ${this.total()}`;
   });
+
+  protected readonly pages = computed(() =>
+    Array.from({ length: this.lastPage() }, (_, index) => index + FIRST_PAGE),
+  );
 
   private readonly rowsPerPage = computed(() => Math.max(this.pageSize(), SMALLEST_PAGE_SIZE));
   private readonly lastPage = computed(() =>
@@ -38,6 +43,10 @@ export class PaginationComponent {
 
   constructor() {
     effect(() => this.page.set(this.currentPage()));
+  }
+
+  protected show(page: number): void {
+    this.page.set(page);
   }
 
   protected showPrevious(): void {

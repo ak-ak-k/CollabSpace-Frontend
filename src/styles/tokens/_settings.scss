@@ -1,0 +1,64 @@
+@mixin settings-tokens {
+  --settings-nav-width: 260px;
+  --settings-nav-item-height: var(--size-control-md);
+  --settings-nav-item-height-mobile: 52px;
+  --settings-content-max-width: 800px;
+  --settings-section-title-size: var(--font-size-display-sm);
+
+  --settings-row-text-gap: var(--space-0-5);
+  --settings-row-text-basis: 220px;
+  --settings-email-input-basis: 260px;
+  --settings-danger-text-basis: 280px;
+  --settings-identity-text-basis: 220px;
+  --settings-session-text-basis: 200px;
+
+  --settings-password-field-min-width: 200px;
+  --settings-profile-field-min-width: 220px;
+  --settings-theme-card-min-width: 180px;
+
+  --settings-tile-size: var(--size-control-md);
+
+  --settings-switch-box-width: var(--size-control-xl);
+  --settings-switch-box-height: var(--size-control-lg);
+  --settings-switch-track-width: 40px;
+  --settings-switch-track-height: 22px;
+  --settings-switch-knob-offset: 3px;
+  --settings-switch-knob-space: calc(var(--settings-switch-knob-offset) * 2);
+  --settings-switch-knob-travel: calc(
+    var(--settings-switch-track-width) - var(--size-toggle-knob) - var(--settings-switch-knob-space)
+  );
+
+  --settings-preview-height: 92px;
+  --settings-preview-rail-width: 22%;
+  --settings-preview-mark-size: var(--space-3);
+  --settings-preview-heading-height: var(--space-2);
+  --settings-preview-heading-width: 60%;
+  --settings-preview-line-height: var(--space-1-5);
+  --settings-preview-line-long: 85%;
+  --settings-preview-line-short: 70%;
+  --settings-preview-button-height: var(--space-3-5);
+  --settings-preview-button-width: 40%;
+  --settings-preview-mark: var(--brand);
+
+  --settings-preview-light-background: #f3f2f2;
+  --settings-preview-light-rail: #201e1d;
+  --settings-preview-light-ink: #201e1d;
+  --settings-preview-light-muted: #bab6b6;
+  --settings-preview-light-rule: rgb(32 30 29 / 40%);
+
+  --settings-preview-dark-background: #151413;
+  --settings-preview-dark-rail: #0b0a0a;
+  --settings-preview-dark-ink: #f1efee;
+  --settings-preview-dark-muted: #605d5d;
+  --settings-preview-dark-rule: rgb(241 239 238 / 26%);
+
+  --settings-preview-system-background: linear-gradient(
+    90deg,
+    var(--settings-preview-light-background) 50%,
+    var(--settings-preview-dark-background) 50%
+  );
+  --settings-preview-system-rail: #201e1d;
+  --settings-preview-system-ink: #9b9797;
+  --settings-preview-system-muted: #9b9797;
+  --settings-preview-system-rule: rgb(155 151 151 / 50%);
+}

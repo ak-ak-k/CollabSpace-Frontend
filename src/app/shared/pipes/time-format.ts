@@ -22,7 +22,7 @@ export const startOfDay = (timestamp: number): number => {
 export const formatTime = (timestamp: number): string =>
   new Date(timestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
-const formatDate = (timestamp: number, options: Intl.DateTimeFormatOptions): string =>
+export const formatDate = (timestamp: number, options: Intl.DateTimeFormatOptions): string =>
   new Date(timestamp).toLocaleDateString('en-GB', options);
 
 const formatWeekday = (timestamp: number, weekday: 'short' | 'long'): string =>
@@ -87,14 +87,30 @@ export const dueLabelOf = (timestamp: number, now = Date.now()): DueLabel => {
   };
 };
 
-export const formatLocalTime = (timeZone: string, now = Date.now()): string => {
+export const formatLocalTime = (
+  timeZone: string,
+  now = Date.now(),
+  twentyFourHour = false,
+): string => {
   try {
-    return new Date(now).toLocaleTimeString('en-US', {
-      hour: 'numeric',
+    return new Date(now).toLocaleTimeString(twentyFourHour ? 'en-GB' : 'en-US', {
+      hour: twentyFourHour ? '2-digit' : 'numeric',
       minute: '2-digit',
       timeZone,
     });
   } catch {
     return '';
   }
+};
+
+const twoDigits = (value: number): string => String(value).padStart(2, '0');
+
+export const toDateInputValue = (timestamp: number): string => {
+  const date = new Date(timestamp);
+  return `${date.getFullYear()}-${twoDigits(date.getMonth() + 1)}-${twoDigits(date.getDate())}`;
+};
+
+export const fromDateInputValue = (value: string): number | null => {
+  const timestamp = new Date(`${value}T00:00`).getTime();
+  return Number.isNaN(timestamp) ? null : timestamp;
 };

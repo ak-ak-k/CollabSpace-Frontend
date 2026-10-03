@@ -1,0 +1,25 @@
+@if (user(); as me) {
+  <app-card class="identity">
+    <div class="identity__row">
+      <app-avatar [name]="me.name" [seed]="colorSeedOf(me.id)" [size]="64" />
+      <span class="identity__text">
+        <strong class="identity__name">{{ me.name }}</strong>
+        <span class="identity__meta">{{ me.title }} · {{ me.email }}</span>
+      </span>
+      <a appButton routerLink="/profile">
+        Open profile
+        <app-icon name="arrow-right" [size]="14" />
+      </a>
+    </div>
+  </app-card>
+}
+
+<form class="profile-form" aria-label="Profile settings" [formRoot]="profileForm">
+  <div class="profile-form__fields">
+    <app-input label="Display name" autocomplete="nickname" [formField]="profileForm.displayName" />
+    <app-input label="Pronouns" placeholder="e.g. he/him" [formField]="profileForm.pronouns" />
+  </div>
+  <div>
+    <button appButton type="submit" variant="primary">Save</button>
+  </div>
+</form>

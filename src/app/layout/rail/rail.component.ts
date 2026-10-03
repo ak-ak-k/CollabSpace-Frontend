@@ -5,11 +5,13 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ThemeState } from '../../core/state/theme.state';
 import { WorkspaceState } from '../../core/state/workspace.state';
 import { PRESENCE_LABELS, userColorSeed } from '../../core/models/user';
+import { WORKSPACE_ROUTE } from '../../features/workspace/workspace-actions.service';
 import { BrandMarkComponent } from '../../shared/components/brand-mark/brand-mark.component';
 import { UserMenuComponent } from '../../shared/components/user-menu/user-menu.component';
-import { WorkspaceMenuComponent } from '../../shared/components/workspace-menu/workspace-menu.component';
+import { WorkspaceSwitcherComponent } from '../../shared/components/workspace-switcher/workspace-switcher.component';
 import { AvatarComponent } from '../../shared/ui/avatar/avatar.component';
 import { BadgeComponent } from '../../shared/ui/badge/badge.component';
+import { DropdownPanelDirective } from '../../shared/ui/dropdown/dropdown-panel/dropdown-panel.directive';
 import { IconComponent } from '../../shared/ui/icon/icon.component';
 import { CurrentRoute } from '../current-route';
 import { PRIMARY_NAVIGATION, SETTINGS_ROUTE } from '../navigation';
@@ -17,12 +19,11 @@ import { NavigationBadges } from '../navigation-badges';
 
 const MENU_GAP = 8;
 
-const MENU_BESIDE_TOP: ConnectedPosition = {
+const SWITCHER_ANCHOR: ConnectedPosition = {
   originX: 'end',
   originY: 'top',
   overlayX: 'start',
   overlayY: 'top',
-  offsetX: MENU_GAP,
 };
 
 const MENU_BESIDE_BOTTOM: ConnectedPosition = {
@@ -44,7 +45,8 @@ const MENU_BESIDE_BOTTOM: ConnectedPosition = {
     BadgeComponent,
     BrandMarkComponent,
     UserMenuComponent,
-    WorkspaceMenuComponent,
+    WorkspaceSwitcherComponent,
+    DropdownPanelDirective,
   ],
   templateUrl: './rail.component.html',
   styleUrl: './rail.component.scss',
@@ -60,15 +62,20 @@ export class RailComponent {
 
   protected readonly items = PRIMARY_NAVIGATION;
   protected readonly settingsRoute = SETTINGS_ROUTE;
-  protected readonly workspaceMenuPositions = [MENU_BESIDE_TOP];
+  protected readonly workspaceMenuPositions = [SWITCHER_ANCHOR];
   protected readonly userMenuPositions = [MENU_BESIDE_BOTTOM];
 
   protected readonly currentWorkspace = this.workspace.currentWorkspace;
   protected readonly me = this.workspace.currentUser;
   protected readonly mySeed = computed(() => userColorSeed(this.me()?.id ?? ''));
 
+  protected readonly inWorkspace = computed(() => this.route.path().startsWith(WORKSPACE_ROUTE));
+  protected readonly workspaceLogo = computed(() => {
+    const logoUrl = this.currentWorkspace()?.logoUrl;
+    return logoUrl ? `url("${logoUrl}")` : null;
+  });
   protected readonly workspaceLabel = computed(
-    () => `Switch workspace, current: ${this.currentWorkspace()?.name ?? ''}`,
+    () => `Workspace menu, current: ${this.currentWorkspace()?.name ?? ''}`,
   );
   protected readonly accountLabel = computed(() => {
     const me = this.me();

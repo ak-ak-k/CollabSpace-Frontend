@@ -53,6 +53,7 @@ export class MessageComposerComponent {
   readonly offline = input(false, { transform: booleanAttribute });
   readonly enterToSend = input(true, { transform: booleanAttribute });
   readonly layout = input<ComposerLayout>('desktop');
+  readonly archivedWorkspace = input('');
 
   readonly draft = model('');
   readonly attachments = model<readonly Attachment[]>([]);
@@ -75,11 +76,15 @@ export class MessageComposerComponent {
   protected readonly mention = new ComposerMentionState(this.draft, this.caret, this.members);
 
   protected readonly isMobile = computed(() => this.layout() === 'mobile');
-  protected readonly placeholderText = computed(
-    () => this.placeholder() || `Message ${this.conversationTitle()}`,
-  );
+  protected readonly readOnly = computed(() => this.archivedWorkspace() !== '');
+  protected readonly placeholderText = computed(() => {
+    if (this.readOnly()) {
+      return `${this.archivedWorkspace()} is archived — read-only`;
+    }
+    return this.placeholder() || `Message ${this.conversationTitle()}`;
+  });
   protected readonly canSend = computed(
-    () => this.draft().trim() !== '' || this.attachments().length > 0,
+    () => !this.readOnly() && (this.draft().trim() !== '' || this.attachments().length > 0),
   );
   protected readonly showsHelper = computed(() => !this.isMobile() || this.offline());
   protected readonly activeOptionId = computed(() =>

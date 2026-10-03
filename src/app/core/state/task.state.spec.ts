@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { DataModeState } from './data-mode.state';
 import { TaskState } from './task.state';
 import { INSTANT_MOCK_DATA, settle } from './state.testing';
+import { WorkspaceState } from './workspace.state';
 
 describe('TaskState', () => {
   beforeEach(() => {
@@ -50,5 +51,28 @@ describe('TaskState', () => {
     await settle();
 
     expect(tasks.status()).toBe('error');
+  });
+
+  it('only shows tasks from the current workspace', async () => {
+    const tasks = TestBed.inject(TaskState);
+    const workspace = TestBed.inject(WorkspaceState);
+    await settle();
+
+    workspace.switchWorkspace('w2');
+
+    expect(tasks.tasks()).toEqual([]);
+    expect(tasks.status()).toBe('empty');
+
+    const created = await tasks.create({
+      title: 'Brand refresh',
+      description: '',
+      status: 'todo',
+      priority: 'medium',
+      assigneeId: null,
+      dueAt: Date.now(),
+    });
+
+    expect(created.workspaceId).toBe('w2');
+    expect(tasks.status()).toBe('ready');
   });
 });

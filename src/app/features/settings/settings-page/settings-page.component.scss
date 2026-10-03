@@ -1,0 +1,38 @@
+:host {
+  display: block;
+  height: 100%;
+  min-width: 0;
+}
+
+.settings {
+  --secondary-sidebar-width-desktop: var(--settings-nav-width);
+
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  background: var(--background);
+}
+
+.settings__main {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.settings__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: var(--settings-content-max-width);
+  padding: var(--page-padding);
+}
+
+.settings__back {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  align-self: flex-start;
+  min-height: var(--size-touch-target);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+}

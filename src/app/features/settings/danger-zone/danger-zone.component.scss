@@ -1,0 +1,45 @@
+@use '../settings-section';
+
+:host {
+  display: block;
+}
+
+.danger-zone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: var(--border-width-rule) solid var(--danger);
+}
+
+.danger-zone__text {
+  display: flex;
+  flex: 1 1 var(--settings-danger-text-basis);
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.danger-zone__title {
+  @include settings-section.subheading;
+
+  color: var(--danger);
+}
+
+.danger-zone__description {
+  margin: var(--space-0);
+  color: var(--text-secondary);
+  font-size: var(--font-size-14);
+  text-wrap: pretty;
+}
+
+:host(.danger-zone--neutral) {
+  .danger-zone {
+    border-color: var(--border);
+  }
+
+  .danger-zone__title {
+    color: var(--text-primary);
+  }
+}

@@ -1,0 +1,89 @@
+<app-table [label]="heading()" minWidth="lg">
+  <table>
+    <caption class="visually-hidden">
+      {{
+        caption()
+      }}
+    </caption>
+    <thead>
+      <tr>
+        <th appSortHeader [direction]="directionOf('name')" (sort)="sortBy.emit('name')">Name</th>
+        <th scope="col">Type</th>
+        <th
+          appSortHeader
+          class="table__numeric"
+          [direction]="directionOf('size')"
+          (sort)="sortBy.emit('size')"
+        >
+          Size
+        </th>
+        <th scope="col">Owner</th>
+        <th appSortHeader [direction]="directionOf('modified')" (sort)="sortBy.emit('modified')">
+          Modified
+        </th>
+        <th scope="col"><span class="visually-hidden">Actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (file of files(); track file.id) {
+        <tr>
+          <th scope="row" class="table__name">
+            <span class="table__file">
+              <app-file-tile [type]="file.type" />
+              <span class="table__text">
+                <span class="table__title truncate">{{ file.name }}</span>
+                <span class="table__location truncate">{{ file.location }}</span>
+              </span>
+            </span>
+          </th>
+          <td class="table__cell">{{ file.typeLabel }}</td>
+          <td class="table__cell table__numeric">{{ file.sizeLabel }}</td>
+          <td class="table__cell">
+            <span class="table__owner">
+              <app-avatar [name]="file.ownerFullName" [seed]="file.ownerSeed" [size]="24" />
+              {{ file.ownerName }}
+            </span>
+          </td>
+          <td class="table__cell table__muted">{{ file.when }}</td>
+          <td class="table__actions">
+            <button
+              appIconButton
+              type="button"
+              [label]="file.starLabel"
+              [pressed]="file.starred"
+              (click)="run('star', file)"
+            >
+              <app-icon name="star" [size]="16" [filled]="file.starred" />
+            </button>
+            <button
+              appIconButton
+              type="button"
+              [label]="'Download ' + file.name"
+              (click)="run('download', file)"
+            >
+              <app-icon name="download" [size]="16" />
+            </button>
+            <button
+              appIconButton
+              type="button"
+              [label]="'Share ' + file.name"
+              (click)="run('share', file)"
+            >
+              <app-icon name="share-2" [size]="16" />
+            </button>
+            @if (file.mine) {
+              <button
+                appIconButton
+                type="button"
+                [label]="'Delete ' + file.name"
+                (click)="run('remove', file)"
+              >
+                <app-icon name="trash-2" [size]="16" />
+              </button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</app-table>

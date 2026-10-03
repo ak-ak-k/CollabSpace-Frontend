@@ -1,0 +1,16 @@
+@for (group of groups(); track group.label; let groupIndex = $index) {
+  <section class="group" [attr.aria-labelledby]="'notification-group-' + groupIndex">
+    <h2 class="group__heading" [id]="'notification-group-' + groupIndex">{{ group.label }}</h2>
+    <ul>
+      @for (row of group.rows; track row.id) {
+        <li
+          appNotificationRow
+          [notification]="row"
+          (opened)="opened.emit(row.id)"
+          (readToggled)="readToggled.emit(row.id)"
+          (dismissed)="dismissed.emit(row.id)"
+        ></li>
+      }
+    </ul>
+  </section>
+}

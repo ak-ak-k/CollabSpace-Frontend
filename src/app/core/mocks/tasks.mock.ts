@@ -4,6 +4,7 @@ import { daysFromToday } from './mock-clock';
 export const MOCK_TASKS: readonly Task[] = [
   {
     id: 'NS-160',
+    workspaceId: 'w1',
     title: 'Audit colour contrast on the dark theme',
     description: '',
     status: 'backlog',
@@ -16,6 +17,7 @@ export const MOCK_TASKS: readonly Task[] = [
   },
   {
     id: 'NS-158',
+    workspaceId: 'w1',
     title: 'Queue outgoing messages while offline',
     description:
       'Persist unsent messages in IndexedDB and replay them in order when the socket reconnects.',
@@ -29,6 +31,7 @@ export const MOCK_TASKS: readonly Task[] = [
   },
   {
     id: 'NS-161',
+    workspaceId: 'w1',
     title: 'Research: threaded replies',
     description: '',
     status: 'backlog',
@@ -41,6 +44,7 @@ export const MOCK_TASKS: readonly Task[] = [
   },
   {
     id: 'NS-151',
+    workspaceId: 'w1',
     title: 'Fix flaky file uploader retry test',
     description:
       'The retry timer races the mocked clock in CI. Reproduce with --runInBand and stabilise.',
@@ -54,6 +58,7 @@ export const MOCK_TASKS: readonly Task[] = [
   },
   {
     id: 'NS-149',
+    workspaceId: 'w1',
     title: 'Notification preferences per channel',
     description: '',
     status: 'todo',
@@ -66,6 +71,7 @@ export const MOCK_TASKS: readonly Task[] = [
   },
   {
     id: 'NS-153',
+    workspaceId: 'w1',
     title: 'Rate-limit headers in the API client',
     description: '',
     status: 'todo',
@@ -78,6 +84,7 @@ export const MOCK_TASKS: readonly Task[] = [
   },
   {
     id: 'NS-142',
+    workspaceId: 'w1',
     title: 'Message composer refactor',
     description:
       'Split the composer into input, toolbar and suggestion list. Fix mention keyboard handling in Safari.',
@@ -91,6 +98,7 @@ export const MOCK_TASKS: readonly Task[] = [
   },
   {
     id: 'NS-145',
+    workspaceId: 'w1',
     title: 'Kanban drag-and-drop on touch devices',
     description: '',
     status: 'progress',
@@ -103,6 +111,7 @@ export const MOCK_TASKS: readonly Task[] = [
   },
   {
     id: 'NS-147',
+    workspaceId: 'w1',
     title: 'Onboarding flow v3',
     description: '',
     status: 'progress',
@@ -115,6 +124,7 @@ export const MOCK_TASKS: readonly Task[] = [
   },
   {
     id: 'NS-150',
+    workspaceId: 'w1',
     title: 'Search indexing for shared files',
     description: '',
     status: 'progress',
@@ -127,6 +137,7 @@ export const MOCK_TASKS: readonly Task[] = [
   },
   {
     id: 'NS-139',
+    workspaceId: 'w1',
     title: 'Presence service heartbeat',
     description: '',
     status: 'review',
@@ -139,6 +150,7 @@ export const MOCK_TASKS: readonly Task[] = [
   },
   {
     id: 'NS-141',
+    workspaceId: 'w1',
     title: 'Settings: roles and permissions UI',
     description: '',
     status: 'review',
@@ -151,6 +163,7 @@ export const MOCK_TASKS: readonly Task[] = [
   },
   {
     id: 'NS-131',
+    workspaceId: 'w1',
     title: 'Virtualized inbox list',
     description: '',
     status: 'done',
@@ -163,6 +176,7 @@ export const MOCK_TASKS: readonly Task[] = [
   },
   {
     id: 'NS-133',
+    workspaceId: 'w1',
     title: 'Dark theme tokens',
     description: '',
     status: 'done',
@@ -175,6 +189,7 @@ export const MOCK_TASKS: readonly Task[] = [
   },
   {
     id: 'NS-135',
+    workspaceId: 'w1',
     title: 'Push notification copy for 2.4',
     description: '',
     status: 'done',

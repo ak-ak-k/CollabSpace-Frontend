@@ -1,0 +1,25 @@
+<ul class="grid">
+  @for (file of files(); track file.id) {
+    <li class="card">
+      <app-file-tile size="preview" [type]="file.type" />
+      <div class="card__footer">
+        <span class="card__text">
+          <span class="card__name truncate">{{ file.name }}</span>
+          <span class="card__meta">{{ file.cardMeta }}</span>
+        </span>
+        <span class="card__actions">
+          <button
+            appIconButton
+            type="button"
+            [label]="file.starLabel"
+            [pressed]="file.starred"
+            (click)="run('star', file)"
+          >
+            <app-icon name="star" [size]="16" [filled]="file.starred" />
+          </button>
+          <app-file-menu includeDownload [file]="file" (action)="run($event, file)" />
+        </span>
+      </div>
+    </li>
+  }
+</ul>

@@ -1,0 +1,43 @@
+<section aria-labelledby="workspace-teams-heading">
+  <app-section-header
+    headingId="workspace-teams-heading"
+    linkLabel="All teams"
+    link="/teams"
+    [heading]="heading()"
+  />
+
+  @if (teams().length === 0) {
+    <div class="teams__empty">
+      <p class="teams__empty-text">
+        No teams yet. Teams group people and channels around shared work.
+      </p>
+      @if (canCreate()) {
+        <button appButton type="button" (click)="createTeam.emit()">
+          <app-icon name="plus" [size]="16" />
+          Create team
+        </button>
+      }
+    </div>
+  } @else {
+    <ul>
+      @for (team of teams(); track team.id) {
+        <li class="team">
+          <a class="team__link" [routerLink]="['/teams', team.id]">
+            <app-avatar variant="inverted" [name]="team.name" [text]="team.code" [size]="32" />
+            <span class="team__text">
+              <span class="team__name">
+                <span class="truncate">{{ team.name }}</span>
+                @if (team.isPrivate) {
+                  <app-icon name="lock" [size]="12" />
+                  <span class="visually-hidden">(private)</span>
+                }
+              </span>
+              <span class="team__meta">{{ team.meta }}</span>
+            </span>
+            <app-icon class="team__chevron" name="chevron-right" [size]="16" />
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</section>

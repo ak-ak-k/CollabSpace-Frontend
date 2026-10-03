@@ -28,6 +28,10 @@
   }
 }
 
+.messages__placeholder {
+  min-height: auto;
+}
+
 .messages__pane {
   position: relative;
   display: flex;

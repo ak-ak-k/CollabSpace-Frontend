@@ -48,6 +48,13 @@ export const BOTTOM_NAVIGATION: readonly NavigationItem[] = PRIMARY_NAVIGATION.f
 
 export const DRAWER_NAVIGATION: readonly NavigationItem[] = [
   {
+    id: 'workspace',
+    label: 'Workspace',
+    accessibleLabel: 'Workspace',
+    icon: 'building-2',
+    route: '/workspace',
+  },
+  {
     id: 'notifications',
     label: 'Notifications',
     accessibleLabel: 'Notifications',
@@ -67,6 +74,7 @@ export const DRAWER_NAVIGATION: readonly NavigationItem[] = [
 ];
 
 export const MORE_SECTION_ROUTES: readonly string[] = [
+  '/workspace',
   '/files',
   '/notifications',
   '/profile',

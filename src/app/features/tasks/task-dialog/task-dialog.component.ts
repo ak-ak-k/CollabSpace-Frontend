@@ -1,4 +1,5 @@
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
+import { fromDateInputValue, toDateInputValue } from '../../../shared/pipes/time-format';
 import { Component, computed, inject, signal } from '@angular/core';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { Router } from '@angular/router';
@@ -36,14 +37,9 @@ interface TaskDraft {
 }
 
 const DEFAULT_DUE_IN_DAYS = 3;
-const DATE_INPUT_LENGTH = 10;
 const MILLISECONDS_PER_DAY = 86_400_000;
 
-const dateInputValue = (timestamp: number): string =>
-  new Date(timestamp).toISOString().slice(0, DATE_INPUT_LENGTH);
-
-const timestampOf = (dateInput: string): number =>
-  new Date(`${dateInput}T00:00`).getTime() || Date.now();
+const timestampOf = (dateInput: string): number => fromDateInputValue(dateInput) ?? Date.now();
 
 @Component({
   selector: 'app-task-dialog',
@@ -78,7 +74,7 @@ export class TaskDialogComponent {
     label: TASK_PRIORITY_LABELS[priority],
   }));
   protected readonly assigneeOptions = computed<readonly SelectOption[]>(() =>
-    this.workspace.users().map((user) => ({
+    this.workspace.members().map((user) => ({
       value: user.id,
       label: user.id === CURRENT_USER_ID ? `${user.name} (you)` : user.name,
     })),
@@ -89,7 +85,7 @@ export class TaskDialogComponent {
     description: '',
     status: this.data?.status ?? 'todo',
     assigneeId: CURRENT_USER_ID,
-    dueDate: dateInputValue(Date.now() + DEFAULT_DUE_IN_DAYS * MILLISECONDS_PER_DAY),
+    dueDate: toDateInputValue(Date.now() + DEFAULT_DUE_IN_DAYS * MILLISECONDS_PER_DAY),
     priority: 'medium',
   });
 

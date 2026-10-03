@@ -8,12 +8,32 @@
   </div>
 </div>
 
+@if (needsTyping) {
+  <div class="confirm-dialog__type">
+    <label class="confirm-dialog__type-label" [for]="typeId">
+      Type <strong>{{ data.confirmText }}</strong> to confirm
+    </label>
+    <input
+      #typeInput
+      class="confirm-dialog__type-input"
+      type="text"
+      autocomplete="off"
+      spellcheck="false"
+      cdkFocusInitial
+      [id]="typeId"
+      [value]="typed()"
+      (input)="typed.set(typeInput.value)"
+      (keydown.enter)="confirmTyped($event)"
+    />
+  </div>
+}
+
 <div class="confirm-dialog__actions">
   <button
     appButton
     type="button"
     variant="secondary"
-    [attr.cdk-focus-initial]="focusesCancel ? '' : null"
+    [attr.cdkFocusInitial]="focusesCancel ? '' : null"
     (click)="cancel()"
   >
     {{ data.cancelLabel }}
@@ -21,8 +41,9 @@
   <button
     appButton
     type="button"
-    variant="primary"
-    [attr.cdk-focus-initial]="focusesCancel ? null : ''"
+    [variant]="data.tone === 'neutral' ? 'inverted' : 'primary'"
+    [attr.cdkFocusInitial]="focusesConfirm ? '' : null"
+    [disabled]="blocked()"
     (click)="confirm()"
   >
     {{ data.confirmLabel }}

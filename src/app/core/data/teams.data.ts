@@ -3,17 +3,14 @@ import { MOCK_ACTIVITY } from '../mocks/activity.mock';
 import { MOCK_CHANNELS } from '../mocks/channels.mock';
 import { MOCK_TEAMS } from '../mocks/teams.mock';
 import { CURRENT_USER_ID, MOCK_USERS } from '../mocks/users.mock';
-import { MOCK_WORKSPACES } from '../mocks/workspaces.mock';
 import { ActivityEvent } from '../models/activity';
-import { Channel } from '../models/channel';
+import { Channel, NewChannel } from '../models/channel';
 import { NewTeam, Team } from '../models/team';
 import { PresenceStatus, User } from '../models/user';
-import { Workspace } from '../models/workspace';
 import { MockRequest } from './mock-request';
 
 export interface WorkspaceDirectory {
   readonly users: readonly User[];
-  readonly workspaces: readonly Workspace[];
   readonly teams: readonly Team[];
   readonly channels: readonly Channel[];
   readonly activity: readonly ActivityEvent[];
@@ -34,6 +31,7 @@ export class TeamsData {
   private teams = [...MOCK_TEAMS];
   private channels = [...MOCK_CHANNELS];
   private createdTeams = 0;
+  private createdChannels = 0;
 
   getDirectory(): Promise<WorkspaceDirectory> {
     return this.request.read(() => this.directory(), {
@@ -59,19 +57,41 @@ export class TeamsData {
     });
   }
 
-  createTeam(newTeam: NewTeam): Promise<CreatedTeam> {
+  createTeam(newTeam: NewTeam, workspaceId: string): Promise<CreatedTeam> {
     return this.request.write(() => {
-      const created = this.buildTeam(newTeam);
+      const created = this.buildTeam(newTeam, workspaceId);
       this.teams = [...this.teams, created.team];
       this.channels = [...this.channels, created.channel];
       return created;
     });
   }
 
+  createChannel(newChannel: NewChannel): Promise<CreatedTeam> {
+    return this.request.write(() => {
+      const team = this.requireTeam(newChannel.teamId);
+      const channel: Channel = {
+        id: `c-${slugOf(newChannel.name)}-${++this.createdChannels}`,
+        teamId: team.id,
+        name: newChannel.name,
+        description: newChannel.description,
+        memberIds: newChannel.isPrivate
+          ? [CURRENT_USER_ID]
+          : [...new Set([...team.memberIds, CURRENT_USER_ID])],
+        isPrivate: newChannel.isPrivate,
+        createdLabel: monthAndYear(new Date()),
+      };
+      const updatedTeam = { ...team, channelIds: [...team.channelIds, channel.id] };
+      this.channels = [...this.channels, channel];
+      this.teams = this.teams.map((candidate) =>
+        candidate.id === team.id ? updatedTeam : candidate,
+      );
+      return { team: updatedTeam, channel };
+    });
+  }
+
   private directory(): WorkspaceDirectory {
     return {
       users: this.users,
-      workspaces: MOCK_WORKSPACES,
       teams: this.teams,
       channels: this.channels,
       activity: MOCK_ACTIVITY,
@@ -102,7 +122,7 @@ export class TeamsData {
     return { ...team, joined: false, memberIds };
   }
 
-  private buildTeam(newTeam: NewTeam): CreatedTeam {
+  private buildTeam(newTeam: NewTeam, workspaceId: string): CreatedTeam {
     const sequence = ++this.createdTeams;
     const slug = slugOf(newTeam.name);
     const teamId = `t-${slug}-${sequence}`;
@@ -111,6 +131,7 @@ export class TeamsData {
     const isPrivate = newTeam.privacy === 'private';
     const team: Team = {
       id: teamId,
+      workspaceId,
       name: newTeam.name,
       code: teamCodeOf(newTeam.name),
       description: newTeam.description || 'No description yet.',

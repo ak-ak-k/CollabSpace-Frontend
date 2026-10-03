@@ -23,6 +23,7 @@ import { SectionHeaderComponent } from '../../../shared/components/section-heade
 export class TeamActivityComponent {
   readonly status = input.required<LoadStatus>();
   readonly teams = input.required<readonly TeamActivityView[]>();
+  readonly workspaceName = input.required<string>();
 
   readonly retry = output<void>();
 }

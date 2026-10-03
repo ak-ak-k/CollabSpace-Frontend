@@ -1,0 +1,17 @@
+@mixin workspace-switcher-tokens {
+  --workspace-switcher-width: 320px;
+  --workspace-switcher-inset: var(--rail-menu-edge);
+  --workspace-switcher-left-desktop: calc(var(--rail-width-desktop) + var(--rail-menu-gap));
+  --workspace-switcher-left-tablet: calc(var(--rail-width-tablet) + var(--rail-menu-gap));
+  --workspace-switcher-max-height: var(--dropdown-max-height);
+  --workspace-switcher-sheet-max-height: 86dvh;
+  --workspace-switcher-item-height: var(--size-touch-target);
+  --workspace-switcher-sheet-item-height: var(--sheet-row-height);
+  --workspace-switcher-row-height: var(--sheet-row-height);
+  --workspace-switcher-tile-size: var(--size-avatar-44);
+  --workspace-switcher-row-tile-size: var(--size-avatar-32);
+
+  --rail-workspace-chevron-gap: var(--space-0-5);
+
+  --workspace-banner-message-min-width: var(--offline-banner-message-min-width);
+}

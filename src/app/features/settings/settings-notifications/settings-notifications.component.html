@@ -1,0 +1,59 @@
+<app-table label="Notification preferences" minWidth="sm">
+  <table>
+    <caption class="visually-hidden">
+      Notification channels by category
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">Notify me about</th>
+        @for (channel of channels; track channel) {
+          <th scope="col" class="matrix__channel">{{ channelLabels[channel] }}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of topics; track row.topic) {
+        <tr>
+          <th scope="row" class="matrix__topic">
+            {{ row.label }}
+            <span class="matrix__description">{{ row.description }}</span>
+          </th>
+          @for (channel of channels; track channel) {
+            <td class="matrix__cell">
+              <app-toggle
+                hideLabel
+                [label]="row.label + ' on ' + channel"
+                [checked]="preferences().notifications[row.topic][channel]"
+                (checkedChange)="setChannel(row.topic, channel, $event)"
+              />
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</app-table>
+
+<ul class="notification-switches">
+  <li
+    appSettingSwitch
+    label="Notification sounds"
+    description="Play a sound for mentions and DMs."
+    [checked]="preferences().sounds"
+    (checkedChange)="setSounds($event)"
+  ></li>
+  <li
+    appSettingSwitch
+    label="Do not disturb"
+    description="Pause notifications until you turn this off. Your status shows as Do not disturb."
+    [checked]="doNotDisturb()"
+    (checkedChange)="setDoNotDisturb($event)"
+  ></li>
+  <li
+    appSettingSwitch
+    label="Enter sends messages"
+    description="When off, use Ctrl + Enter to send and Enter for a new line."
+    [checked]="preferences().enterToSend"
+    (checkedChange)="setEnterToSend($event)"
+  ></li>
+</ul>

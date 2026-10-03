@@ -2,6 +2,16 @@
   display: block;
 }
 
+.teams__none {
+  margin: var(--space-3) var(--space-0) var(--space-0);
+  color: var(--text-secondary);
+  font-size: var(--font-size-14);
+
+  a {
+    font-weight: var(--font-weight-semibold);
+  }
+}
+
 .teams {
   display: flex;
   flex-direction: column;

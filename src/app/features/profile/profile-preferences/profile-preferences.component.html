@@ -1,0 +1,37 @@
+<section class="section" aria-labelledby="profile-preferences-heading">
+  <h2 class="section__heading" id="profile-preferences-heading">Preferences</h2>
+  <div class="preference">
+    <span class="preference__label" aria-hidden="true">Theme</span>
+    <app-radio-group
+      label="Theme"
+      hideLabel
+      [options]="themeOptions"
+      [value]="themePreference()"
+      (valueChange)="setTheme($event)"
+    />
+  </div>
+  <div class="preference">
+    <span class="preference__label" aria-hidden="true">Time format</span>
+    <app-radio-group
+      label="Time format"
+      hideLabel
+      [options]="timeFormatOptions"
+      [value]="timeFormat()"
+      (valueChange)="setTimeFormat($event)"
+    />
+  </div>
+  <div class="preference">
+    <span class="preference__label" aria-hidden="true">Language</span>
+    <app-select
+      label="Language"
+      hideLabel
+      [options]="languageOptions"
+      [value]="language()"
+      (valueChange)="setLanguage($event)"
+    />
+  </div>
+  <a class="section__link" routerLink="/settings/notifications">
+    Notification preferences
+    <app-icon name="arrow-right" [size]="14" />
+  </a>
+</section>

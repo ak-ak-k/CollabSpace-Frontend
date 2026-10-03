@@ -1,0 +1,26 @@
+<ul class="privacy-switches">
+  @for (item of switches; track item.key) {
+    <li
+      appSettingSwitch
+      [label]="item.label"
+      [description]="item.description"
+      [checked]="preferences()[item.key]"
+      (checkedChange)="setSwitch(item, $event)"
+    ></li>
+  }
+</ul>
+
+<div class="visibility">
+  <span class="visibility__text">
+    <strong class="visibility__label">Who can see your profile</strong>
+    <span class="visibility__description">Guests only ever see your name and title.</span>
+  </span>
+  <app-select
+    class="visibility__select"
+    label="Who can see your profile"
+    hideLabel
+    [options]="visibilityOptions"
+    [value]="preferences().profileVisibility"
+    (valueChange)="setVisibility($event)"
+  />
+</div>

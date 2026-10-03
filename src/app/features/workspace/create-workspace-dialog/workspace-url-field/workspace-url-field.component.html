@@ -1,0 +1,30 @@
+<label class="field__label" [attr.for]="controlId">{{ label() }}</label>
+
+<div class="field__body">
+  <input
+    #control
+    class="field__control url-field__control"
+    [class.field__control--invalid]="error().invalid"
+    [id]="controlId"
+    [value]="value()"
+    [disabled]="disabled()"
+    [attr.name]="name() || null"
+    [attr.placeholder]="placeholder() || null"
+    [attr.maxlength]="maxlength() ?? null"
+    autocomplete="off"
+    autocapitalize="none"
+    spellcheck="false"
+    [attr.aria-invalid]="error().invalid ? 'true' : null"
+    [attr.aria-describedby]="describedBy()"
+    (input)="clean(control)"
+    (blur)="touch.emit()"
+  />
+  <span class="url-field__suffix" [id]="suffixId">{{ suffix() }}</span>
+</div>
+
+@if (hint()) {
+  <p class="field__hint" [attr.id]="hintId">{{ hint() }}</p>
+}
+@if (error().message) {
+  <app-field-error [attr.id]="errorId" [message]="error().message" />
+}

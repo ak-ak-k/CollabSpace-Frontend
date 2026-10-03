@@ -45,9 +45,11 @@
     <app-message-composer
       [conversationTitle]="conversation.title"
       [placeholder]="placeholder()"
+      [archivedWorkspace]="session.archivedWorkspace()"
       [members]="thread.mentionCandidates()"
       [replyTo]="session.replyPreview()"
       [offline]="!network.online()"
+      [enterToSend]="session.enterToSend()"
       [layout]="isMobile() ? 'mobile' : 'desktop'"
       [draft]="session.drafts.text(conversationId())"
       (draftChange)="session.drafts.setText(conversationId(), $event)"
@@ -84,6 +86,13 @@
           message="The conversation didn’t load. Your messages are safe — try again in a moment."
           actionLabel="Try again"
           (action)="retry()"
+        />
+      }
+      @case ('empty') {
+        <app-empty-state
+          icon="message-square"
+          heading="No conversation selected"
+          message="Pick a conversation from the list, or start a new one."
         />
       }
       @default {

@@ -9,6 +9,8 @@
   --on-primary: #ffffff;
   --secondary: var(--color-text);
   --on-secondary: var(--color-bg);
+  --secondary-hover: color-mix(in srgb, var(--secondary) 84%, var(--background));
+  --secondary-active: color-mix(in srgb, var(--secondary) 72%, var(--background));
 
   --background: var(--color-bg);
   --surface: var(--color-surface);
@@ -29,7 +31,7 @@
 
   --hover: color-mix(in srgb, var(--color-text) 6%, transparent);
   --press: color-mix(in srgb, var(--color-text) 12%, transparent);
-  --selected: var(--color-neutral-300);
+  --selected: var(--color-selected);
   --rail-hover: color-mix(in srgb, var(--rail-foreground) 10%, transparent);
   --rail-selected: color-mix(in srgb, var(--rail-foreground) 14%, transparent);
   --focus-ring: var(--color-text);

@@ -1,0 +1,16 @@
+@mixin profile-tokens {
+  --profile-page-max-width: 1120px;
+  --profile-page-padding: clamp(16px, 3vw, 40px);
+  --profile-section-min-width: 420px;
+  --profile-identity-basis: 300px;
+  --profile-name-size: clamp(1.75rem, 4vw, 2.625rem);
+  --profile-avatar-offset: calc(var(--space-1-5) * -1);
+  --profile-status-size: 22px;
+  --profile-status-ring: var(--space-1);
+  --profile-photo-inset: var(--space-1-5);
+  --profile-detail-label-min: 110px;
+  --profile-status-tile-min: 150px;
+  --profile-team-min-width: 240px;
+  --profile-preference-label-basis: 160px;
+  --profile-bio-line-height: 1.6;
+}

@@ -62,11 +62,19 @@ ol {
   background: var(--selection);
 }
 
-@include breakpoints.reduced-motion {
+@mixin motion-off {
   *,
   *::before,
   *::after {
     animation-duration: var(--duration-reduced) !important;
     transition-duration: var(--duration-reduced) !important;
   }
+}
+
+@include breakpoints.reduced-motion {
+  @include motion-off;
+}
+
+[data-reduce-motion] {
+  @include motion-off;
 }

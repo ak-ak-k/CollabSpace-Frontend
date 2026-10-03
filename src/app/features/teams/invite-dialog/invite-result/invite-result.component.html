@@ -1,0 +1,38 @@
+@let outcome = result();
+
+<div class="summary" role="status">
+  <span class="summary__tile" aria-hidden="true">
+    <app-icon [name]="icon()" [size]="20" />
+  </span>
+  <div class="summary__text">
+    <strong class="summary__heading">{{ heading() }}</strong>
+    <span class="summary__detail">{{ detail() }}</span>
+  </div>
+</div>
+
+<ul class="sent" aria-label="Invited" tabindex="0">
+  @for (email of outcome.emails; track email) {
+    <li class="sent__item">
+      <app-icon class="sent__icon" [name]="itemIcon()" [size]="16" />
+      <span class="sent__email">{{ email }}</span>
+      @if (isResent(email)) {
+        <app-tag>Resent</app-tag>
+      }
+      <app-tag tone="outline">{{ outcome.roleLabel }}</app-tag>
+    </li>
+  }
+</ul>
+
+@if (outcome.skipped.length > 0) {
+  <div class="skipped">
+    <span class="skipped__label caps-label">Skipped · {{ outcome.skipped.length }}</span>
+    <ul class="skipped__list">
+      @for (email of outcome.skipped; track email) {
+        <li class="skipped__item">
+          <app-icon name="user-check" [size]="14" />
+          {{ email }} — already a member
+        </li>
+      }
+    </ul>
+  </div>
+}

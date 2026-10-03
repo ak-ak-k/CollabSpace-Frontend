@@ -1,0 +1,28 @@
+@use '../profile-section';
+
+:host {
+  display: block;
+}
+
+.section {
+  @include profile-section.section;
+}
+
+.section__heading {
+  @include profile-section.heading;
+}
+
+.status__options {
+  --radio-tile-columns: 2;
+}
+
+.status__message {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.status__field {
+  flex: 1;
+  min-width: 0;
+}

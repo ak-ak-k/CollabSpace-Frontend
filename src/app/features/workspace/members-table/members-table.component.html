@@ -1,0 +1,83 @@
+<table class="table">
+  <caption class="visually-hidden">
+    {{
+      caption()
+    }}
+  </caption>
+  <colgroup>
+    <col />
+    @if (wide()) {
+      <col class="table__col--title" />
+    }
+    <col class="table__col--role" />
+    @if (wide()) {
+      <col class="table__col--status" />
+    }
+    <col class="table__col--active" />
+    <col class="table__col--actions" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th scope="col">Member</th>
+      @if (wide()) {
+        <th scope="col">Title</th>
+      }
+      <th scope="col">Role</th>
+      @if (wide()) {
+        <th scope="col">Status</th>
+      }
+      <th scope="col">Last active</th>
+      <th scope="col"><span class="visually-hidden">Actions</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (member of rows(); track member.id) {
+      <tr>
+        <td class="table__person">
+          <span class="person">
+            <app-avatar
+              [name]="member.name"
+              [seed]="member.seed"
+              [size]="32"
+              [status]="member.status"
+            />
+            <span class="person__text">
+              <button
+                type="button"
+                class="person__name truncate"
+                [attr.aria-label]="'View profile of ' + member.label"
+                (click)="openProfile(member)"
+              >
+                {{ member.label }}
+              </button>
+              <span class="person__line truncate">{{ wide() ? member.email : member.title }}</span>
+            </span>
+          </span>
+        </td>
+        @if (wide()) {
+          <td class="table__title">
+            <span class="truncate">{{ member.title }}</span>
+            <span class="person__line truncate">{{ member.department }}</span>
+          </td>
+        }
+        <td>
+          <app-tag [tone]="member.roleTone">{{ member.roleLabel }}</app-tag>
+        </td>
+        @if (wide()) {
+          <td class="table__status">
+            <span class="status">
+              <app-status-dot [status]="member.status" size="sm" />
+              {{ member.statusLabel }}
+            </span>
+          </td>
+        }
+        <td class="table__active">
+          <span class="truncate">{{ member.activeLabel }}</span>
+        </td>
+        <td class="table__actions">
+          <app-member-menu [member]="member" />
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

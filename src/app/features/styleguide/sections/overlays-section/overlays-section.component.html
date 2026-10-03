@@ -55,41 +55,48 @@
   <p class="result" role="status">{{ menuResult() }}</p>
 
   <ng-template #conversationMenu>
-    <app-dropdown label="Conversation actions" width="md">
-      <app-dropdown-heading>Status</app-dropdown-heading>
-      @for (option of statusOptions; track option.value) {
+    <div appDropdownPanel="Conversation actions">
+      <app-dropdown label="Conversation actions" width="md">
+        <app-dropdown-heading>Status</app-dropdown-heading>
+        @for (option of statusOptions; track option.value) {
+          <button
+            appDropdownItem
+            [selected]="status() === option.value"
+            (triggered)="status.set(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        }
+        <app-dropdown-divider />
+        <app-dropdown-heading>Conversation</app-dropdown-heading>
         <button
           appDropdownItem
-          [selected]="status() === option.value"
-          (triggered)="status.set(option.value)"
+          selection="checkbox"
+          [selected]="muted()"
+          (triggered)="toggleMuted()"
         >
-          {{ option.label }}
+          <app-icon name="bell-off" [size]="18" />
+          Mute notifications
         </button>
-      }
-      <app-dropdown-divider />
-      <app-dropdown-heading>Conversation</app-dropdown-heading>
-      <button appDropdownItem selection="checkbox" [selected]="muted()" (triggered)="toggleMuted()">
-        <app-icon name="bell-off" [size]="18" />
-        Mute notifications
-      </button>
-      <button appDropdownItem (triggered)="menuResult.set('Pinned the conversation.')">
-        <app-icon name="pin" [size]="18" />
-        Pin conversation
-      </button>
-      <a
-        appDropdownItem
-        href="/styleguide"
-        (triggered)="menuResult.set('Opened the styleguide link.')"
-      >
-        <app-icon name="external-link" [size]="18" />
-        Open styleguide
-      </a>
-      <app-dropdown-divider />
-      <button appDropdownItem tone="danger" (triggered)="confirmDelete()">
-        <app-icon name="trash-2" [size]="18" />
-        Delete task
-      </button>
-    </app-dropdown>
+        <button appDropdownItem (triggered)="menuResult.set('Pinned the conversation.')">
+          <app-icon name="pin" [size]="18" />
+          Pin conversation
+        </button>
+        <a
+          appDropdownItem
+          href="/styleguide"
+          (triggered)="menuResult.set('Opened the styleguide link.')"
+        >
+          <app-icon name="external-link" [size]="18" />
+          Open styleguide
+        </a>
+        <app-dropdown-divider />
+        <button appDropdownItem tone="danger" (triggered)="confirmDelete()">
+          <app-icon name="trash-2" [size]="18" />
+          Delete task
+        </button>
+      </app-dropdown>
+    </div>
   </ng-template>
 </section>
 

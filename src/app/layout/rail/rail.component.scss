@@ -21,7 +21,6 @@
 @include breakpoints.tablet {
   :host {
     --rail-width: var(--rail-width-tablet);
-    --rail-workspace-size: var(--size-touch-target);
   }
 
   .rail__label {
@@ -55,21 +54,39 @@
 }
 
 .rail__workspace {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rail-workspace-chevron-gap);
+  padding: var(--space-0-5);
+  border: var(--space-0);
+  background: transparent;
+  color: var(--rail-foreground);
+  cursor: pointer;
+
+  &:hover .rail__workspace-tile {
+    border-color: var(--rail-foreground);
+  }
+}
+
+.rail__workspace-tile {
   display: grid;
   place-items: center;
   width: var(--rail-workspace-size);
   height: var(--rail-workspace-size);
-  padding: var(--space-0);
+  overflow: hidden;
   border: var(--border-width-rule) solid var(--rail-muted);
-  background: transparent;
-  color: var(--rail-foreground);
+  background: center / cover no-repeat;
   font-size: var(--font-size-13);
   font-weight: var(--font-weight-heavy);
-  cursor: pointer;
+}
 
-  &:hover {
-    border-color: var(--rail-foreground);
-  }
+.rail__workspace--current .rail__workspace-tile {
+  border-color: var(--rail-foreground);
+}
+
+.rail__workspace-chevron {
+  color: var(--rail-muted);
 }
 
 .rail__divider {
@@ -150,6 +167,7 @@
 }
 
 .rail__control--active {
+  background: var(--rail-selected);
   color: var(--rail-foreground);
 }
 

@@ -1,15 +1,33 @@
 import { DirectConversation, GroupConversation } from '../models/conversation';
 
 export const MOCK_CONVERSATIONS: readonly (DirectConversation | GroupConversation)[] = [
-  { id: 'dm-u1', type: 'dm', userId: 'u1' },
-  { id: 'g-launch', type: 'group', name: 'Launch crew', memberIds: ['u0', 'u1', 'u2', 'u4'] },
-  { id: 'dm-u2', type: 'dm', userId: 'u2' },
-  { id: 'dm-u4', type: 'dm', userId: 'u4' },
-  { id: 'g-design', type: 'group', name: 'Design critique', memberIds: ['u0', 'u2', 'u5', 'u9'] },
-  { id: 'dm-u3', type: 'dm', userId: 'u3' },
-  { id: 'dm-u8', type: 'dm', userId: 'u8' },
-  { id: 'g-q4', type: 'group', name: 'Q4 planning', memberIds: ['u0', 'u4', 'u9', 'u10'] },
-  { id: 'dm-u5', type: 'dm', userId: 'u5' },
+  { id: 'dm-u1', type: 'dm', userId: 'u1', workspaceId: 'w1' },
+  {
+    id: 'g-launch',
+    type: 'group',
+    name: 'Launch crew',
+    memberIds: ['u0', 'u1', 'u2', 'u4'],
+    workspaceId: 'w1',
+  },
+  { id: 'dm-u2', type: 'dm', userId: 'u2', workspaceId: 'w1' },
+  { id: 'dm-u4', type: 'dm', userId: 'u4', workspaceId: 'w1' },
+  {
+    id: 'g-design',
+    type: 'group',
+    name: 'Design critique',
+    memberIds: ['u0', 'u2', 'u5', 'u9'],
+    workspaceId: 'w1',
+  },
+  { id: 'dm-u3', type: 'dm', userId: 'u3', workspaceId: 'w1' },
+  { id: 'dm-u8', type: 'dm', userId: 'u8', workspaceId: 'w1' },
+  {
+    id: 'g-q4',
+    type: 'group',
+    name: 'Q4 planning',
+    memberIds: ['u0', 'u4', 'u9', 'u10'],
+    workspaceId: 'w1',
+  },
+  { id: 'dm-u5', type: 'dm', userId: 'u5', workspaceId: 'w1' },
 ];
 
 export const MOCK_UNREAD_COUNTS: Readonly<Record<string, number>> = {

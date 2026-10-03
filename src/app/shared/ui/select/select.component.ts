@@ -23,6 +23,7 @@ export interface SelectOption {
   imports: [IconComponent, FieldErrorComponent],
   templateUrl: './select.component.html',
   styleUrl: './select.component.scss',
+  host: { '[class.select--inline]': 'inlineLabel()' },
 })
 export class SelectComponent extends FieldControl implements FormValueControl<string> {
   readonly value = model('');
@@ -32,6 +33,7 @@ export class SelectComponent extends FieldControl implements FormValueControl<st
   readonly hint = input('');
   readonly size = input<FieldSize>('md');
   readonly hideLabel = input(false, { transform: booleanAttribute });
+  readonly inlineLabel = input(false, { transform: booleanAttribute });
 
   private readonly control = viewChild.required<ElementRef<HTMLSelectElement>>('control');
 

@@ -1,0 +1,95 @@
+@use '../../../../shared/ui/input/field/field';
+
+:host {
+  display: block;
+  min-width: var(--space-0);
+}
+
+.emails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: var(--space-0);
+}
+
+.emails__header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--font-size-12);
+}
+
+.emails__label {
+  flex: 1;
+  color: var(--text-secondary);
+}
+
+.emails__count {
+  font-weight: var(--font-weight-semibold);
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: var(--space-0);
+}
+
+.row__line {
+  display: flex;
+  gap: var(--space-2);
+  min-width: var(--space-0);
+}
+
+.row__field {
+  @include field.control;
+
+  flex: 1;
+  min-width: var(--space-0);
+}
+
+.row__field--invalid {
+  @include field.control-invalid;
+}
+
+.row__message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  color: var(--text-muted);
+  font-size: var(--font-size-12);
+  overflow-wrap: anywhere;
+
+  app-icon {
+    flex: none;
+  }
+}
+
+.row__message--alert {
+  color: var(--danger);
+}
+
+.emails__more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+}
+
+.emails__tip {
+  color: var(--text-muted);
+  font-size: var(--font-size-12);
+}
+
+.emails__policy {
+  display: flex;
+  gap: var(--space-1-5);
+  margin: var(--space-0);
+  color: var(--text-muted);
+  font-size: var(--font-size-12);
+
+  app-icon {
+    flex: none;
+    margin-top: var(--space-0-5);
+  }
+}

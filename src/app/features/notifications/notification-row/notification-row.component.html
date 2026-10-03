@@ -1,0 +1,61 @@
+<span class="notification__marker" aria-hidden="true"></span>
+
+@if (notification().actorName; as actorName) {
+  <app-avatar [name]="actorName" [seed]="notification().avatarSeed" [size]="40" />
+} @else {
+  <span class="notification__system" aria-hidden="true">
+    <app-icon [name]="notification().systemIcon" [size]="18" />
+  </span>
+}
+
+@if (link(); as link) {
+  <a
+    #contentLink
+    class="notification__content notification__content--link"
+    [routerLink]="link"
+    (click)="opened.emit()"
+  >
+    <ng-container [ngTemplateOutlet]="content" />
+  </a>
+} @else {
+  <div class="notification__content">
+    <ng-container [ngTemplateOutlet]="content" />
+  </div>
+}
+
+<div class="notification__actions">
+  <button
+    #toggleButton
+    appIconButton
+    type="button"
+    [label]="toggleLabel()"
+    (click)="readToggled.emit()"
+  >
+    <app-icon [name]="notification().unread ? 'circle-check' : 'circle-dot'" [size]="16" />
+  </button>
+  <button appIconButton type="button" [label]="dismissLabel()" (click)="dismissed.emit()">
+    <app-icon name="x" [size]="16" />
+  </button>
+</div>
+
+<ng-template #content>
+  <span class="notification__text">
+    @if (notification().actorName; as actorName) {
+      <strong class="notification__actor">{{ actorName }}</strong>
+    }
+    {{ notification().text }}
+    @if (notification().unread) {
+      <span class="visually-hidden">(unread)</span>
+    }
+  </span>
+  @if (notification().snippet) {
+    <span class="notification__snippet">{{ notification().snippet }}</span>
+  }
+  <span class="notification__meta">
+    <app-tag class="notification__tag" tone="neutral">
+      <app-icon [name]="notification().categoryIcon" [size]="11" />
+      {{ notification().categoryLabel }}
+    </app-tag>
+    {{ notification().when }}
+  </span>
+</ng-template>

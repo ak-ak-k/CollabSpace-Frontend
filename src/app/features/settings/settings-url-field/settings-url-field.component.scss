@@ -1,0 +1,45 @@
+@use '../../../shared/ui/input/field/field';
+
+:host {
+  @include field.host;
+}
+
+.field__label {
+  @include field.label;
+}
+
+.field__body {
+  @include field.body;
+
+  align-items: stretch;
+}
+
+.field__control {
+  @include field.control;
+
+  flex: 1;
+  min-width: 0;
+}
+
+.field__hint {
+  @include field.message;
+}
+
+.field__control--invalid {
+  @include field.control-invalid;
+}
+
+.url-field__control {
+  border-right: var(--space-0);
+}
+
+.url-field__suffix {
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding: var(--space-0) var(--space-2-5);
+  border: var(--border-width-hairline) solid var(--border-control);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  font-size: var(--font-size-13);
+}

@@ -18,6 +18,7 @@ export interface TabItem {
   readonly id: string;
   readonly label: string;
   readonly count?: number;
+  readonly countLabel?: string;
   readonly icon?: IconName;
   readonly link?: string | readonly unknown[];
 }

@@ -71,6 +71,19 @@
   background: var(--primary-active);
 }
 
+:host(.button--inverted) {
+  background: var(--secondary);
+  color: var(--on-secondary);
+}
+
+:host(.button--inverted:hover:not(:disabled)) {
+  background: var(--secondary-hover);
+}
+
+:host(.button--inverted:active:not(:disabled)) {
+  background: var(--secondary-active);
+}
+
 :host(.button--secondary) {
   border-color: var(--border-control);
 }

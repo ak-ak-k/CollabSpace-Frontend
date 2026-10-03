@@ -1,0 +1,85 @@
+<div class="members__toolbar">
+  <app-search-input
+    class="members__search"
+    label="Search members"
+    placeholder="Search by name, email or title"
+    [(value)]="query"
+  />
+  <span class="members__spacer"></span>
+  @if (access().canInvite) {
+    <button appButton type="button" variant="primary" (click)="invite()">
+      <app-icon name="user-plus" [size]="16" />
+      Invite people
+    </button>
+  }
+</div>
+
+<div class="members__filters" role="group" aria-label="Filter members">
+  @for (chip of chips(); track chip.filter) {
+    <a
+      class="members__chip"
+      [class.members__chip--current]="chip.filter === filter()"
+      [routerLink]="chip.link"
+      [attr.aria-current]="chip.filter === filter() ? 'page' : null"
+    >
+      {{ chip.label }}
+      @if (ready()) {
+        <span class="members__chip-count">{{ chip.count }}</span>
+      }
+    </a>
+  }
+</div>
+
+@if (showPending()) {
+  <p class="members__pending">
+    <app-icon name="mail" [size]="14" />
+    {{ pendingCount() | count: 'pending invitation' }} ·
+    <a class="members__pending-link" [routerLink]="manageInvitationsRoute">Manage invitations</a>
+  </p>
+}
+
+@switch (view()) {
+  @case ('loading') {
+    <app-skeleton layout="table" [rows]="8" compact label="Loading members" />
+  }
+  @case ('error') {
+    <app-empty-state
+      kind="error"
+      heading="Couldn’t load members"
+      message="The member directory didn’t load. Nobody’s access has changed."
+      actionLabel="Try again"
+      (action)="retry()"
+    />
+  }
+  @case ('solo') {
+    <app-empty-state
+      icon="users"
+      heading="It’s just you for now"
+      actionIcon="user-plus"
+      [message]="soloMessage()"
+      [actionLabel]="access().canInvite ? 'Invite people' : ''"
+      (action)="invite()"
+    />
+  }
+  @case ('none') {
+    <app-empty-state
+      compact
+      [icon]="noMatch().icon"
+      [heading]="noMatch().heading"
+      [message]="noMatch().message"
+    />
+  }
+  @default {
+    @if (isMobile()) {
+      <app-member-cards [rows]="rows()" [label]="caption()" />
+    } @else {
+      <app-members-table [rows]="rows()" [caption]="caption()" [wide]="isDesktop()" />
+    }
+  }
+}
+
+<p class="members__count" aria-live="polite">
+  @if (view() === 'list') {
+    {{ countLabel() }}
+  }
+</p>

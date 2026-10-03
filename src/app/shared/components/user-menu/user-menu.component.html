@@ -54,6 +54,12 @@
     <app-icon name="wifi-off" [size]="18" />
     Simulate offline
   </button>
+  @if (installer.canInstall()) {
+    <button appDropdownItem type="button" (triggered)="installer.install()">
+      <app-icon name="download" [size]="18" />
+      Install CollabSpace
+    </button>
+  }
 
   @if (dataMode.available) {
     <app-dropdown-divider />

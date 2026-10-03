@@ -1,0 +1,26 @@
+<ul class="cards" [attr.aria-label]="label()">
+  @for (member of rows(); track member.id) {
+    <li class="card">
+      <button type="button" class="card__profile" (click)="openProfile(member)">
+        <app-avatar
+          [name]="member.name"
+          [seed]="member.seed"
+          [size]="40"
+          [status]="member.status"
+        />
+        <span class="card__text">
+          <span class="card__name truncate">
+            <span class="visually-hidden">View profile of</span>
+            {{ member.label }}
+          </span>
+          <span class="card__title truncate">{{ member.title }}</span>
+          <span class="card__meta">
+            <app-tag [tone]="member.roleTone">{{ member.roleLabel }}</app-tag>
+            {{ member.activeLabel }}
+          </span>
+        </span>
+      </button>
+      <app-member-menu variant="sheet" [member]="member" />
+    </li>
+  }
+</ul>

@@ -1,0 +1,26 @@
+<app-secondary-sidebar label="Settings">
+  <h1 sidebarHeader class="settings-nav__title">Settings</h1>
+  <div class="settings-nav">
+    @for (group of groups; track group.label) {
+      <p class="settings-nav__group" [id]="'settings-nav-' + group.label">{{ group.label }}</p>
+      <ul class="settings-nav__list" [attr.aria-labelledby]="'settings-nav-' + group.label">
+        @for (item of group.items; track item.id) {
+          <li>
+            <a
+              #sectionLink
+              class="settings-nav__link"
+              [class.settings-nav__link--current]="item.id === current()"
+              [routerLink]="item.link"
+              [attr.data-section]="item.id"
+              [attr.aria-current]="item.id === current() ? 'page' : null"
+            >
+              <app-icon [name]="item.icon" [size]="18" />
+              <span class="settings-nav__label">{{ item.label }}</span>
+              <app-icon class="settings-nav__chevron" name="chevron-right" [size]="16" />
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</app-secondary-sidebar>

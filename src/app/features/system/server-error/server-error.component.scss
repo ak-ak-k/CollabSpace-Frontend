@@ -1,0 +1,16 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.reference {
+  margin: var(--space-0);
+  color: var(--text-secondary);
+  font-size: var(--font-size-13);
+}
+
+.reference__code {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-heavy);
+  letter-spacing: var(--system-reference-letter-spacing);
+}

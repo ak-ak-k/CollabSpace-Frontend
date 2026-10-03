@@ -37,7 +37,7 @@
           @case ('channels') {
             <app-team-channels
               [channels]="detail.channels()"
-              (createChannel)="actions.createChannel()"
+              (createChannel)="actions.createChannel(team.id)"
             />
           }
           @case ('files') {

@@ -1,12 +1,14 @@
 export type ConversationType = 'dm' | 'group' | 'channel';
 
 export interface DirectConversation {
+  readonly workspaceId: string;
   readonly id: string;
   readonly type: 'dm';
   readonly userId: string;
 }
 
 export interface GroupConversation {
+  readonly workspaceId: string;
   readonly id: string;
   readonly type: 'group';
   readonly name: string;

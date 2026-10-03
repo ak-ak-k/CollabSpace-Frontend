@@ -1,0 +1,23 @@
+<app-system-page
+  kicker="Error 500"
+  icon="triangle-alert"
+  tileTone="danger"
+  heading="Something went wrong"
+  message="An unexpected error stopped this page from loading. It’s been reported automatically. Trying again usually fixes it."
+  [lists]="lists"
+>
+  @if (reference(); as code) {
+    <p systemNote class="reference">
+      Reference <strong class="reference__code">{{ code }}</strong> · include it if you contact
+      support
+    </p>
+  }
+  <button appButton type="button" variant="primary" size="lg" (click)="tryAgain()">
+    <app-icon name="refresh-cw" [size]="16" />
+    Try again
+  </button>
+  <a appButton size="lg" routerLink="/home">
+    <app-icon name="house" [size]="16" />
+    Go to dashboard
+  </a>
+</app-system-page>

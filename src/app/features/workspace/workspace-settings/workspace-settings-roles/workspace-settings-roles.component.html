@@ -1,0 +1,83 @@
+@if (isMobile()) {
+  <ul class="role-cards">
+    @for (row of rows(); track row.role) {
+      <li>
+        <app-card class="role-card">
+          <div cardTitle class="role-card__header">
+            <app-icon [name]="row.icon" [size]="16" />
+            <h3 class="role-card__title">{{ row.label }}</h3>
+            <a class="role-card__count" [routerLink]="row.link" [attr.aria-label]="row.countAria">
+              {{ row.countLabel }}
+            </a>
+          </div>
+          <div class="role-card__body">
+            <p class="role-card__description">{{ row.description }}</p>
+            <ul class="role-card__permissions" [attr.aria-label]="row.permissionsLabel">
+              @for (permission of row.permissions; track permission.label) {
+                <li class="permission" [class.permission--denied]="!permission.allowed">
+                  <app-icon
+                    class="permission__icon"
+                    [name]="permission.allowed ? 'check' : 'x'"
+                    [size]="14"
+                  />
+                  <span>
+                    <span class="visually-hidden">{{
+                      permission.allowed ? 'Can: ' : 'Can’t: '
+                    }}</span>
+                    {{ permission.label }}
+                  </span>
+                </li>
+              }
+            </ul>
+          </div>
+        </app-card>
+      </li>
+    }
+  </ul>
+} @else {
+  <app-table [label]="rolesCaption()" minWidth="sm">
+    <table class="roles">
+      <caption class="visually-hidden">
+        {{
+          rolesCaption()
+        }}
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col" class="roles__role">Role</th>
+          <th scope="col">Description</th>
+          <th scope="col" class="roles__count">Members</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows(); track row.role) {
+          <tr>
+            <th scope="row" class="roles__name">
+              <span class="roles__name-inner">
+                <app-icon [name]="row.icon" [size]="14" />
+                {{ row.label }}
+              </span>
+            </th>
+            <td class="roles__description">{{ row.description }}</td>
+            <td class="roles__count">
+              <a class="roles__link" [routerLink]="row.link" [attr.aria-label]="row.countAria">
+                {{ row.count }}
+              </a>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </app-table>
+
+  <div class="roles__matrix">
+    <h3 class="roles__heading">What each role can do</h3>
+    <app-workspace-permission-matrix />
+  </div>
+}
+
+<p class="roles__footer">
+  Change someone’s role from
+  <a class="roles__footer-link" routerLink="/workspace/members">Members</a>. Custom roles are
+  available on the Enterprise plan.
+</p>

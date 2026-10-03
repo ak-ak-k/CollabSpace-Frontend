@@ -15,11 +15,12 @@ export class TasksData {
     return this.request.read(() => this.tasks, []);
   }
 
-  createTask(newTask: NewTask): Promise<Task> {
+  createTask(newTask: NewTask, workspaceId: string): Promise<Task> {
     return this.request.write(() => {
       const task: Task = {
         ...newTask,
         id: this.nextId(),
+        workspaceId,
         labels: [],
         commentCount: 0,
         attachmentCount: 0,

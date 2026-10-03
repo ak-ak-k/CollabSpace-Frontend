@@ -18,45 +18,9 @@ import {
   GroupConversation,
 } from '../models/conversation';
 import { DeliveryState, Message, MessageDraft } from '../models/message';
+import { ChatEvent, ChatSnapshot, EMPTY_SNAPSHOT } from './chat-events';
 import { planReply, scheduleReply } from './chat-simulation';
 import { MockRequest } from './mock-request';
-
-export interface ChatSnapshot {
-  readonly conversations: readonly Conversation[];
-  readonly messages: Readonly<Record<string, readonly Message[]>>;
-  readonly unreadCounts: Readonly<Record<string, number>>;
-  readonly starredIds: readonly string[];
-  readonly mutedIds: readonly string[];
-  readonly typingUserIds: Readonly<Record<string, readonly string[]>>;
-}
-
-export interface TypingEvent {
-  readonly type: 'typing';
-  readonly conversationId: string;
-  readonly userIds: readonly string[];
-}
-
-export interface MessageEvent {
-  readonly type: 'message';
-  readonly message: Message;
-}
-
-export interface DeliveryEvent {
-  readonly type: 'delivery';
-  readonly conversationId: string;
-  readonly state: DeliveryState;
-}
-
-export type ChatEvent = TypingEvent | MessageEvent | DeliveryEvent;
-
-const EMPTY_SNAPSHOT: ChatSnapshot = {
-  conversations: [],
-  messages: {},
-  unreadCounts: {},
-  starredIds: [],
-  mutedIds: [],
-  typingUserIds: {},
-};
 
 const channelConversation = (channel: Channel): ChannelConversation => ({
   id: channel.id,
@@ -143,32 +107,48 @@ export class ChatData {
     return this.request.write(() => this.setMembership(this.mutedIds, conversationId, muted));
   }
 
-  ensureDirectConversation(userId: string): Promise<DirectConversation> {
+  ensureDirectConversation(userId: string, workspaceId: string): Promise<DirectConversation> {
     return this.request.write(() => {
-      const id = `dm-${userId}`;
-      const existing = this.conversations.find((conversation) => conversation.id === id);
-      if (existing?.type === 'dm') {
+      const existing = this.conversations.find(
+        (conversation): conversation is DirectConversation =>
+          conversation.type === 'dm' &&
+          conversation.userId === userId &&
+          conversation.workspaceId === workspaceId,
+      );
+      if (existing) {
         return existing;
       }
-      const created: DirectConversation = { id, type: 'dm', userId };
+      const id = this.directIdFor(userId, workspaceId);
+      const created: DirectConversation = { id, type: 'dm', userId, workspaceId };
       this.conversations = [...this.conversations, created];
       this.messages[id] = [];
       return created;
     });
   }
 
-  createGroup(name: string, memberIds: readonly string[]): Promise<GroupConversation> {
+  createGroup(
+    name: string,
+    memberIds: readonly string[],
+    workspaceId: string,
+  ): Promise<GroupConversation> {
     return this.request.write(() => {
       const group: GroupConversation = {
         id: `g-new-${++this.createdGroups}`,
         type: 'group',
         name,
         memberIds: [CURRENT_USER_ID, ...memberIds],
+        workspaceId,
       };
       this.conversations = [...this.conversations, group];
       this.messages[group.id] = [];
       return group;
     });
+  }
+
+  private directIdFor(userId: string, workspaceId: string): string {
+    const id = `dm-${userId}`;
+    const taken = this.conversations.some((conversation) => conversation.id === id);
+    return taken ? `${id}-${workspaceId}` : id;
   }
 
   addChannel(channel: Channel): ChannelConversation {

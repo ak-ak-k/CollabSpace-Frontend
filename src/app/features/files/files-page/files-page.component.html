@@ -1,0 +1,90 @@
+@if (isDesktop()) {
+  <app-files-sidebar [active]="folder()" [counts]="counts()" [usedBytes]="usedBytes()" />
+}
+<div class="files">
+  <div class="files__content">
+    <header class="files__header">
+      <div class="files__heading">
+        <h1 class="files__title" tabindex="-1" #heading>{{ meta().label }}</h1>
+        <p class="files__description">{{ meta().description }}</p>
+      </div>
+      <button appButton type="button" variant="primary" (click)="pickFiles()">
+        <app-icon name="upload" [size]="16" />
+        Upload
+      </button>
+      <input
+        #picker
+        type="file"
+        multiple
+        hidden
+        tabindex="-1"
+        aria-label="Choose files to upload"
+        (change)="uploadPicked()"
+      />
+    </header>
+
+    @if (!isDesktop()) {
+      <app-tabs label="File locations" gap="lg" [tabs]="tabs()" [active]="folder()" />
+    }
+
+    <app-files-toolbar
+      [showLayout]="!isMobile()"
+      [showSort]="body() !== 'table'"
+      [(query)]="query"
+      [(type)]="type"
+      [(layout)]="layout"
+      [(sort)]="sort"
+    />
+
+    @switch (status()) {
+      @case ('loading') {
+        <app-skeleton layout="table" compact label="Loading files" />
+      }
+      @case ('error') {
+        <app-empty-state
+          kind="error"
+          heading="Couldn’t load files"
+          message="The file service didn’t respond. Nothing was deleted."
+          actionLabel="Try again"
+          (action)="reload()"
+        />
+      }
+      @default {
+        @if (rows().length === 0) {
+          <app-empty-state
+            [icon]="emptyCopy().icon"
+            [heading]="emptyCopy().heading"
+            [message]="emptyCopy().message"
+            [actionLabel]="emptyCopy().actionLabel"
+            actionIcon="upload"
+            (action)="pickFiles()"
+          />
+        } @else {
+          @switch (body()) {
+            @case ('table') {
+              <app-files-table
+                [files]="pageRows()"
+                [heading]="meta().label"
+                [sort]="sort()"
+                (sortBy)="sortBy($event)"
+                (action)="run($event)"
+              />
+            }
+            @case ('grid') {
+              <app-files-grid [files]="pageRows()" (action)="run($event)" />
+            }
+            @default {
+              <app-files-list [files]="pageRows()" (action)="run($event)" />
+            }
+          }
+          <app-pagination
+            pageNumbers
+            [total]="rows().length"
+            [pageSize]="pageSize"
+            [(page)]="page"
+          />
+        }
+      }
+    }
+  </div>
+</div>

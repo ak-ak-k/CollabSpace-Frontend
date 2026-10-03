@@ -1,0 +1,26 @@
+:host {
+  --file-tile-size: var(--files-tile-size-sm);
+
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--file-tile-size);
+  height: var(--file-tile-size);
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+:host(.file-tile--md) {
+  --file-tile-size: var(--files-tile-size-md);
+}
+
+:host(.file-tile--preview) {
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--files-preview-aspect-ratio);
+}
+
+:host(.file-tile--inverted) {
+  background: var(--text-primary);
+  color: var(--background);
+}

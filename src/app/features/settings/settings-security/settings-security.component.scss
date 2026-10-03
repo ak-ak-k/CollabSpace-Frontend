@@ -1,0 +1,9 @@
+@use '../settings-section';
+
+:host {
+  @include settings-section.section-host;
+}
+
+.security-list {
+  @include settings-section.list;
+}

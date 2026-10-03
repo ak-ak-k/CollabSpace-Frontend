@@ -1,0 +1,48 @@
+@let me = user();
+
+<header class="header">
+  <div class="header__avatar">
+    <app-avatar [name]="me.name" [seed]="seed()" [size]="avatarSize()" />
+    <span class="header__status" [class]="'header__status--' + me.status" aria-hidden="true"></span>
+    <button
+      appIconButton
+      type="button"
+      class="header__photo"
+      label="Change profile photo"
+      (click)="changePhoto.emit()"
+    >
+      <app-icon name="upload" [size]="16" />
+    </button>
+  </div>
+
+  <div class="header__identity">
+    <span class="header__eyebrow">Your profile</span>
+    <h1 class="header__name">{{ me.name }}</h1>
+    <p class="header__meta">{{ me.title }} · {{ me.department }}</p>
+    <div class="header__tags">
+      <app-tag tone="outline">{{ roleLabel() }}</app-tag>
+      <app-tag>
+        <app-status-dot [status]="me.status" size="sm" />
+        {{ statusLabel() }}
+      </app-tag>
+      @if (statusMessage()) {
+        <app-tag>{{ statusMessage() }}</app-tag>
+      }
+    </div>
+  </div>
+
+  <div class="header__actions">
+    @if (editing()) {
+      <button appButton type="button" (click)="cancel.emit()">Cancel</button>
+      <button appButton type="button" variant="primary" [busy]="saving()" (click)="save.emit()">
+        <app-icon name="check" [size]="16" />
+        Save changes
+      </button>
+    } @else {
+      <button #editButton appButton type="button" variant="primary" (click)="edit.emit()">
+        <app-icon name="pencil" [size]="16" />
+        Edit profile
+      </button>
+    }
+  </div>
+</header>

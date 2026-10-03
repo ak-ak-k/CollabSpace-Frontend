@@ -4,6 +4,7 @@ import { minutesAgo } from './mock-clock';
 export const MOCK_FILES: readonly FileItem[] = [
   {
     id: 'f1',
+    workspaceId: 'w1',
     name: 'Q4 Roadmap.pdf',
     type: 'pdf',
     sizeLabel: '2.4 MB',
@@ -16,6 +17,7 @@ export const MOCK_FILES: readonly FileItem[] = [
   },
   {
     id: 'f2',
+    workspaceId: 'w1',
     name: 'Onboarding v3.fig',
     type: 'design',
     sizeLabel: '18.6 MB',
@@ -28,6 +30,7 @@ export const MOCK_FILES: readonly FileItem[] = [
   },
   {
     id: 'f3',
+    workspaceId: 'w1',
     name: 'composer-states.pdf',
     type: 'pdf',
     sizeLabel: '1.8 MB',
@@ -40,6 +43,7 @@ export const MOCK_FILES: readonly FileItem[] = [
   },
   {
     id: 'f4',
+    workspaceId: 'w1',
     name: 'CHANGELOG-2.4.md',
     type: 'code',
     sizeLabel: '12 KB',
@@ -52,6 +56,7 @@ export const MOCK_FILES: readonly FileItem[] = [
   },
   {
     id: 'f5',
+    workspaceId: 'w1',
     name: 'release-banner-v2.png',
     type: 'image',
     sizeLabel: '640 KB',
@@ -64,6 +69,7 @@ export const MOCK_FILES: readonly FileItem[] = [
   },
   {
     id: 'f6',
+    workspaceId: 'w1',
     name: 'Design QA — 2.4.pdf',
     type: 'pdf',
     sizeLabel: '3.1 MB',
@@ -76,6 +82,7 @@ export const MOCK_FILES: readonly FileItem[] = [
   },
   {
     id: 'f7',
+    workspaceId: 'w1',
     name: 'Sprint 24 metrics.xlsx',
     type: 'sheet',
     sizeLabel: '284 KB',
@@ -88,6 +95,7 @@ export const MOCK_FILES: readonly FileItem[] = [
   },
   {
     id: 'f8',
+    workspaceId: 'w1',
     name: 'Q4 OKRs.docx',
     type: 'doc',
     sizeLabel: '96 KB',
@@ -100,6 +108,7 @@ export const MOCK_FILES: readonly FileItem[] = [
   },
   {
     id: 'f9',
+    workspaceId: 'w1',
     name: 'api-v2-spec.yaml',
     type: 'code',
     sizeLabel: '48 KB',
@@ -112,6 +121,7 @@ export const MOCK_FILES: readonly FileItem[] = [
   },
   {
     id: 'f10',
+    workspaceId: 'w1',
     name: 'Brand guidelines 2026.pdf',
     type: 'pdf',
     sizeLabel: '12.4 MB',
@@ -124,6 +134,7 @@ export const MOCK_FILES: readonly FileItem[] = [
   },
   {
     id: 'f11',
+    workspaceId: 'w1',
     name: 'Customer interviews.zip',
     type: 'archive',
     sizeLabel: '84.2 MB',
@@ -136,6 +147,7 @@ export const MOCK_FILES: readonly FileItem[] = [
   },
   {
     id: 'f12',
+    workspaceId: 'w1',
     name: 'Product demo.mp4',
     type: 'video',
     sizeLabel: '146 MB',
@@ -148,6 +160,7 @@ export const MOCK_FILES: readonly FileItem[] = [
   },
   {
     id: 'f13',
+    workspaceId: 'w1',
     name: 'Board update — September.pptx',
     type: 'slides',
     sizeLabel: '7.9 MB',
@@ -160,6 +173,7 @@ export const MOCK_FILES: readonly FileItem[] = [
   },
   {
     id: 'f14',
+    workspaceId: 'w1',
     name: 'Hiring plan H2.xlsx',
     type: 'sheet',
     sizeLabel: '152 KB',
@@ -172,6 +186,7 @@ export const MOCK_FILES: readonly FileItem[] = [
   },
   {
     id: 'f15',
+    workspaceId: 'w1',
     name: 'Architecture overview.pdf',
     type: 'pdf',
     sizeLabel: '5.6 MB',

@@ -1,0 +1,5 @@
+@use '../settings-section';
+
+:host {
+  @include settings-section.section-host;
+}

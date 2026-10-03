@@ -5,6 +5,7 @@ export type TeamActivityLevel = 'Very active' | 'Active' | 'Moderate' | 'Quiet' 
 export type TeamPrivacy = 'public' | 'private';
 
 export interface Team {
+  readonly workspaceId: string;
   readonly id: string;
   readonly name: string;
   readonly code: string;

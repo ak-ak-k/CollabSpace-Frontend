@@ -1,0 +1,87 @@
+<header class="profile__bar">
+  <span class="profile__kicker">Member profile</span>
+  <button appIconButton type="button" label="Close profile" (click)="close()">
+    <app-icon name="x" [size]="18" />
+  </button>
+</header>
+
+@if (profile(); as person) {
+  <div class="profile__body">
+    <div class="profile__identity">
+      <app-avatar
+        class="profile__avatar"
+        [name]="person.name"
+        [seed]="person.seed"
+        [size]="72"
+        [status]="person.status"
+      />
+      <div class="profile__names">
+        <h2 class="profile__name" [id]="titleId">{{ person.name }}</h2>
+        <p class="profile__title">{{ person.title }} · {{ person.department }}</p>
+      </div>
+      <div class="profile__tags">
+        <app-tag [tone]="person.roleTone">{{ person.roleLabel }}</app-tag>
+        <app-tag>
+          <app-status-dot [status]="person.status" size="sm" />
+          {{ person.statusLabel }}
+        </app-tag>
+      </div>
+    </div>
+
+    <dl class="profile__facts">
+      <dt>Email</dt>
+      <dd>
+        <a class="profile__email" [href]="'mailto:' + person.email">{{ person.email }}</a>
+      </dd>
+      <dt>Local time</dt>
+      <dd>{{ person.localTime }} · {{ person.timeZoneLabel }}</dd>
+      <dt>Location</dt>
+      <dd>{{ person.location }}</dd>
+      <dt>Last active</dt>
+      <dd>{{ person.activeLabel }}</dd>
+      <dt>Member since</dt>
+      <dd>{{ person.memberSince }}</dd>
+    </dl>
+
+    <section [attr.aria-labelledby]="teamsHeadingId">
+      <h3 class="profile__section-title" [id]="teamsHeadingId">
+        Teams in {{ workspaceName() }} · {{ teams().length }}
+      </h3>
+      @if (teams().length > 0) {
+        <ul class="profile__teams">
+          @for (team of teams(); track team.id) {
+            <li class="profile__team">
+              <a class="profile__team-link" [routerLink]="['/teams', team.id]" (click)="close()">
+                <app-avatar variant="inverted" [name]="team.name" [text]="team.code" [size]="28" />
+                <span class="profile__team-name truncate">{{ team.name }}</span>
+                <span class="profile__team-role">{{ team.roleLabel }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="profile__no-teams">Not in any teams yet.</p>
+      }
+    </section>
+  </div>
+
+  <footer class="profile__footer">
+    @if (person.isMe) {
+      <a appButton size="lg" variant="inverted" routerLink="/profile" (click)="close()">
+        <app-icon name="pencil" [size]="16" />
+        Edit your profile
+      </a>
+    } @else {
+      <button appButton type="button" size="lg" variant="inverted" (click)="close('message')">
+        <app-icon name="message-square" [size]="16" />
+        Message {{ person.firstName }}
+      </button>
+    }
+    @if (canChangeRole()) {
+      <button appButton type="button" size="lg" (click)="close('role')">
+        <app-icon name="user-cog" [size]="16" />
+        Change role
+      </button>
+    }
+  </footer>
+}

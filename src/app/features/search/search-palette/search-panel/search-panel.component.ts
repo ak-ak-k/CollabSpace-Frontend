@@ -92,8 +92,8 @@ export class SearchPanelComponent {
 
   private readonly commands = computed(() =>
     this.session.filter() === 'people'
-      ? messageCommands(this.workspace.users())
-      : jumpCommands(this.theme.isDark()),
+      ? messageCommands(this.workspace.members())
+      : jumpCommands(this.theme.isDark(), this.workspace.currentWorkspace()?.name),
   );
   private readonly recentSearches = computed(() =>
     this.session.filter() === 'people' ? [] : this.search.recentSearches(),

@@ -1,0 +1,25 @@
+<header class="header">
+  <div class="header__heading">
+    <h1 class="header__title" tabindex="-1" #title>Notifications</h1>
+    <p class="header__summary" aria-live="polite">{{ summary() }}</p>
+  </div>
+  <div class="header__actions">
+    <app-radio-group
+      label="Show"
+      name="notification-show"
+      hideLabel
+      [options]="showOptions"
+      [(value)]="show"
+    />
+    <button
+      appButton
+      type="button"
+      variant="secondary"
+      [attr.aria-disabled]="canMarkAllRead() ? null : 'true'"
+      (click)="requestMarkAllRead()"
+    >
+      <app-icon name="check-check" [size]="16" />
+      Mark all as read
+    </button>
+  </div>
+</header>

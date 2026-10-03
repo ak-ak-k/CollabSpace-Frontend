@@ -2,8 +2,23 @@
   display: block;
 }
 
-.invite-dialog__row {
+.invite__banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--danger-surface);
+  color: var(--on-danger-surface);
+  font-size: var(--font-size-14);
+
+  app-icon {
+    flex: none;
+    margin-top: var(--space-0-5);
+  }
+}
+
+.invite__fields {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--dialog-field-min-width-md), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--invite-field-min-width)), 1fr));
   gap: var(--space-4);
 }

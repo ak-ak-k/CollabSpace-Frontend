@@ -1,0 +1,45 @@
+@use 'breakpoints';
+
+:host {
+  display: block;
+  flex: none;
+}
+
+.workspace-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: var(--rule-hairline);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  font-size: var(--font-size-13);
+}
+
+.workspace-banner__message {
+  flex: 1;
+  min-width: var(--workspace-banner-message-min-width);
+}
+
+.workspace-banner__action {
+  padding: var(--space-1) var(--space-2-5);
+  border: var(--border-width-hairline) solid var(--text-primary);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover);
+  }
+
+  @include breakpoints.tablet-and-down {
+    min-height: var(--size-touch-target);
+  }
+
+  @include breakpoints.touch-device {
+    min-height: var(--size-touch-target);
+  }
+}

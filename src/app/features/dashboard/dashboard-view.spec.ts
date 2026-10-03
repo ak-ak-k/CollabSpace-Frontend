@@ -13,6 +13,7 @@ const DAY = 86_400_000;
 
 const task = (id: string, daysFromToday: number, overrides: Partial<Task> = {}): Task => ({
   id,
+  workspaceId: 'w1',
   title: `Task ${id}`,
   description: '',
   status: 'todo',
@@ -27,6 +28,7 @@ const task = (id: string, daysFromToday: number, overrides: Partial<Task> = {}):
 
 const team = (id: string, weeklyMessageCount: number): Team => ({
   id,
+  workspaceId: 'w1',
   name: id,
   code: id.slice(0, 2).toUpperCase(),
   description: '',
@@ -80,9 +82,17 @@ describe('dashboard view', () => {
         id: 'w1',
         name: 'Northstar Labs',
         code: 'NL',
-        memberCount: 48,
         plan: 'Business',
+        slug: 'northstar-labs',
+        description: '',
+        createdLabel: 'Mar 2022',
+        ownerId: 'u0',
+        domain: 'northstar.io',
+        logoUrl: null,
+        archivedAt: null,
+        deleteAt: null,
       },
+      dataEmpty: false,
     });
 
     expect(stats.map((stat) => stat.caption)).toEqual([
@@ -92,5 +102,30 @@ describe('dashboard view', () => {
       'of 12 in Northstar Labs',
     ]);
     expect(stats[2].tone).toBe('danger');
+  });
+
+  it('describes an empty workspace differently from missing data', () => {
+    const inputs = {
+      joinedTeams: [],
+      unreadMessages: 0,
+      unreadConversations: 0,
+      openTasks: [],
+      onlineMembers: 0,
+      knownMembers: 1,
+      workspace: null,
+    };
+
+    expect(toStats({ ...inputs, dataEmpty: false }).map((stat) => stat.caption)).toEqual([
+      'No teams yet',
+      'Across 0 conversations',
+      '0 due today',
+      '',
+    ]);
+    expect(toStats({ ...inputs, dataEmpty: true }).map((stat) => stat.caption)).toEqual([
+      'Create your first team',
+      'No messages yet',
+      'Board is empty',
+      '',
+    ]);
   });
 });

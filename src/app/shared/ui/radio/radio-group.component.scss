@@ -198,3 +198,14 @@
     @include focus-ring;
   }
 }
+
+:host(.radio-group--segmented) .option,
+:host(.radio-group--icon-only) .option {
+  @include breakpoints.tablet-and-down {
+    min-width: var(--size-touch-target);
+  }
+
+  @include breakpoints.touch-device {
+    min-width: var(--size-touch-target);
+  }
+}

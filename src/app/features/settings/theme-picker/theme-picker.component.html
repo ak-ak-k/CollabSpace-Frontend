@@ -1,0 +1,38 @@
+<fieldset class="theme-picker">
+  <legend class="theme-picker__legend">Theme</legend>
+  <div class="theme-picker__cards">
+    @for (card of cards; track card.value) {
+      <label
+        class="theme-card"
+        [class]="'theme-card--' + card.value"
+        [class.theme-card--selected]="card.value === preference()"
+      >
+        <input
+          type="radio"
+          class="theme-card__input"
+          name="settings-theme"
+          [value]="card.value"
+          [checked]="card.value === preference()"
+          (change)="choose(card.value)"
+        />
+        <span class="theme-card__preview" aria-hidden="true">
+          <span class="theme-card__rail"><span class="theme-card__mark"></span></span>
+          <span class="theme-card__body">
+            <span class="theme-card__heading"></span>
+            <span class="theme-card__rule"></span>
+            <span class="theme-card__line theme-card__line--long"></span>
+            <span class="theme-card__line theme-card__line--short"></span>
+            <span class="theme-card__button"></span>
+          </span>
+        </span>
+        <span class="theme-card__caption">
+          <app-icon [name]="card.icon" [size]="16" />
+          <span class="theme-card__label">{{ card.label }}</span>
+          @if (card.value === preference()) {
+            <app-icon name="circle-check" [size]="16" />
+          }
+        </span>
+      </label>
+    }
+  </div>
+</fieldset>

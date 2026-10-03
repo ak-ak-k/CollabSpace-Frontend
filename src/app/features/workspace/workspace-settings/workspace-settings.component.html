@@ -1,0 +1,47 @@
+<div class="workspace-settings">
+  @if (showNav()) {
+    <app-workspace-settings-nav [layout]="navLayout()" [current]="current()?.id ?? null" />
+  }
+
+  @if (current(); as section) {
+    <div class="workspace-settings__content">
+      @if (isMobile()) {
+        <a
+          class="workspace-settings__back"
+          [routerLink]="listUrl"
+          [state]="returnState(section.id)"
+        >
+          <app-icon name="arrow-left" [size]="16" />
+          All workspace settings
+        </a>
+      }
+
+      <app-settings-section-header
+        group="Workspace settings"
+        [heading]="section.label"
+        [description]="section.description"
+        [tone]="section.id === ownerSection ? 'danger' : 'default'"
+      />
+
+      @switch (status()) {
+        @case ('loading') {
+          <app-skeleton layout="detail" compact label="Loading settings" />
+        }
+        @case ('error') {
+          <app-empty-state
+            kind="error"
+            compact
+            [headingLevel]="3"
+            heading="Couldn’t load settings"
+            message="Nothing was changed. Try again in a moment."
+            actionLabel="Try again"
+            (action)="retry()"
+          />
+        }
+        @default {
+          <app-workspace-settings-panel [section]="section" />
+        }
+      }
+    </div>
+  }
+</div>

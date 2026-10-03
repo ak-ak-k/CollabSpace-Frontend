@@ -1,0 +1,28 @@
+<nav class="settings-nav" aria-label="Workspace settings">
+  <ul class="settings-nav__list">
+    @for (section of sections; track section.id) {
+      <li class="settings-nav__item">
+        <a
+          #sectionLink
+          class="settings-nav__link"
+          [class.settings-nav__link--current]="section.id === current()"
+          [class.settings-nav__link--danger]="section.id === dangerSection"
+          [routerLink]="linkOf(section.id)"
+          [attr.data-section]="section.id"
+          [attr.aria-current]="section.id === current() ? 'page' : null"
+        >
+          <app-icon class="settings-nav__icon" [name]="section.icon" [size]="iconSize()" />
+          <span class="settings-nav__text">
+            <span class="settings-nav__label">{{ section.label }}</span>
+            @if (layout() === 'list') {
+              <span class="settings-nav__description">{{ section.description }}</span>
+            }
+          </span>
+          @if (layout() === 'list') {
+            <app-icon class="settings-nav__chevron" name="chevron-right" [size]="16" />
+          }
+        </a>
+      </li>
+    }
+  </ul>
+</nav>

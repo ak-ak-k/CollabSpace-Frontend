@@ -1,29 +1,44 @@
-<form class="invite-dialog" [formRoot]="inviteForm">
-  <app-modal heading="Invite people" [description]="description()" size="md">
-    <app-input
-      label="Email addresses"
-      placeholder="name@company.com, another@company.com"
-      inputmode="email"
-      [formField]="inviteForm.emails"
-    />
-    <div class="invite-dialog__row">
-      <app-select label="Add to team" [options]="teamOptions()" [formField]="inviteForm.teamId" />
-      <app-radio-group label="Role" stretch [options]="roleOptions" [formField]="inviteForm.role" />
-    </div>
-    <app-textarea
-      label="Personal note"
-      optional
-      [rows]="2"
-      placeholder="Hey! We’re moving our team chat to CollabSpace."
-      [formField]="inviteForm.note"
-    />
+<form class="invite" novalidate (submit)="submit($event)">
+  <app-modal size="lg" [heading]="heading()" [description]="subtitle()">
+    @if (result(); as outcome) {
+      <app-invite-result [result]="outcome" />
+    } @else {
+      @if (banner()) {
+        <div class="invite__banner" role="alert">
+          <app-icon name="circle-alert" [size]="16" />
+          <span>{{ banner() }}</span>
+        </div>
+      }
+      <app-invite-email-rows
+        [(rows)]="rows"
+        [views]="rowViews()"
+        [countLabel]="countLabel()"
+        [policy]="policy()"
+      />
+      <div class="invite__fields">
+        <app-select label="Role" [options]="roleOptions()" [hint]="roleHelp()" [(value)]="role" />
+        <app-select label="Add to team (optional)" [options]="teamOptions()" [(value)]="teamId" />
+      </div>
+    }
 
     <ng-container modalActions>
-      <button appButton type="button" (click)="cancel()">Cancel</button>
-      <button appButton type="submit" variant="primary" [busy]="inviteForm().submitting()">
-        <app-icon name="send-horizontal" [size]="16" />
-        Send invites
-      </button>
+      @if (result()) {
+        <button appButton type="button" (click)="inviteMore()">
+          <app-icon name="mail-plus" [size]="16" />
+          Invite more
+        </button>
+        <button #doneButton appButton type="button" variant="inverted" (click)="close()">
+          Done
+        </button>
+      } @else {
+        <button appButton type="button" (click)="close()">Cancel</button>
+        <button appButton type="submit" variant="primary" [busy]="busy()">
+          @if (!busy()) {
+            <app-icon name="send-horizontal" [size]="16" />
+          }
+          {{ submitLabel() }}
+        </button>
+      }
     </ng-container>
   </app-modal>
 </form>

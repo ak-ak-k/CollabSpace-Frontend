@@ -6,12 +6,18 @@
     <button
       type="button"
       class="rail__workspace"
+      [class.rail__workspace--current]="inWorkspace()"
       [attr.aria-label]="workspaceLabel()"
       [attr.title]="currentWorkspace()?.name"
-      [cdkMenuTriggerFor]="workspaceMenu"
+      [cdkMenuTriggerFor]="workspaceSwitcher"
       [cdkMenuPosition]="workspaceMenuPositions"
     >
-      {{ currentWorkspace()?.code }}
+      <span class="rail__workspace-tile" [style.background-image]="workspaceLogo()">
+        @if (!workspaceLogo()) {
+          {{ currentWorkspace()?.code }}
+        }
+      </span>
+      <app-icon class="rail__workspace-chevron" name="chevrons-up-down" [size]="12" />
     </button>
   </div>
 
@@ -82,10 +88,10 @@
   </div>
 </nav>
 
-<ng-template #workspaceMenu>
-  <app-workspace-menu />
+<ng-template #workspaceSwitcher>
+  <app-workspace-switcher />
 </ng-template>
 
 <ng-template #userMenu>
-  <app-user-menu />
+  <app-user-menu appDropdownPanel="Account" />
 </ng-template>

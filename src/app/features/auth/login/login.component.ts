@@ -25,6 +25,10 @@ interface LoginModel {
 }
 
 const SESSION_EXPIRED_PARAMETER = 'expired';
+const RETURN_URL_PARAMETER = 'returnUrl';
+
+const safeReturnUrl = (value: string | null | undefined): string | null =>
+  value && value.startsWith('/') && !value.startsWith('//') ? value : null;
 
 @Component({
   selector: 'app-login',
@@ -92,7 +96,8 @@ export class LoginComponent {
   private async logIn(): Promise<void> {
     await this.auth.login();
     this.toasts.show(this.welcomeMessage(), { icon: 'circle-check' });
-    await this.router.navigateByUrl(HOME_URL);
+    const returnUrl = safeReturnUrl(this.queryParameters()?.get(RETURN_URL_PARAMETER));
+    await this.router.navigateByUrl(returnUrl ?? HOME_URL);
   }
 
   private welcomeMessage(): string {

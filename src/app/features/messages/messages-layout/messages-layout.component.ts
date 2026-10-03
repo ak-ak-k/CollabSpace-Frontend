@@ -1,7 +1,6 @@
 import { Component, computed, effect, inject, untracked } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { BreakpointService } from '../../../core/services/breakpoint.service';
-import { SearchService } from '../../../core/services/search.service';
 import { ChatState } from '../../../core/state/chat.state';
 import { CurrentRoute } from '../../../layout/current-route';
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
@@ -21,7 +20,6 @@ export class MessagesLayoutComponent {
   private readonly chat = inject(ChatState);
   private readonly breakpoint = inject(BreakpointService);
 
-  protected readonly search = inject(SearchService);
   protected readonly conversationId = computed(
     () => CONVERSATION_PATH.exec(this.route.path())?.[1] ?? null,
   );

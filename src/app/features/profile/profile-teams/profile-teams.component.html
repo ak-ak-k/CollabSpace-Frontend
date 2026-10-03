@@ -1,0 +1,16 @@
+<section class="section" aria-labelledby="profile-teams-heading">
+  <h2 class="section__heading" id="profile-teams-heading">Teams · {{ teams().length }}</h2>
+  <ul class="teams">
+    @for (team of teams(); track team.id) {
+      <li>
+        <a class="team" [routerLink]="['/teams', team.id]">
+          <app-avatar variant="inverted" [name]="team.name" [text]="team.code" [size]="36" />
+          <span class="team__text">
+            <strong class="team__name">{{ team.name }}</strong>
+            <span class="team__meta">{{ team.meta }}</span>
+          </span>
+        </a>
+      </li>
+    }
+  </ul>
+</section>

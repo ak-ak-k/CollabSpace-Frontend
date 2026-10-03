@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.matrix {
+  table-layout: fixed;
+}
+
+.matrix__role {
+  width: var(--workspace-settings-permission-column-width);
+  text-align: center;
+}
+
+.matrix__cell {
+  text-align: center;
+}
+
+.matrix__permission {
+  padding: var(--space-3) var(--space-2);
+  font-size: var(--font-size-14);
+}
+
+.permission-mark {
+  display: inline-grid;
+  place-items: center;
+  width: var(--workspace-settings-permission-mark-size);
+  height: var(--workspace-settings-permission-mark-size);
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+.permission-mark--allowed {
+  background: var(--text-primary);
+  color: var(--background);
+}

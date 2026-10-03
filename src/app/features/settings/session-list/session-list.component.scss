@@ -1,0 +1,60 @@
+@use '../settings-section';
+
+:host {
+  display: block;
+}
+
+.sessions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sessions__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.sessions__title {
+  @include settings-section.subheading;
+
+  flex: 1;
+}
+
+.sessions__list {
+  @include settings-section.list;
+}
+
+.session {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-0);
+  border-bottom: var(--rule-hairline);
+}
+
+.session__tile {
+  @include settings-section.tile;
+
+  background: var(--surface);
+}
+
+.session__text {
+  display: flex;
+  flex: 1 1 var(--settings-session-text-basis);
+  flex-direction: column;
+  min-width: 0;
+}
+
+.session__device {
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+}
+
+.session__meta {
+  color: var(--text-secondary);
+  font-size: var(--font-size-13);
+}

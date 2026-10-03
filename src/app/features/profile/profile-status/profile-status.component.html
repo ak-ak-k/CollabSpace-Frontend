@@ -1,0 +1,21 @@
+<section class="section" aria-labelledby="profile-status-heading">
+  <h2 class="section__heading" id="profile-status-heading">Status</h2>
+  <app-radio-group
+    class="status__options"
+    label="Availability"
+    hideLabel
+    appearance="tiles"
+    [options]="statusOptions"
+    [value]="user().status"
+    (valueChange)="setStatus($event)"
+  />
+  <form class="status__message" (submit)="setMessage($event)">
+    <app-input
+      class="status__field"
+      label="Status message"
+      placeholder="e.g. Heads-down on the 2.4 release until 3 pm"
+      [(value)]="messageDraft"
+    />
+    <button appButton type="submit">Set</button>
+  </form>
+</section>

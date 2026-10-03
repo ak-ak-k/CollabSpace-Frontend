@@ -48,9 +48,10 @@ export class ConversationListComponent {
   protected readonly query = signal('');
   protected readonly filter = signal<ConversationFilter>('all');
 
-  protected readonly status = computed(() =>
-    this.workspace.status() === 'ready' ? this.chat.status() : this.workspace.status(),
-  );
+  protected readonly status = computed(() => {
+    const directory = this.workspace.status();
+    return directory === 'loading' || directory === 'error' ? directory : this.chat.inboxStatus();
+  });
   protected readonly tabs = computed<readonly TabItem[]>(() =>
     CONVERSATION_FILTERS.map((filter) => ({
       id: filter,

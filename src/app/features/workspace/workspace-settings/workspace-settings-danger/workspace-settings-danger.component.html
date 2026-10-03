@@ -1,0 +1,35 @@
+@if (!isOwner()) {
+  <app-workspace-settings-note kind="locked">{{ ownerNote() }}</app-workspace-settings-note>
+}
+
+<fieldset class="danger" [disabled]="!isOwner()">
+  <legend class="visually-hidden">Danger zone</legend>
+
+  <app-danger-zone tone="neutral" [heading]="archiveHeading()" [description]="archiveText()">
+    @if (archived()) {
+      <button appButton type="button" (click)="unarchive()">
+        <app-icon name="archive-restore" [size]="16" />
+        Unarchive workspace
+      </button>
+    } @else {
+      <button appButton type="button" (click)="archive()">
+        <app-icon name="archive" [size]="16" />
+        Archive workspace
+      </button>
+    }
+  </app-danger-zone>
+
+  <app-danger-zone heading="Delete workspace" [description]="deleteText()">
+    @if (deleting()) {
+      <button appButton type="button" (click)="cancelDeletion()">
+        <app-icon name="rotate-ccw" [size]="16" />
+        Cancel deletion
+      </button>
+    } @else {
+      <button appButton type="button" variant="primary" (click)="scheduleDeletion()">
+        <app-icon name="trash-2" [size]="16" />
+        Delete workspace
+      </button>
+    }
+  </app-danger-zone>
+</fieldset>

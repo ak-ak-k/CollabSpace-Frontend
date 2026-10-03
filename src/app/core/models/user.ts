@@ -11,6 +11,7 @@ export interface User {
   readonly phone?: string;
   readonly status: PresenceStatus;
   readonly lastSeenAt?: number;
+  readonly lastActiveAt?: number;
   readonly timeZone: string;
   readonly timeZoneLabel: string;
   readonly location: string;

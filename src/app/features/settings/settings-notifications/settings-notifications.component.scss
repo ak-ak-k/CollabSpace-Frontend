@@ -1,0 +1,26 @@
+@use '../settings-section';
+
+:host {
+  @include settings-section.section-host;
+}
+
+.matrix__channel,
+.matrix__cell {
+  text-align: center;
+}
+
+.matrix__topic {
+  padding: var(--space-3) var(--space-2);
+  font-size: var(--font-size-14);
+}
+
+.matrix__description {
+  display: block;
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-regular);
+}
+
+.notification-switches {
+  @include settings-section.list;
+}

@@ -19,10 +19,10 @@ export const MESSAGE_SHORTCUT_LIMIT = 8;
 
 const NO_HINT = '';
 
-const goTo = (label: string, icon: IconName, path: string): PaletteCommand => ({
+const goTo = (label: string, icon: IconName, path: string, hint = NO_HINT): PaletteCommand => ({
   label,
   icon,
-  hint: NO_HINT,
+  hint,
   action: { type: 'navigate', path },
 });
 
@@ -33,11 +33,17 @@ const themeCommand = (darkTheme: boolean): PaletteCommand => ({
   action: { type: 'toggle-theme' },
 });
 
-export const jumpCommands = (darkTheme: boolean): readonly PaletteCommand[] => [
+export const jumpCommands = (
+  darkTheme: boolean,
+  workspaceName = NO_HINT,
+): readonly PaletteCommand[] => [
   goTo('Go to Dashboard', 'house', '/home'),
   goTo('Go to Messages', 'message-square', '/messages'),
   goTo('Go to Tasks board', 'square-kanban', '/tasks'),
   goTo('Go to Files', 'folder', '/files'),
+  goTo('Workspace overview', 'building-2', '/workspace', workspaceName),
+  goTo('Workspace members', 'users', '/workspace/members'),
+  goTo('Workspace settings', 'settings', '/workspace/settings/general'),
   { label: 'Create a task', icon: 'plus', hint: 'Task', action: { type: 'create-task' } },
   { label: 'Invite people', icon: 'user-plus', hint: NO_HINT, action: { type: 'invite-people' } },
   themeCommand(darkTheme),
