@@ -1,34 +1,28 @@
-import {
-  computed,
-  DestroyRef,
-  effect,
-  inject,
-  Service,
-  signal,
-  untracked,
-  WritableSignal,
-} from '@angular/core';
-import { ChatEvent, ChatSnapshot } from '../data/chat-events';
+import { computed, DestroyRef, effect, inject, Service, signal, untracked } from '@angular/core';
+import { ChatSnapshot } from '../data/chat-events';
 import { ChatData } from '../data/chat.data';
 import { CURRENT_USER_ID } from '../mocks/users.mock';
 import { Channel } from '../models/channel';
-import { Conversation, ConversationPreview } from '../models/conversation';
-import { Message } from '../models/message';
+import { Conversation, ConversationPreview, NotifyLevel } from '../models/conversation';
+import { Message, SavedEntry } from '../models/message';
+import { threadKey } from '../models/thread';
+import { firstUnreadId, releaseQueued, sum, Threads } from './chat-mutations';
 import {
-  advanceDelivery,
-  appendMessage,
-  firstUnreadId,
-  releaseQueued,
-  sum,
-  Threads,
-  toggleIn,
-} from './chat-mutations';
-import { buildPreview, PreviewContext } from './conversation-preview';
+  isListed,
+  ListingContext,
+  savedMessagesOf,
+  timelinesOf,
+  unreadFromHere,
+} from './chat-selectors';
+import { applyChatEvent, applySnapshot, Counts } from './chat-sync';
+import { buildPreview, PreviewContext, typingTextOf } from './conversation-preview';
 import { DataModeState } from './data-mode.state';
 import { Loadable, settledStatus } from './loadable';
 import { WorkspaceState } from './workspace.state';
 
 const INITIAL_TYPING_DURATION = 7000;
+
+const privateChannelId = (channel: Channel): string[] => (channel.isPrivate ? [channel.id] : []);
 
 @Service()
 export class ChatState {
@@ -38,13 +32,18 @@ export class ChatState {
 
   readonly conversations = signal<readonly Conversation[]>([]);
   readonly messages = signal<Threads>({});
-  readonly unreadCounts = signal<Readonly<Record<string, number>>>({});
+  readonly unreadCounts = signal<Counts>({});
+  readonly threadUnreadCounts = signal<Counts>({});
   readonly starredIds = signal<ReadonlySet<string>>(new Set());
   readonly mutedIds = signal<ReadonlySet<string>>(new Set());
+  readonly leftIds = signal<ReadonlySet<string>>(new Set());
+  readonly archivedIds = signal<ReadonlySet<string>>(new Set());
+  readonly notifyLevels = signal<Readonly<Record<string, NotifyLevel>>>({});
+  readonly saved = signal<Readonly<Record<string, SavedEntry>>>({});
   readonly typingUserIds = signal<Readonly<Record<string, readonly string[]>>>({});
   readonly activeConversationId = signal<string | null>(null);
+  readonly activeThreadId = signal<string | null>(null);
   readonly newMessagesMarkerId = signal<string | null>(null);
-  readonly incomingMessage = signal<Message | null>(null);
 
   private readonly loader = new Loadable<ChatSnapshot>({
     fetch: () => this.data.getConversations(),
@@ -53,41 +52,50 @@ export class ChatState {
   });
 
   readonly status = this.loader.status;
+  readonly timelines = computed(() => timelinesOf(this.messages()));
 
   private initialTypingTimer?: ReturnType<typeof setTimeout>;
 
   private readonly previewContext = computed<PreviewContext>(() => ({
     usersById: this.workspace.usersById(),
-    messages: this.messages(),
+    messages: this.timelines(),
     unreadCounts: this.unreadCounts(),
     starredIds: this.starredIds(),
     mutedIds: this.mutedIds(),
     typingUserIds: this.typingUserIds(),
+    teamNames: new Map(this.workspace.teams().map((team) => [team.id, team.name])),
   }));
 
-  private readonly scopedConversations = computed(() =>
-    this.conversations().filter((conversation) =>
-      this.workspace.containsConversation(conversation),
-    ),
-  );
-  private readonly scopedUnreadCounts = computed(() =>
-    this.scopedConversations().map((conversation) => this.unreadCounts()[conversation.id] ?? 0),
-  );
+  private readonly listing = computed<ListingContext>(() => ({
+    currentUserId: CURRENT_USER_ID,
+    leftIds: this.leftIds(),
+    archivedIds: this.archivedIds(),
+    joinedTeamIds: new Set(this.workspace.joinedTeams().map((team) => team.id)),
+    privateChannelIds: new Set(this.workspace.channels().flatMap(privateChannelId)),
+  }));
 
   readonly previews = computed<readonly ConversationPreview[]>(() =>
-    this.scopedConversations()
-      .filter((conversation) => conversation.type !== 'channel')
+    this.conversations()
+      .filter((conversation) => this.workspace.containsConversation(conversation))
+      .filter((conversation) => isListed(conversation, this.listing()))
       .map((conversation) => buildPreview(conversation, this.previewContext()))
       .sort((first, second) => second.lastMessageAt - first.lastMessageAt),
   );
 
   readonly inboxStatus = settledStatus(this.status, () => this.previews().length === 0);
-  readonly unreadTotal = computed(() => sum(this.scopedUnreadCounts()));
+  readonly unreadTotal = computed(() => sum(this.previews().map((preview) => preview.unreadCount)));
   readonly unreadConversationCount = computed(
-    () => this.scopedUnreadCounts().filter((count) => count > 0).length,
+    () => this.previews().filter((preview) => preview.unreadCount > 0).length,
   );
   readonly unreadDirectTotal = computed(() =>
-    sum(this.previews().map((preview) => preview.unreadCount)),
+    sum(
+      this.previews()
+        .filter((preview) => preview.type !== 'channel')
+        .map((preview) => preview.unreadCount),
+    ),
+  );
+  readonly savedMessages = computed(() =>
+    savedMessagesOf(this.saved(), this.messages(), (id) => this.inCurrentWorkspace(id)),
   );
 
   constructor() {
@@ -95,7 +103,7 @@ export class ChatState {
       this.dataMode.mode();
       untracked(() => void this.loader.load());
     });
-    const subscription = this.data.events$.subscribe((event) => this.apply(event));
+    const subscription = this.data.events$.subscribe((event) => applyChatEvent(this, event));
     inject(DestroyRef).onDestroy(() => subscription.unsubscribe());
   }
 
@@ -117,36 +125,72 @@ export class ChatState {
     return conversation ? buildPreview(conversation, this.previewContext()) : null;
   }
 
+  timeline(conversationId: string): readonly Message[] {
+    return this.timelines()[conversationId] ?? [];
+  }
+
+  threadTypingText(conversationId: string, rootId: string): string {
+    const typing = this.typingUserIds()[threadKey(conversationId, rootId)] ?? [];
+    return typingTextOf(typing, this.previewContext());
+  }
+
+  hasLeft(conversationId: string): boolean {
+    return this.leftIds().has(conversationId);
+  }
+
+  isArchived(conversationId: string): boolean {
+    return this.archivedIds().has(conversationId);
+  }
+
+  isSaved(messageId: string): boolean {
+    return messageId in this.saved();
+  }
+
+  notifyLevel(conversationId: string): NotifyLevel {
+    const muted = this.mutedIds().has(conversationId);
+    return this.notifyLevels()[conversationId] ?? (muted ? 'muted' : 'all');
+  }
+
   open(conversationId: string | null): void {
     this.activeConversationId.set(conversationId);
     if (!conversationId) {
       return;
     }
     const unread = this.unreadCounts()[conversationId] ?? 0;
-    this.newMessagesMarkerId.set(firstUnreadId(this.messages()[conversationId] ?? [], unread));
+    this.newMessagesMarkerId.set(firstUnreadId(this.timeline(conversationId), unread));
     this.markRead(conversationId);
+  }
+
+  openThread(rootId: string | null): void {
+    this.activeThreadId.set(rootId);
+    if (rootId) {
+      this.markThreadRead(rootId);
+    }
   }
 
   markRead(conversationId: string): void {
     if (this.unreadCounts()[conversationId]) {
-      this.setUnread(conversationId, 0);
+      this.setUnreadCount(conversationId, 0);
     }
   }
 
   markUnread(conversationId: string): void {
-    this.setUnread(conversationId, Math.max(1, this.unreadCounts()[conversationId] ?? 0));
+    this.setUnreadCount(conversationId, Math.max(1, this.unreadCounts()[conversationId] ?? 0));
   }
 
-  toggleStar(conversationId: string): boolean {
-    return this.toggleFlag(this.starredIds, conversationId, (on) =>
-      this.data.setStarred(conversationId, on),
-    );
+  markUnreadFrom(conversationId: string, messageId: string): boolean {
+    const count = unreadFromHere(this.timeline(conversationId), messageId, CURRENT_USER_ID);
+    if (count !== null) {
+      this.setUnreadCount(conversationId, count);
+    }
+    return count !== null;
   }
 
-  toggleMute(conversationId: string): boolean {
-    return this.toggleFlag(this.mutedIds, conversationId, (on) =>
-      this.data.setMuted(conversationId, on),
-    );
+  markThreadRead(rootId: string): void {
+    if (this.threadUnreadCounts()[rootId]) {
+      this.threadUnreadCounts.update((counts) => ({ ...counts, [rootId]: 0 }));
+      void this.data.setThreadUnread(rootId, 0);
+    }
   }
 
   async openDirectConversation(userId: string): Promise<string> {
@@ -154,78 +198,47 @@ export class ChatState {
       userId,
       this.workspace.currentWorkspaceId(),
     );
-    if (!this.conversation(conversation.id)) {
-      this.conversations.update((conversations) => [...conversations, conversation]);
-    }
+    this.putConversation(conversation);
     return conversation.id;
   }
 
   async createGroup(name: string, memberIds: readonly string[]): Promise<string> {
     const group = await this.data.createGroup(name, memberIds, this.workspace.currentWorkspaceId());
-    this.conversations.update((conversations) => [...conversations, group]);
+    this.putConversation(group);
     return group.id;
   }
 
   addChannel(channel: Channel): void {
-    const conversation = this.data.addChannel(channel);
-    this.conversations.update((conversations) => [...conversations, conversation]);
+    this.putConversation(this.data.addChannel(channel));
   }
 
-  setTyping(conversationId: string, userIds: readonly string[]): void {
-    this.typingUserIds.update((typing) => ({ ...typing, [conversationId]: userIds }));
+  syncChannel(channel: Channel): void {
+    const existing = this.conversation(channel.id);
+    const memberIds = existing?.type === 'channel' ? existing.memberIds : channel.memberIds;
+    this.putConversation(this.data.syncChannel({ ...channel, memberIds }));
+  }
+
+  putConversation(conversation: Conversation): void {
+    this.conversations.update((conversations) =>
+      conversations.some((candidate) => candidate.id === conversation.id)
+        ? conversations.map((candidate) =>
+            candidate.id === conversation.id ? conversation : candidate,
+          )
+        : [...conversations, conversation],
+    );
   }
 
   flushQueue(): void {
     this.messages.update(releaseQueued);
   }
 
-  private setUnread(conversationId: string, count: number): void {
+  setUnreadCount(conversationId: string, count: number): void {
     this.unreadCounts.update((counts) => ({ ...counts, [conversationId]: count }));
     void this.data.setUnread(conversationId, count);
   }
 
-  private toggleFlag(
-    ids: WritableSignal<ReadonlySet<string>>,
-    conversationId: string,
-    persist: (on: boolean) => Promise<void>,
-  ): boolean {
-    ids.update((current) => toggleIn(current, conversationId));
-    const on = ids().has(conversationId);
-    void persist(on);
-    return on;
-  }
-
-  private apply(event: ChatEvent): void {
-    if (event.type === 'typing') {
-      this.setTyping(event.conversationId, event.userIds);
-    } else if (event.type === 'delivery') {
-      this.messages.update((threads) =>
-        advanceDelivery(threads, event.conversationId, CURRENT_USER_ID, event.state),
-      );
-    } else {
-      this.receive(event.message);
-    }
-  }
-
-  private receive(message: Message): void {
-    this.messages.update((threads) => appendMessage(threads, message));
-    if (message.conversationId === this.activeConversationId()) {
-      return;
-    }
-    this.unreadCounts.update((counts) => ({
-      ...counts,
-      [message.conversationId]: (counts[message.conversationId] ?? 0) + 1,
-    }));
-    this.incomingMessage.set(message);
-  }
-
   private store(snapshot: ChatSnapshot): void {
-    this.conversations.set(snapshot.conversations);
-    this.messages.set(snapshot.messages);
-    this.unreadCounts.set(snapshot.unreadCounts);
-    this.starredIds.set(new Set(snapshot.starredIds));
-    this.mutedIds.set(new Set(snapshot.mutedIds));
-    this.typingUserIds.set(snapshot.typingUserIds);
+    applySnapshot(this, snapshot);
     this.stopInitialTypingSoon();
     this.open(this.activeConversationId());
   }

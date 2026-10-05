@@ -1,0 +1,61 @@
+@let task = card();
+
+<a
+  class="mobile-card"
+  [routerLink]="[]"
+  [queryParams]="{ task: task.id }"
+  queryParamsHandling="merge"
+  [attr.aria-label]="task.accessibleLabel"
+>
+  <span class="mobile-card__top">
+    <span class="mobile-card__id">{{ task.id }}</span>
+    @if (variant() === 'list') {
+      <app-tag>{{ task.statusLabel }}</app-tag>
+    }
+    <app-tag [tone]="task.priorityTone">{{ task.priorityLabel }}</app-tag>
+    @if (variant() === 'board' && task.teamName) {
+      <span class="mobile-card__muted">{{ task.teamName }}</span>
+    }
+  </span>
+  <span class="mobile-card__title" [class.mobile-card__title--done]="task.done">
+    {{ task.title }}
+  </span>
+  <span class="mobile-card__meta">
+    <span class="mobile-card__due" [class]="'mobile-card__due--' + task.dueState">
+      <app-icon [name]="task.dueIcon" [size]="13" />
+      {{ task.dueText }}
+    </span>
+    @if (task.subtaskLabel) {
+      <span class="mobile-card__count">
+        <app-icon name="list-checks" [size]="13" />
+        {{ task.subtaskLabel }}
+      </span>
+    }
+    @if (variant() === 'list') {
+      <span>{{ task.assigneeName }}</span>
+    } @else {
+      @if (task.commentCount > 0) {
+        <span class="mobile-card__count">
+          <app-icon name="message-circle" [size]="13" />
+          {{ task.commentCount }}
+        </span>
+      }
+      @if (task.pending) {
+        <span class="mobile-card__count">
+          <app-icon name="clock" [size]="13" />
+          Pending
+        </span>
+      }
+      <span class="mobile-card__spacer"></span>
+      @if (task.assignee; as person) {
+        <app-avatar [name]="person.name" [seed]="person.seed" [size]="26" />
+      }
+    }
+  </span>
+</a>
+<app-task-menu
+  class="mobile-card__menu"
+  appearance="sheet"
+  [card]="task"
+  (moved)="moved.emit($event)"
+/>

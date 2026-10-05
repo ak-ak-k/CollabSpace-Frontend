@@ -44,6 +44,7 @@ const KEYBOARD_STEPS: Partial<Record<string, KeyboardStep>> = {
     '[class.tabs--lg]': "size() === 'lg'",
     '[class.tabs--gap-lg]': "gap() === 'lg'",
     '[class.tabs--bleed]': 'bleed()',
+    '[class.tabs--wrap]': 'wrap()',
   },
 })
 export class TabsComponent {
@@ -52,6 +53,7 @@ export class TabsComponent {
   readonly gap = input<TabsGap>('md');
   readonly size = input<TabsSize>('md');
   readonly bleed = input(false, { transform: booleanAttribute });
+  readonly wrap = input(false, { transform: booleanAttribute });
   readonly active = model('');
 
   protected readonly isNavigation = computed(

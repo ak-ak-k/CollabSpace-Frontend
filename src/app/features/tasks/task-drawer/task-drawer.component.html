@@ -2,6 +2,12 @@
   <header class="drawer__header">
     <span class="drawer__id">{{ current.id }}</span>
     <app-tag>{{ statusLabel() }}</app-tag>
+    @if (current.pending) {
+      <app-tag tone="subtle">
+        <app-icon name="clock" [size]="11" />
+        Pending sync
+      </app-tag>
+    }
     <span class="drawer__spacer"></span>
     <button
       appIconButton
@@ -11,21 +17,33 @@
     >
       <app-icon name="link" [size]="16" />
     </button>
+    @if (actions.canCreate()) {
+      <button
+        appIconButton
+        type="button"
+        class="drawer__delete"
+        label="Delete task"
+        (click)="remove()"
+      >
+        <app-icon name="trash-2" [size]="16" />
+      </button>
+    }
     <button
       appIconButton
       type="button"
-      class="drawer__delete"
-      label="Delete task"
-      (click)="remove()"
+      size="lg"
+      label="Close task"
+      cdkFocusInitial
+      (click)="close()"
     >
-      <app-icon name="trash-2" [size]="16" />
-    </button>
-    <button appIconButton type="button" label="Close task" cdkFocusInitial (click)="close()">
       <app-icon name="x" [size]="18" />
     </button>
   </header>
   <div class="drawer__body">
     <app-task-editor [task]="current" [titleId]="titleId" />
+    <app-task-subtasks [task]="current" />
+    <app-task-attachments [task]="current" />
     <app-task-comments [task]="current" />
+    <app-task-history [task]="current" />
   </div>
 }

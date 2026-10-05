@@ -3,6 +3,9 @@ import { MOCK_NOTIFICATIONS } from '../mocks/notifications.mock';
 import { AppNotification, NotificationFilter } from '../models/notification';
 import { MockRequest } from './mock-request';
 
+const newestFirst = (notifications: AppNotification[]): AppNotification[] =>
+  notifications.sort((first, second) => second.createdAt - first.createdAt);
+
 @Service()
 export class NotificationsData {
   private readonly request = inject(MockRequest);
@@ -38,11 +41,15 @@ export class NotificationsData {
     });
   }
 
+  add(added: readonly AppNotification[]): Promise<void> {
+    return this.request.write(() => {
+      this.notifications = newestFirst([...added, ...this.notifications]);
+    });
+  }
+
   restore(notification: AppNotification): Promise<void> {
     return this.request.write(() => {
-      this.notifications = [...this.notifications, notification].sort(
-        (first, second) => second.createdAt - first.createdAt,
-      );
+      this.notifications = newestFirst([...this.notifications, notification]);
     });
   }
 }

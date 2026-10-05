@@ -3,25 +3,17 @@
 }
 <div class="files">
   <div class="files__content">
-    <header class="files__header">
-      <div class="files__heading">
-        <h1 class="files__title" tabindex="-1" #heading>{{ meta().label }}</h1>
-        <p class="files__description">{{ meta().description }}</p>
-      </div>
-      <button appButton type="button" variant="primary" (click)="pickFiles()">
-        <app-icon name="upload" [size]="16" />
-        Upload
-      </button>
-      <input
-        #picker
-        type="file"
-        multiple
-        hidden
-        tabindex="-1"
-        aria-label="Choose files to upload"
-        (change)="uploadPicked()"
-      />
-    </header>
+    <app-files-header
+      [heading]="meta().label"
+      [description]="meta().description"
+      [offline]="offline()"
+      [compact]="isMobile()"
+      (picked)="upload($event)"
+    />
+
+    @if (uploads.items().length > 0) {
+      <app-files-upload-panel />
+    }
 
     @if (!isDesktop()) {
       <app-tabs label="File locations" gap="lg" [tabs]="tabs()" [active]="folder()" />
@@ -29,12 +21,20 @@
 
     <app-files-toolbar
       [showLayout]="!isMobile()"
-      [showSort]="body() !== 'table'"
-      [(query)]="query"
-      [(type)]="type"
+      [filterCount]="view.filterCount()"
+      [filtersOpen]="filtersOpen()"
+      [(query)]="view.search"
       [(layout)]="layout"
-      [(sort)]="sort"
+      (openFilters)="openFilters($event)"
     />
+
+    @if (view.chips().length > 0) {
+      <app-files-filter-chips
+        [chips]="view.chips()"
+        (remove)="view.removeChip($event)"
+        (clearAll)="view.clearAll()"
+      />
+    }
 
     @switch (status()) {
       @case ('loading') {
@@ -50,14 +50,14 @@
         />
       }
       @default {
-        @if (rows().length === 0) {
+        @if (view.rows().length === 0) {
           <app-empty-state
             [icon]="emptyCopy().icon"
             [heading]="emptyCopy().heading"
             [message]="emptyCopy().message"
             [actionLabel]="emptyCopy().actionLabel"
-            actionIcon="upload"
-            (action)="pickFiles()"
+            [actionIcon]="emptyCopy().actionIcon"
+            (action)="runEmptyAction(emptyCopy().action)"
           />
         } @else {
           @switch (body()) {
@@ -65,8 +65,9 @@
               <app-files-table
                 [files]="pageRows()"
                 [heading]="meta().label"
-                [sort]="sort()"
-                (sortBy)="sortBy($event)"
+                [sort]="view.sort()"
+                [wide]="isDesktop()"
+                (sortBy)="view.sortBy($event)"
                 (action)="run($event)"
               />
             }
@@ -79,7 +80,7 @@
           }
           <app-pagination
             pageNumbers
-            [total]="rows().length"
+            [total]="view.rows().length"
             [pageSize]="pageSize"
             [(page)]="page"
           />
@@ -88,3 +89,12 @@
     }
   </div>
 </div>
+
+@if (dragging()) {
+  <div class="files__drop" aria-hidden="true">
+    <span class="files__drop-label">
+      <app-icon name="upload" [size]="22" />
+      Drop files to upload
+    </span>
+  </div>
+}

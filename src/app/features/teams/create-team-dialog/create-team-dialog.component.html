@@ -1,9 +1,5 @@
 <form class="create-team" [formRoot]="teamForm">
-  <app-modal
-    heading="Create team"
-    description="Teams bring people, channels and files together around shared work."
-    size="md"
-  >
+  <app-modal [heading]="copy.heading" [description]="copy.description" size="md">
     <app-input
       label="Team name"
       placeholder="e.g. Data Platform"
@@ -22,16 +18,31 @@
       <app-radio-group label="Privacy" [options]="privacyOptions" [formField]="teamForm.privacy" />
       <p class="create-team__help" aria-live="polite">{{ privacyHelp() }}</p>
     </div>
-    <p class="create-team__note">
-      <app-icon name="info" [size]="14" />
-      You’ll be the team lead. A #general channel is created automatically.
-    </p>
+    @if (!editing) {
+      <p class="create-team__note">
+        <app-icon name="info" [size]="14" />
+        You’ll be the team lead. A #general channel is created automatically.
+      </p>
+    }
 
     <ng-container modalActions>
+      @if (editing) {
+        <button
+          appButton
+          type="button"
+          variant="ghost"
+          class="create-team__archive"
+          [busy]="archiving()"
+          (click)="archive()"
+        >
+          <app-icon name="archive" [size]="16" />
+          Archive team
+        </button>
+      }
       <button appButton type="button" (click)="cancel()">Cancel</button>
       <button appButton type="submit" variant="primary" [busy]="teamForm().submitting()">
-        <app-icon name="plus" [size]="16" />
-        Create team
+        <app-icon [name]="copy.submitIcon" [size]="16" />
+        {{ copy.submitLabel }}
       </button>
     </ng-container>
   </app-modal>

@@ -1,16 +1,20 @@
 import {
+  isTaskOverdue,
+  overdueDaysOf,
+  overdueLabelOf,
   Task,
-  TASK_PRIORITIES,
+  TASK_COLUMNS,
   TASK_PRIORITY_LABELS,
-  TaskPriority,
+  TASK_STATUS_LABELS,
   TaskStatus,
 } from '../../core/models/task';
 import { User, userColorSeed } from '../../core/models/user';
-import { dueLabelOf, formatDate } from '../../shared/pipes/time-format';
+import { subtaskProgressOf } from '../../core/state/task-subtasks';
+import { dueLabelOf } from '../../shared/pipes/time-format';
+import { IconName } from '../../shared/ui/icon/icon-registry';
 import { PRIORITY_TAG_TONES, TagTone } from '../../shared/ui/tag/tag.component';
 
 export type DueState = 'overdue' | 'soon' | 'later' | 'done';
-export type PriorityFilter = TaskPriority | 'all';
 
 export interface TaskPerson {
   readonly id: string;
@@ -22,98 +26,112 @@ export interface TaskCardView {
   readonly id: string;
   readonly title: string;
   readonly status: TaskStatus;
+  readonly statusLabel: string;
   readonly priorityLabel: string;
   readonly priorityTone: TagTone;
+  readonly teamName: string | null;
   readonly labels: readonly string[];
-  readonly dueLabel: string;
+  readonly shortLabels: readonly string[];
+  readonly dueText: string;
+  readonly dueIcon: IconName;
   readonly dueState: DueState;
+  readonly subtaskLabel: string | null;
   readonly commentCount: number;
   readonly attachmentCount: number;
+  readonly pending: boolean;
   readonly assignee: TaskPerson | null;
+  readonly assigneeName: string;
   readonly done: boolean;
   readonly accessibleLabel: string;
+  readonly idLine: string;
+  readonly menuLabel: string;
+  readonly menuTitle: string;
 }
 
-export interface TaskFilters {
-  readonly query: string;
-  readonly assigneeIds: readonly string[];
-  readonly priority: PriorityFilter;
+export interface TaskViewContext {
+  readonly user: (userId: string | null) => User | null;
+  readonly teamName: (teamId: string | null) => string | null;
+  readonly commentCount: (taskId: string) => number;
+  readonly attachmentCount: (taskId: string) => number;
+  readonly now: number;
 }
 
-export const TASK_LABELS: readonly string[] = [
-  'Frontend',
-  'API',
-  'Design',
-  'Bug',
-  'Mobile',
-  'Research',
-  'Performance',
-  'Accessibility',
-  'Content',
-];
+const CARD_LABEL_LIMIT = 2;
+const SEPARATOR = ' · ';
+const UNASSIGNED = 'Unassigned';
 
-const SPRINT_NAME = 'Atlas Web · Sprint 24';
-const SPRINT_DAYS_BEFORE = 7;
-const SPRINT_DAYS_AFTER = 6;
-const DAY = 86_400_000;
-
-export const sprintKicker = (now = Date.now()): string => {
-  const start = formatDate(now - SPRINT_DAYS_BEFORE * DAY, { day: 'numeric', month: 'short' });
-  const end = formatDate(now + SPRINT_DAYS_AFTER * DAY, { day: 'numeric', month: 'short' });
-  return `${SPRINT_NAME} · ${start} – ${end}`;
-};
-
-export const SPRINT_TITLE = SPRINT_NAME;
-
-const dueStateOf = (task: Task): DueState => {
-  if (task.status === 'done') {
-    return 'done';
-  }
-  const due = dueLabelOf(task.dueAt);
-  if (due.overdue) {
-    return 'overdue';
-  }
-  return due.soon ? 'soon' : 'later';
-};
+export const PENDING_SYNC_HINT = 'Saved offline — syncs when you reconnect';
 
 export const personOf = (user: User | null): TaskPerson | null =>
   user ? { id: user.id, name: user.name, seed: userColorSeed(user.id) } : null;
 
-export const taskCardView = (task: Task, assignee: User | null): TaskCardView => {
-  const dueLabel = dueLabelOf(task.dueAt).label;
-  const dueState = dueStateOf(task);
-  const priorityLabel = TASK_PRIORITY_LABELS[task.priority];
-  const overdueText = dueState === 'overdue' ? ', overdue' : '';
-  const assigneeText = assignee ? `, assigned to ${assignee.name}` : '';
-  return {
+const dueStateOf = (task: Task, now: number): DueState => {
+  if (task.status === 'done') {
+    return 'done';
+  }
+  if (isTaskOverdue(task, now)) {
+    return 'overdue';
+  }
+  return dueLabelOf(task.dueAt, now).soon ? 'soon' : 'later';
+};
+
+const dueTextOf = (task: Task, state: DueState, now: number): string =>
+  state === 'overdue'
+    ? overdueLabelOf(overdueDaysOf(task, now))
+    : dueLabelOf(task.dueAt, now).label;
+
+const idLineOf = (task: Task, subtaskLabel: string | null): string =>
+  [
+    task.id,
+    ...(subtaskLabel ? [`${subtaskLabel} subtasks`] : []),
+    ...(task.labels.length ? [task.labels.join(', ')] : []),
+  ].join(SEPARATOR);
+
+const accessibleLabelOf = (task: Task, card: Omit<TaskCardView, 'accessibleLabel'>): string => {
+  const progress = subtaskProgressOf(task.subtasks);
+  const due = card.dueState === 'overdue' ? card.dueText : `due ${card.dueText}`;
+  return [
+    task.id,
+    task.title,
+    card.statusLabel,
+    `${card.priorityLabel} priority`,
+    due,
+    card.assignee ? `assigned to ${card.assignee.name}` : 'unassigned',
+    ...(progress.total ? [`${progress.done} of ${progress.total} subtasks done`] : []),
+    ...(task.pending ? ['waiting to sync'] : []),
+  ].join(', ');
+};
+
+export const taskCardView = (task: Task, context: TaskViewContext): TaskCardView => {
+  const progress = subtaskProgressOf(task.subtasks);
+  const subtaskLabel = progress.total ? `${progress.done}/${progress.total}` : null;
+  const dueState = dueStateOf(task, context.now);
+  const assignee = personOf(context.user(task.assigneeId));
+  const card: Omit<TaskCardView, 'accessibleLabel'> = {
     id: task.id,
     title: task.title,
     status: task.status,
-    priorityLabel,
+    statusLabel: TASK_STATUS_LABELS[task.status],
+    priorityLabel: TASK_PRIORITY_LABELS[task.priority],
     priorityTone: PRIORITY_TAG_TONES[task.priority],
+    teamName: context.teamName(task.teamId),
     labels: task.labels,
-    dueLabel,
+    shortLabels: task.labels.slice(0, CARD_LABEL_LIMIT),
+    dueText: dueTextOf(task, dueState, context.now),
+    dueIcon: dueState === 'overdue' ? 'circle-alert' : 'calendar',
     dueState,
-    commentCount: task.commentCount,
-    attachmentCount: task.attachmentCount,
-    assignee: personOf(assignee),
+    subtaskLabel,
+    commentCount: context.commentCount(task.id),
+    attachmentCount: context.attachmentCount(task.id),
+    pending: task.pending,
+    assignee,
+    assigneeName: assignee?.name ?? UNASSIGNED,
     done: task.status === 'done',
-    accessibleLabel: `${task.id}, ${task.title}, ${priorityLabel} priority, due ${dueLabel}${overdueText}${assigneeText}`,
+    idLine: idLineOf(task, subtaskLabel),
+    menuLabel: `Actions for ${task.id}`,
+    menuTitle: `${task.id}${SEPARATOR}${task.title}`,
   };
-};
-
-export const priorityFilterOf = (value: string): PriorityFilter =>
-  TASK_PRIORITIES.find((priority) => priority === value) ?? 'all';
-
-export const matchesFilters = (task: Task, filters: TaskFilters): boolean => {
-  const query = filters.query.trim().toLowerCase();
-  const matchesQuery =
-    !query || task.title.toLowerCase().includes(query) || task.id.toLowerCase().includes(query);
-  const matchesAssignee =
-    filters.assigneeIds.length === 0 ||
-    (task.assigneeId !== null && filters.assigneeIds.includes(task.assigneeId));
-  const matchesPriority = filters.priority === 'all' || task.priority === filters.priority;
-  return matchesQuery && matchesAssignee && matchesPriority;
+  return { ...card, accessibleLabel: accessibleLabelOf(task, card) };
 };
 
 export const assigneeIdsOf = (tasks: readonly Task[]): string[] => [
@@ -125,3 +143,29 @@ export const nextTaskIdInColumn = (tasks: readonly Task[], id: string): string |
   const status = tasks[index]?.status;
   return tasks.slice(index + 1).find((task) => task.status === status)?.id;
 };
+
+export type TaskMenuItem =
+  | {
+      readonly kind: 'move';
+      readonly key: string;
+      readonly status: TaskStatus;
+      readonly label: string;
+      readonly icon: IconName;
+    }
+  | {
+      readonly kind: 'copy-link';
+      readonly key: string;
+      readonly label: string;
+      readonly icon: IconName;
+    };
+
+export const taskMenuItems = (status: TaskStatus): TaskMenuItem[] => [
+  ...TASK_COLUMNS.filter((column) => column.status !== status).map((column): TaskMenuItem => ({
+    kind: 'move',
+    key: `move-${column.status}`,
+    status: column.status,
+    label: `Move to ${column.label}`,
+    icon: 'arrow-right',
+  })),
+  { kind: 'copy-link', key: 'copy-link', label: 'Copy link', icon: 'link' },
+];

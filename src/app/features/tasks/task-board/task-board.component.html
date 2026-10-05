@@ -1,8 +1,8 @@
 <p class="visually-hidden" id="task-board-help">
-  Drag cards between columns, or focus a card and press Alt plus Left or Right arrow to move it.
-  Press Enter or Space to open.
+  Drag cards between columns, use the actions menu’s Move to options, or focus a card and press Alt
+  plus Left or Right arrow. Press Enter to open.
 </p>
-<ul class="board" cdkDropListGroup aria-label="Board columns">
+<ul class="board" cdkDropListGroup aria-label="Board columns" aria-describedby="task-board-help">
   @for (column of columns(); track column.status) {
     <li
       class="column"
@@ -17,16 +17,18 @@
           aria-hidden="true"
         ></span>
         <h2 class="column__title">{{ column.label }}</h2>
-        <span class="column__count">{{ column.cards.length }}</span>
-        <button
-          appIconButton
-          type="button"
-          class="column__add"
-          [label]="'Add task to ' + column.label"
-          (click)="add.emit(column.status)"
-        >
-          <app-icon name="plus" [size]="16" />
-        </button>
+        <span class="column__count" aria-hidden="true">{{ column.cards.length }}</span>
+        @if (canCreate()) {
+          <button
+            appIconButton
+            type="button"
+            class="column__add"
+            [label]="'Add task to ' + column.label"
+            (click)="add.emit(column.status)"
+          >
+            <app-icon name="plus" [size]="16" />
+          </button>
+        }
       </header>
       <div
         class="column__list"
@@ -35,12 +37,11 @@
         (cdkDropListDropped)="onDrop($event)"
       >
         @for (card of column.cards; track card.id) {
-          <div
+          <article
             class="column__card"
             cdkDrag
             [cdkDragData]="card.id"
             [cdkDragStartDelay]="dragDelay"
-            role="button"
             tabindex="0"
             [attr.data-task-id]="card.id"
             [attr.aria-label]="card.accessibleLabel"
@@ -48,9 +49,13 @@
             (click)="open.emit(card.id)"
             (keydown)="onKeydown($event, card.id)"
           >
-            <app-task-card [card]="card" showGrip [selected]="card.id === selectedId()" />
+            <app-task-card
+              [card]="card"
+              [selected]="card.id === selectedId()"
+              (moved)="focusCard($event)"
+            />
             <div *cdkDragPlaceholder class="column__drop-indicator"></div>
-          </div>
+          </article>
         } @empty {
           <p class="column__empty">Drop tasks here</p>
         }

@@ -1,0 +1,38 @@
+<section class="section" [attr.aria-labelledby]="headingId">
+  <div class="section__head">
+    <h3 class="section__title" [id]="headingId">Attachments · {{ rows().length }}</h3>
+    <button appButton type="button" variant="ghost" size="sm" (click)="picker.click()">
+      <app-icon name="paperclip" [size]="14" />
+      Attach file
+    </button>
+  </div>
+  @if (rows().length === 0) {
+    <p class="section__empty">No attachments. Files you attach are also saved to Files.</p>
+  }
+  <ul class="attachments">
+    @for (row of rows(); track row.file.id) {
+      <li class="attachment">
+        <span class="attachment__icon" aria-hidden="true">
+          <app-icon [name]="row.icon" [size]="16" />
+        </span>
+        <a
+          class="attachment__text"
+          [routerLink]="previewPath"
+          [queryParams]="{ file: row.file.id }"
+        >
+          <span class="attachment__name truncate">{{ row.file.name }}</span>
+          <span class="attachment__meta">{{ row.meta }}</span>
+        </a>
+        <button
+          appIconButton
+          type="button"
+          [label]="'Remove attachment ' + row.file.name"
+          (click)="detach(row.file)"
+        >
+          <app-icon name="x" [size]="14" />
+        </button>
+      </li>
+    }
+  </ul>
+  <input #picker type="file" multiple hidden (change)="attach(picker)" />
+</section>

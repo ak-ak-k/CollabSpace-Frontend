@@ -1,6 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ChatState } from '../../../core/state/chat.state';
+import { TeamChannelsState } from '../../../core/state/team-channels.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import { SecondarySidebarComponent } from '../../../layout/secondary-sidebar/secondary-sidebar.component';
 import { AvatarComponent } from '../../../shared/ui/avatar/avatar.component';
@@ -35,6 +36,7 @@ const SIDEBAR_DIRECT_MESSAGE_LIMIT = 6;
 export class TeamsSidebarComponent {
   private readonly workspace = inject(WorkspaceState);
   private readonly chat = inject(ChatState);
+  private readonly teamChannels = inject(TeamChannelsState);
 
   readonly teamId = input<string | null>(null);
   readonly channelId = input<string | null>(null);
@@ -45,16 +47,13 @@ export class TeamsSidebarComponent {
       name: team.name,
       code: team.code,
       open: team.id === this.teamId(),
-      channels: this.workspace
-        .channels()
-        .filter((channel) => team.channelIds.includes(channel.id))
-        .map((channel) => ({
-          id: channel.id,
-          name: channel.name,
-          icon: channel.isPrivate ? 'lock' : 'hash',
-          unreadCount: this.chat.unreadCounts()[channel.id] ?? 0,
-          current: channel.id === this.channelId(),
-        })),
+      channels: this.teamChannels.visibleChannels(team).map((channel) => ({
+        id: channel.id,
+        name: channel.name,
+        icon: channel.isPrivate ? 'lock' : 'hash',
+        unreadCount: this.teamChannels.access().unreadOf(channel.id),
+        current: channel.id === this.channelId(),
+      })),
     })),
   );
   protected readonly directMessages = computed(() =>

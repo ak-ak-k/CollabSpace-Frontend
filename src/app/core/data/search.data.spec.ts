@@ -12,7 +12,7 @@ describe('SearchData', () => {
     data = TestBed.inject(SearchData);
   });
 
-  it('finds a person and links to their direct messages', async () => {
+  it('finds a person and links to their profile', async () => {
     const groups = await data.search('priya');
     const people = groups.find((group) => group.key === 'people');
 
@@ -21,8 +21,33 @@ describe('SearchData', () => {
         kind: 'person',
         name: 'Priya Sharma',
         title: { before: '', match: 'Priya', after: ' Sharma' },
-        target: { path: '/messages/dm-u2' },
+        subtitle: expect.stringContaining('Product Designer · Design'),
+        target: { path: '/profile/u2' },
       }),
+    );
+  });
+
+  it('finds people by department', async () => {
+    const groups = await data.search('design', 'people');
+
+    expect(groups[0].items.map((item) => item.id)).toContain('u2');
+  });
+
+  it('opens a file in the preview and finds files by type', async () => {
+    const groups = await data.search('figma', 'files');
+
+    expect(groups[0].items.length).toBeGreaterThan(0);
+    expect(groups[0].items[0].target).toEqual({
+      path: '/files/recent',
+      queryParams: { file: groups[0].items[0].id },
+    });
+  });
+
+  it('links a thread reply to its thread', async () => {
+    const groups = await data.search('timebox it', 'messages');
+
+    expect(groups[0].items[0].target.path).toBe(
+      '/teams/t-frontend/channels/c-frontend/thread/c-frontend-t1',
     );
   });
 
@@ -61,13 +86,13 @@ describe('SearchData', () => {
   it('links a channel to its team route', async () => {
     const groups = await data.search('design-system', 'channels');
 
-    expect(groups[0].items[0].target.path).toBe('/teams/t-frontend/c/c-design-system');
+    expect(groups[0].items[0].target.path).toBe('/teams/t-frontend/channels/c-design-system');
   });
 
-  it('links every message to its conversation or its channel', async () => {
+  it('links every message to the message or its thread', async () => {
     const groups = await data.search('the', 'messages');
     const paths = groups[0].items.map((item) => item.target.path);
-    const route = /^\/(messages\/[\w-]+|teams\/[\w-]+\/c\/[\w-]+)$/;
+    const route = /^\/(messages\/[\w-]+|teams\/[\w-]+\/channels\/[\w-]+)\/(m|thread)\/[\w-]+$/;
 
     expect(paths.length).toBeGreaterThan(0);
     expect(paths.every((path) => route.test(path))).toBe(true);

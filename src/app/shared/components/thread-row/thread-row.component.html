@@ -1,0 +1,8 @@
+<a class="thread-row" [routerLink]="link()" [attr.aria-label]="accessibleLabel()">
+  <app-avatar-group [members]="thread().participants" [size]="24" />
+  <span class="thread-row__count">{{ replies() }}</span>
+  <span class="thread-row__last">{{ lastReply() }}</span>
+  @if (unread() > 0) {
+    <span class="thread-row__new">{{ unread() }} new</span>
+  }
+</a>

@@ -1,0 +1,64 @@
+@let row = person();
+
+<app-avatar
+  class="row__avatar"
+  [name]="row.name"
+  [seed]="row.seed"
+  [size]="40"
+  [status]="row.status"
+/>
+<div class="row__text">
+  <h2 class="row__name">
+    <button
+      type="button"
+      class="row__open"
+      aria-haspopup="dialog"
+      [attr.aria-label]="'View profile of ' + row.label"
+      (click)="actions.openProfile(row.id)"
+    >
+      <span class="row__open-text truncate">{{ row.label }}</span>
+    </button>
+  </h2>
+  <span class="row__line truncate">
+    {{ row.title }}
+    @if (!wide()) {
+      · {{ row.department }}
+    }
+  </span>
+  <span class="row__status">
+    <app-status-dot [status]="row.status" size="sm" />
+    <span class="truncate">{{ row.statusLine }}</span>
+  </span>
+</div>
+@if (wide()) {
+  <span class="row__organisation truncate">{{ row.organisation }}</span>
+}
+@if (!row.isMe) {
+  @if (compact()) {
+    <button
+      appIconButton
+      type="button"
+      size="lg"
+      [label]="'Message ' + row.name"
+      (click)="actions.message(row.id)"
+    >
+      <app-icon name="message-square" [size]="20" />
+    </button>
+  } @else {
+    <button
+      appButton
+      type="button"
+      [attr.aria-label]="'Message ' + row.name"
+      (click)="actions.message(row.id)"
+    >
+      <app-icon name="message-square" [size]="16" />
+      Message
+    </button>
+  }
+}
+<app-person-menu
+  icon="ellipsis-vertical"
+  size="lg"
+  [person]="row"
+  [variant]="compact() ? 'sheet' : 'popover'"
+/>

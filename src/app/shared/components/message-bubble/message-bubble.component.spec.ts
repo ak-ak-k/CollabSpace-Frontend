@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MessageView } from '../../../core/models/thread';
 import { MessageBubbleComponent } from './message-bubble.component';
+import { MessageCommand } from './message-menu';
 
 const MESSAGE: MessageView = {
   id: 'm1',
@@ -12,24 +13,31 @@ const MESSAGE: MessageView = {
   continuation: false,
   sentAt: 0,
   time: '9:41 AM',
-  text: '@Aarav are we shipping?',
+  text: '@Aarav are we **shipping**?',
   segments: [
-    { text: '@Aarav', highlighted: true },
-    { text: ' are we shipping?', highlighted: false },
+    { text: '@Aarav', style: 'mention', href: null },
+    { text: ' are we ', style: 'plain', href: null },
+    { text: 'shipping', style: 'bold', href: null },
+    { text: '?', style: 'plain', href: null },
   ],
   attachments: [],
   reactions: [],
   replyTo: null,
+  isReply: false,
+  thread: null,
+  saved: true,
+  mentionsMe: true,
   pinned: false,
   edited: false,
   deliveryState: 'sent',
   showsDeliveryLine: false,
-  accessibleLabel: 'Rahul Mehta, 9:41 AM: @Aarav are we shipping?',
+  accessibleLabel: 'Rahul Mehta, 9:41 AM, saved, mentions you: @Aarav are we **shipping**?',
 };
 
 describe('MessageBubbleComponent', () => {
   let fixture: ComponentFixture<MessageBubbleComponent>;
   let host: HTMLElement;
+  let commands: MessageCommand[];
 
   const button = (label: string): HTMLButtonElement | undefined =>
     Array.from(host.querySelectorAll('button')).find(
@@ -39,44 +47,60 @@ describe('MessageBubbleComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(MessageBubbleComponent);
     host = fixture.nativeElement as HTMLElement;
+    commands = [];
+    fixture.componentInstance.command.subscribe((command) => commands.push(command));
     fixture.componentRef.setInput('message', MESSAGE);
   });
 
-  it('renders a labelled article with author, time and highlighted body', async () => {
+  it('renders a labelled article with formatted text, the Saved flag and the mention highlight', async () => {
     await fixture.whenStable();
 
     expect(host.getAttribute('role')).toBe('article');
     expect(host.getAttribute('aria-label')).toBe(MESSAGE.accessibleLabel);
+    expect(host.classList.contains('message--mention')).toBe(true);
     expect(host.querySelector('.message__author')?.textContent).toBe('Rahul Mehta');
-    expect(host.querySelector('.message__time')?.textContent).toBe('9:41 AM');
-    expect(host.querySelector('.message__body')?.textContent).toBe('@Aarav are we shipping?');
-    expect(host.querySelector('.message__highlight')?.textContent).toBe('@Aarav');
+    expect(host.querySelector('.message-text')?.textContent).toBe('@Aarav are we shipping?');
+    expect(host.querySelector('.message-text__mention')?.textContent).toBe('@Aarav');
+    expect(host.querySelector('strong')?.textContent).toBe('shipping');
+    expect(host.querySelector('.message__flag')?.textContent?.trim()).toBe('Saved');
   });
 
-  it('emits toolbar actions and quick reactions in pointer mode', async () => {
-    const emitted: string[] = [];
-    fixture.componentInstance.reply.subscribe(() => emitted.push('reply'));
-    fixture.componentInstance.pin.subscribe(() => emitted.push('pin'));
-    fixture.componentInstance.react.subscribe((emoji) => emitted.push(emoji));
+  it('offers reaction, thread, save and more actions in the hover toolbar', async () => {
+    const reactions: string[] = [];
+    fixture.componentInstance.react.subscribe((emoji) => reactions.push(emoji));
     await fixture.whenStable();
 
-    button('Reply')?.click();
-    button('Pin message')?.click();
+    button('Reply in thread')?.click();
+    button('Remove from saved')?.click();
     button('Add reaction')?.click();
     await fixture.whenStable();
-    button('React with 👍')?.click();
+    button('React with thumbs up')?.click();
     await fixture.whenStable();
 
-    expect(emitted).toEqual(['reply', 'pin', '👍']);
-    expect(host.querySelector('[role="group"]')).toBeNull();
-    expect(button('Edit')).toBeUndefined();
+    expect(commands).toEqual(['thread', 'save']);
+    expect(reactions).toEqual(['👍']);
+    expect(host.querySelector('[role="menu"]')).toBeNull();
+    expect(button('More actions')?.getAttribute('aria-haspopup')).toBe('menu');
+  });
+
+  it('shows Not sent with Retry and Delete for a failed message of mine', async () => {
+    fixture.componentRef.setInput('message', {
+      ...MESSAGE,
+      mine: true,
+      deliveryState: 'failed',
+    });
+    await fixture.whenStable();
+
+    expect(host.querySelector('[role="alert"]')?.textContent).toContain('Not sent');
+    button('Retry sending')?.click();
+    button('Delete unsent message')?.click();
+
+    expect(commands).toEqual(['retry', 'discard']);
   });
 
   it('saves a changed edit on Enter and cancels on Escape, returning focus to the row', async () => {
     const saved: string[] = [];
-    let cancelled = false;
     fixture.componentInstance.editSaved.subscribe((text) => saved.push(text));
-    fixture.componentInstance.editCancelled.subscribe(() => (cancelled = true));
     fixture.componentRef.setInput('editing', true);
     await fixture.whenStable();
     const textarea = host.querySelector('textarea') as HTMLTextAreaElement;
@@ -88,20 +112,30 @@ describe('MessageBubbleComponent', () => {
     textarea.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 
     expect(saved).toEqual(['Shipping Thursday']);
-    expect(cancelled).toBe(true);
+    expect(commands).toEqual(['editCancel']);
     expect(document.activeElement).toBe(host);
   });
 
-  it('asks for the actions sheet when tapped in touch mode', async () => {
-    let requested = 0;
-    fixture.componentInstance.actionsRequested.subscribe(() => requested++);
+  it('asks for the actions sheet on tap or long-press in touch mode', async () => {
     fixture.componentRef.setInput('pointerActions', false);
     await fixture.whenStable();
 
-    host.querySelector<HTMLElement>('.message__body')?.click();
+    host.querySelector<HTMLElement>('.message-text')?.click();
     host.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+    const press = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+    host.querySelector('.message-text')?.dispatchEvent(press);
 
-    expect(requested).toBe(2);
+    expect(commands).toEqual(['actions', 'actions', 'actions']);
+    expect(press.defaultPrevented).toBe(true);
     expect(host.querySelector('[role="toolbar"]')).toBeNull();
+  });
+
+  it('jumps to the message when tapped as a search result', async () => {
+    fixture.componentRef.setInput('jumpOnTap', true);
+    await fixture.whenStable();
+
+    host.querySelector<HTMLElement>('.message-text')?.click();
+
+    expect(commands).toEqual(['jump']);
   });
 });

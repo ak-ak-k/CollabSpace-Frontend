@@ -1,29 +1,39 @@
 import { inject, Service } from '@angular/core';
-import { MOCK_TASKS } from '../mocks/tasks.mock';
-import { NewTask, Task, TaskStatus } from '../models/task';
+import { MOCK_TASKS, SeededTask } from '../mocks/tasks.mock';
+import { NewTask, Task, TaskChanges, TaskStatus } from '../models/task';
 import { MockRequest } from './mock-request';
 
 const TASK_ID_PREFIX = 'NS-';
+
+export interface TaskAuthor {
+  readonly workspaceId: string;
+  readonly reporterId: string;
+}
+
+const withoutSeedFields = ({ attachmentCount: _attachments, ...task }: SeededTask): Task => task;
 
 @Service()
 export class TasksData {
   private readonly request = inject(MockRequest);
 
-  private tasks = [...MOCK_TASKS];
+  private tasks: readonly Task[] = MOCK_TASKS.map(withoutSeedFields);
 
   getTasks(): Promise<readonly Task[]> {
     return this.request.read(() => this.tasks, []);
   }
 
-  createTask(newTask: NewTask, workspaceId: string): Promise<Task> {
+  createTask(newTask: NewTask, author: TaskAuthor): Promise<Task> {
     return this.request.write(() => {
+      const now = Date.now();
       const task: Task = {
         ...newTask,
+        ...author,
         id: this.nextId(),
-        workspaceId,
         labels: [],
-        commentCount: 0,
-        attachmentCount: 0,
+        subtasks: [],
+        createdAt: now,
+        updatedAt: now,
+        pending: false,
       };
       this.tasks = [...this.tasks, task];
       return task;
@@ -37,7 +47,7 @@ export class TasksData {
     });
   }
 
-  updateTask(id: string, changes: Partial<Task>): Promise<Task> {
+  updateTask(id: string, changes: TaskChanges & Pick<Task, 'updatedAt'>): Promise<Task> {
     return this.request.write(() => {
       const current = this.tasks.find((task) => task.id === id);
       if (!current) {
@@ -52,6 +62,18 @@ export class TasksData {
   deleteTask(id: string): Promise<void> {
     return this.request.write(() => {
       this.tasks = this.tasks.filter((task) => task.id !== id);
+    });
+  }
+
+  restoreTask(task: Task): Promise<void> {
+    return this.request.write(() => {
+      this.tasks = [...this.tasks.filter((candidate) => candidate.id !== task.id), task];
+    });
+  }
+
+  syncTasks(tasks: readonly Task[]): Promise<void> {
+    return this.request.write(() => {
+      this.tasks = tasks.map((task) => ({ ...task, pending: false }));
     });
   }
 

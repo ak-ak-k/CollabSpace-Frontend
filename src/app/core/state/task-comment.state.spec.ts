@@ -1,39 +1,41 @@
 import { TestBed } from '@angular/core/testing';
-import { Task } from '../models/task';
 import { INSTANT_MOCK_DATA, settle } from './state.testing';
 import { TaskCommentState } from './task-comment.state';
-import { TaskState } from './task.state';
 
 describe('TaskCommentState', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({ providers: [INSTANT_MOCK_DATA] });
   });
 
-  const firstTaskWithComments = async (): Promise<Task> => {
-    const tasks = TestBed.inject(TaskState);
+  const loaded = async (): Promise<TaskCommentState> => {
+    const comments = TestBed.inject(TaskCommentState);
     await settle();
-    const task = tasks.tasks().find((candidate) => candidate.commentCount > 0);
-    if (!task) {
-      throw new Error('The mock board has no commented task');
-    }
-    return task;
+    return comments;
   };
 
-  it('seeds at most two comments for a task', async () => {
-    const task = await firstTaskWithComments();
-    const comments = TestBed.inject(TaskCommentState).commentsFor(task);
+  it('seeds at most three comments per task', async () => {
+    const comments = await loaded();
 
-    expect(comments.length).toBe(Math.min(task.commentCount, 2));
+    expect(comments.countFor('NS-142')).toBe(3);
+    expect(comments.countFor('NS-160')).toBe(1);
+    expect(comments.countFor('NS-161')).toBe(0);
   });
 
-  it('appends a new comment and bumps the task comment count', async () => {
-    const task = await firstTaskWithComments();
-    const state = TestBed.inject(TaskCommentState);
+  it('adds, edits and removes a comment', async () => {
+    const comments = await loaded();
 
-    await state.add(task, 'u0', '  Shipping today  ');
+    const added = comments.add('NS-161', '  Shipping today  ');
+    expect(comments.commentsFor('NS-161').map((comment) => comment.text)).toEqual([
+      'Shipping today',
+    ]);
 
-    const updated = TestBed.inject(TaskState).task(task.id);
-    expect(state.commentsFor(updated ?? task).at(-1)?.text).toBe('Shipping today');
-    expect(updated?.commentCount).toBe(task.commentCount + 1);
+    comments.edit(added.id, 'Shipping tomorrow');
+    expect(comments.commentsFor('NS-161')[0]).toMatchObject({
+      text: 'Shipping tomorrow',
+      edited: true,
+    });
+
+    comments.remove(added.id);
+    expect(comments.countFor('NS-161')).toBe(0);
   });
 });

@@ -1,3 +1,10 @@
+<div class="files__toolbar">
+  <a appButton [routerLink]="filesLink" [queryParams]="filesQuery()">
+    <app-icon name="folder" [size]="16" />
+    Open in Files
+  </a>
+</div>
+
 @switch (status()) {
   @case ('loading') {
     <app-skeleton layout="list" [rows]="4" compact label="Loading files" />

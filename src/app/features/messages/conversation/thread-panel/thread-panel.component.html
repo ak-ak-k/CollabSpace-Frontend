@@ -1,0 +1,78 @@
+<div class="thread-panel" [cdkTrapFocus]="overlay()">
+  <header class="thread-panel__header">
+    @if (fullscreen()) {
+      <a
+        appIconButton
+        size="lg"
+        class="thread-panel__back"
+        label="Back to conversation"
+        [routerLink]="view().route"
+      >
+        <app-icon name="arrow-left" [size]="22" />
+      </a>
+    }
+    <div class="thread-panel__heading">
+      @if (fullscreen()) {
+        <h1 #title class="thread-panel__title" tabindex="-1">Thread</h1>
+      } @else {
+        <h2 #title class="thread-panel__title" tabindex="-1">Thread</h2>
+      }
+      <span class="thread-panel__subtitle">{{ subtitle() }}</span>
+    </div>
+    @if (!fullscreen()) {
+      <a appIconButton label="Close thread" [routerLink]="view().route">
+        <app-icon name="x" [size]="18" />
+      </a>
+    }
+  </header>
+
+  @if (missing()) {
+    <div class="thread-panel__missing">
+      <app-empty-state
+        compact
+        icon="messages-square"
+        heading="Thread not found"
+        message="The original message may have been deleted."
+        [headingLevel]="fullscreen() ? 2 : 3"
+      />
+    </div>
+  } @else {
+    <app-message-log
+      label="Thread messages"
+      [view]="view()"
+      [rows]="thread.rows()"
+      [status]="status()"
+      [rootId]="rootId()"
+      [editingId]="session.editingId()"
+      [pointerActions]="!fullscreen()"
+      [canPin]="messages.menuContext().canPin"
+      (action)="messages.handle($event)"
+      (retry)="retry.emit()"
+    />
+
+    <div class="thread-panel__typing" aria-live="polite">
+      <app-typing-indicator [text]="thread.typingText()" />
+    </div>
+
+    @if (joinBar(); as bar) {
+      <app-join-bar [bar]="bar" />
+    } @else {
+      <app-message-composer
+        label="Reply in thread"
+        placeholder="Reply…"
+        [conversationTitle]="view().title"
+        [archivedWorkspace]="session.archivedWorkspace()"
+        [mentions]="thread.mentionCandidates()"
+        [offline]="!network.online()"
+        [enterToSend]="session.enterToSend()"
+        [layout]="fullscreen() ? 'mobile' : 'desktop'"
+        [draft]="drafts().text(draftKey())"
+        (draftChange)="drafts().setText(draftKey(), $event)"
+        [attachments]="drafts().attachments(draftKey())"
+        (attachmentsChange)="drafts().setAttachments(draftKey(), $event)"
+        (send)="send($event)"
+        (editLastRequested)="editLast()"
+      />
+    }
+  }
+</div>

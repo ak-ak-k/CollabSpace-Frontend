@@ -28,8 +28,8 @@ describe('PreferencesState', () => {
     await state.setNotification('team', 'email', true);
 
     expect(state.preferences().notifications.team).toEqual({
-      desktop: false,
-      mobile: false,
+      inapp: true,
+      push: false,
       email: true,
     });
   });

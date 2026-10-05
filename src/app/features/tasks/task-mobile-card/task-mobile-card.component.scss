@@ -1,0 +1,82 @@
+:host {
+  position: relative;
+  display: block;
+}
+
+.mobile-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--task-mobile-card-menu-room) var(--space-3) var(--space-3);
+  background: var(--surface);
+  color: var(--text-primary);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--hover);
+  }
+}
+
+.mobile-card__top,
+.mobile-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.mobile-card__top {
+  gap: var(--space-2);
+}
+
+.mobile-card__id,
+.mobile-card__muted {
+  color: var(--text-muted);
+  font-size: var(--font-size-12);
+}
+
+.mobile-card__id {
+  font-weight: var(--font-weight-semibold);
+}
+
+.mobile-card__title {
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--task-card-title-line-height);
+}
+
+.mobile-card__title--done {
+  text-decoration: line-through;
+}
+
+.mobile-card__meta {
+  gap: var(--space-3);
+  color: var(--text-muted);
+  font-size: var(--font-size-12);
+}
+
+.mobile-card__due,
+.mobile-card__count {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.mobile-card__due--overdue {
+  color: var(--danger);
+  font-weight: var(--font-weight-heavy);
+}
+
+.mobile-card__due--soon {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.mobile-card__spacer {
+  flex: 1;
+}
+
+.mobile-card__menu {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+}

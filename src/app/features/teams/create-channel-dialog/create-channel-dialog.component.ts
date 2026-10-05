@@ -137,7 +137,7 @@ export class CreateChannelDialogComponent {
       isPrivate: privacy === 'private',
     });
     this.chat.addChannel(channel);
-    const route = `/teams/${teamId}/c/${channel.id}`;
+    const route = `/teams/${teamId}/channels/${channel.id}`;
     this.activity.record({
       kind: 'channel',
       verb: 'created',

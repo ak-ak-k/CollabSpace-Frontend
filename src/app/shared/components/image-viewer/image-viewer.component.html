@@ -1,0 +1,40 @@
+<div class="viewer">
+  <div class="viewer__bar">
+    <span class="viewer__details">
+      <strong class="viewer__name truncate" [id]="titleId">{{ image.name }}</strong>
+      @if (image.size) {
+        <span class="viewer__size">{{ image.size }}</span>
+      }
+    </span>
+    <button
+      type="button"
+      class="viewer__button"
+      aria-label="Download image"
+      title="Download image"
+      (click)="download()"
+    >
+      <app-icon name="download" [size]="downloadIconSize" />
+    </button>
+    <button
+      type="button"
+      class="viewer__button"
+      aria-label="Close image"
+      title="Close image"
+      cdkFocusInitial
+      (click)="close()"
+    >
+      <app-icon name="x" [size]="closeIconSize" />
+    </button>
+  </div>
+  <div class="viewer__stage" (click)="close()">
+    @if (image.src) {
+      <div class="viewer__frame">
+        <img class="viewer__image" [src]="image.src" [alt]="image.name" />
+      </div>
+    } @else {
+      <div class="viewer__placeholder" role="img" [attr.aria-label]="image.name">
+        <app-icon name="image" [size]="placeholderIconSize" />
+      </div>
+    }
+  </div>
+</div>

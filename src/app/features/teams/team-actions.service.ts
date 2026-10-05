@@ -6,11 +6,17 @@ import { ToastService } from '../../core/services/toast.service';
 import { ChatState } from '../../core/state/chat.state';
 import { WorkspaceState } from '../../core/state/workspace.state';
 import { WorkspaceActions } from '../workspace/workspace-actions.service';
+import {
+  CreateTeamDialogComponent,
+  TeamDialogData,
+} from './create-team-dialog/create-team-dialog.component';
+import { TeamAdminActions } from './team-admin-actions.service';
 
 @Service()
 export class TeamActions {
   private readonly workspace = inject(WorkspaceState);
   private readonly workspaceActions = inject(WorkspaceActions);
+  private readonly admin = inject(TeamAdminActions);
   private readonly chat = inject(ChatState);
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
@@ -20,8 +26,17 @@ export class TeamActions {
     this.workspaceActions.openCreateTeam();
   }
 
-  invite(teamId: string): void {
+  addMembers(teamId: string): void {
+    void this.admin.addMembers(teamId);
+  }
+
+  inviteByEmail(teamId: string): void {
     this.workspaceActions.openInvite(teamId);
+  }
+
+  openSettings(teamId: string): void {
+    const data: TeamDialogData = { teamId };
+    this.dialogs.open(CreateTeamDialogComponent, { size: 'md', data });
   }
 
   createChannel(teamId: string | null = null): void {

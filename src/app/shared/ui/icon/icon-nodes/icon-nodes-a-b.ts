@@ -87,6 +87,14 @@ export const ICON_NODES_A_TO_B = {
     ['path', { d: 'M4 2C2.8 3.7 2 5.7 2 8' }],
   ],
   bookmark: [['path', { d: 'm19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z' }]],
+  bold: [
+    ['path', { d: 'M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8' }],
+  ],
+  'bookmark-x': [
+    ['path', { d: 'm19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2Z' }],
+    ['path', { d: 'm14.5 7.5-5 5' }],
+    ['path', { d: 'm9.5 7.5 5 5' }],
+  ],
   briefcase: [
     ['path', { d: 'M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16' }],
     ['rect', { width: '20', height: '14', x: '2', y: '6', rx: '2' }],

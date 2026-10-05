@@ -1,0 +1,26 @@
+<p class="sheet__title truncate">{{ data.title }}</p>
+
+<div
+  class="sheet__menu"
+  cdkMenu
+  [attr.aria-label]="data.label"
+  (keydown.tab)="cancel($event)"
+  (keydown.shift.tab)="cancel($event)"
+>
+  @for (item of data.items; track item.key; let first = $first) {
+    <button
+      cdkMenuItem
+      type="button"
+      class="sheet__item"
+      [attr.cdkFocusInitial]="first ? '' : null"
+      (cdkMenuItemTriggered)="choose(item)"
+    >
+      <app-icon [name]="item.icon" [size]="20" />
+      {{ item.label }}
+    </button>
+  }
+  <button cdkMenuItem type="button" class="sheet__item" (cdkMenuItemTriggered)="cancel()">
+    <app-icon name="x" [size]="20" />
+    Cancel
+  </button>
+</div>

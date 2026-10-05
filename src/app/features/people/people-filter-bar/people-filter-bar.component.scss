@@ -1,0 +1,89 @@
+@use 'touch';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  min-height: var(--size-control-md);
+  padding: var(--space-0) var(--space-3);
+  border: var(--border-width-hairline) solid var(--border);
+  color: var(--text-primary);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--hover);
+  }
+
+  @include touch.on-touch {
+    min-height: var(--size-touch-target);
+  }
+}
+
+.chip--current,
+.chip--current:hover {
+  border-color: var(--text-primary);
+  background: var(--text-primary);
+  color: var(--background);
+}
+
+.chip__dot {
+  --size-status-dot-md: var(--people-chip-dot-size);
+}
+
+.chip--current .chip__dot {
+  --status-dot-ring: var(--background);
+  --status-dot-ring-width: var(--border-width-hairline);
+}
+
+.chip__count {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-regular);
+}
+
+.active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-13);
+}
+
+.active__label {
+  color: var(--text-secondary);
+}
+
+.active__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--people-pill-height);
+  padding: var(--space-0) var(--space-2);
+  border: var(--border-width-hairline) solid var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover);
+  }
+
+  @include touch.on-touch {
+    min-height: var(--size-touch-target);
+  }
+}

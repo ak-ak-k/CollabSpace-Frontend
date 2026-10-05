@@ -2,18 +2,29 @@
   <div class="list__header">
     <div class="list__title-row">
       <h1 class="list__title">Messages</h1>
+      <button
+        appIconButton
+        type="button"
+        size="md"
+        label="Search all messages"
+        (click)="searchMessages()"
+      >
+        <app-icon name="search" [size]="20" />
+      </button>
       <button appIconButton type="button" size="md" label="New group chat" (click)="newGroup()">
         <app-icon name="square-pen" [size]="20" />
       </button>
     </div>
     <app-search-input
-      label="Search conversations"
-      placeholder="Search conversations"
+      label="Filter conversations"
+      placeholder="Filter conversations"
+      icon="list-filter"
       [(value)]="query"
     />
     <app-tabs
-      label="Filter conversations"
+      label="Filter conversations by type"
       bleed
+      wrap
       [tabs]="tabs()"
       [active]="filter()"
       (activeChange)="selectFilter($event)"
@@ -21,6 +32,21 @@
   </div>
 
   <div class="list__body">
+    @if (showSavedRow()) {
+      <a
+        class="list__saved"
+        routerLink="/messages/saved"
+        [attr.aria-current]="savedOpen() ? 'page' : null"
+      >
+        <span class="list__saved-icon" aria-hidden="true">
+          <app-icon name="bookmark" [size]="20" />
+        </span>
+        <span class="list__saved-label">Saved messages</span>
+        @if (savedCount()) {
+          <span class="list__saved-count">{{ savedCount() }}</span>
+        }
+      </a>
+    }
     @switch (status()) {
       @case ('loading') {
         <app-skeleton class="list__state" layout="list" compact label="Loading conversations" />
@@ -56,17 +82,21 @@
             [message]="emptyState().message"
           />
         } @else {
-          <ul>
-            @for (conversation of conversations(); track conversation.id) {
-              <li>
-                <app-conversation-item
-                  density="comfortable"
-                  [conversation]="conversation"
-                  [selected]="conversation.id === selectedId()"
-                />
-              </li>
+          @for (section of sections(); track section.label) {
+            @if (section.label) {
+              <h2 class="list__section caps-label">{{ section.label }}</h2>
             }
-          </ul>
+            <ul [attr.aria-label]="section.label">
+              @for (conversation of section.conversations; track conversation.id) {
+                <li>
+                  <app-conversation-row
+                    [conversation]="conversation"
+                    [selected]="conversation.id === selectedId()"
+                  />
+                </li>
+              }
+            </ul>
+          }
         }
       }
     }

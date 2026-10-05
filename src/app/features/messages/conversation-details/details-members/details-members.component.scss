@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.members__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1-5) var(--space-0);
+}
+
+.members__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.members__name {
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+}
+
+.members__line {
+  color: var(--text-muted);
+  font-size: var(--font-size-12);
+}

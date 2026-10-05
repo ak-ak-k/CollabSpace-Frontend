@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { BreakpointService } from '../../../core/services/breakpoint.service';
+import { TeamChannelsState } from '../../../core/state/team-channels.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import {
   BreadcrumbComponent,
@@ -44,6 +45,7 @@ const LAYOUT_OPTIONS: readonly RadioOption[] = [
 export class TeamDirectoryComponent {
   private readonly workspace = inject(WorkspaceState);
   private readonly breakpoint = inject(BreakpointService);
+  private readonly teamChannels = inject(TeamChannelsState);
   protected readonly actions = inject(TeamActions);
 
   protected readonly query = signal('');
@@ -76,7 +78,12 @@ export class TeamDirectoryComponent {
     return this.workspace
       .teams()
       .filter((team) => (this.filter() === 'all' || team.joined) && matchesTeamQuery(team, query))
-      .map((team) => teamCardView(team, this.workspace.usersById(), currentUserId));
+      .map((team) =>
+        teamCardView(team, this.workspace.usersById(), currentUserId, {
+          channelCount: this.teamChannels.visibleChannels(team).length,
+          unreadCount: this.teamChannels.unreadCount(team),
+        }),
+      );
   });
   protected readonly noMatch = computed(() => {
     const query = this.query().trim();

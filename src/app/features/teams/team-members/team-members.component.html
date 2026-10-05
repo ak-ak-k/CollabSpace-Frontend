@@ -6,9 +6,16 @@
       placeholder="Search members"
       [(value)]="query"
     />
-    <button appButton type="button" (click)="invite.emit()">
+    <span class="members__spacer"></span>
+    @if (canInvite()) {
+      <button appButton type="button" variant="ghost" (click)="inviteByEmail.emit()">
+        <app-icon name="mail-plus" [size]="16" />
+        Invite by email
+      </button>
+    }
+    <button appButton type="button" (click)="addMembers.emit()">
       <app-icon name="user-plus" [size]="16" />
-      Invite members
+      Add members
     </button>
   </div>
 
@@ -26,10 +33,7 @@
           <app-avatar [name]="member.name" [seed]="member.seed" [status]="member.status" />
           <span class="member__text">
             <strong class="member__name">{{ member.label }}</strong>
-            <span class="member__line truncate">{{ member.role }} · {{ member.title }}</span>
-            <span class="member__line truncate"
-              >{{ member.presence }} · {{ member.localTime }}</span
-            >
+            <span class="member__line truncate">{{ member.roleLabel }} · {{ member.title }}</span>
           </span>
           @if (!member.isMe) {
             <button
@@ -42,6 +46,7 @@
               <app-icon name="message-square" [size]="18" />
             </button>
           }
+          <app-team-member-menu [teamId]="teamId()" [member]="member" variant="sheet" />
         </li>
       }
     </ul>
@@ -70,7 +75,7 @@
                 </span>
               </td>
               <td>
-                <app-tag>{{ member.role }}</app-tag>
+                <app-tag [tone]="member.roleTone">{{ member.roleLabel }}</app-tag>
               </td>
               <td>
                 <span class="members__status">
@@ -80,13 +85,16 @@
               </td>
               <td class="members__time">{{ member.localTime }}</td>
               <td class="members__actions">
-                @if (!member.isMe) {
-                  <button appButton type="button" size="sm" (click)="message.emit(member.id)">
-                    <app-icon name="message-square" [size]="14" />
-                    Message
-                    <span class="visually-hidden">{{ member.name }}</span>
-                  </button>
-                }
+                <span class="members__action-group">
+                  @if (!member.isMe) {
+                    <button appButton type="button" size="sm" (click)="message.emit(member.id)">
+                      <app-icon name="message-square" [size]="14" />
+                      Message
+                      <span class="visually-hidden">{{ member.name }}</span>
+                    </button>
+                  }
+                  <app-team-member-menu [teamId]="teamId()" [member]="member" />
+                </span>
               </td>
             </tr>
           }

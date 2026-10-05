@@ -15,7 +15,14 @@ export class ReactionBarComponent {
   readonly showAdd = input(false, { transform: booleanAttribute });
 
   readonly toggle = output<string>();
-  readonly add = output<void>();
+  readonly add = output<HTMLElement>();
+  readonly reactorsShown = output<string>();
 
   protected readonly addIconSize = ADD_ICON_SIZE;
+
+  protected showReactors(event: MouseEvent, reaction: ReactionView): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.reactorsShown.emit(reaction.description);
+  }
 }

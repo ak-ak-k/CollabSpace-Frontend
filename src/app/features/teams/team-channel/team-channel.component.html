@@ -1,6 +1,8 @@
 @if (belongsToTeam()) {
   <app-conversation
     [conversationId]="channelId()"
+    [messageId]="messageId()"
+    [rootId]="rootId()"
     [backLink]="teamLink()"
     [backBelowDesktop]="true"
     [detailsOnWideScreens]="true"

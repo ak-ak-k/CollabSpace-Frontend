@@ -31,6 +31,12 @@
       [value]="task().assigneeId ?? ''"
       (valueChange)="changeAssignee($event)"
     />
+    <app-select
+      label="Team"
+      [options]="teamOptions()"
+      [value]="task().teamId ?? ''"
+      (valueChange)="changeTeam($event)"
+    />
     <app-input
       label="Due date"
       type="date"

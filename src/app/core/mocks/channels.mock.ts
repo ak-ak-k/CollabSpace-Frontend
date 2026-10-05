@@ -9,6 +9,7 @@ export const MOCK_CHANNELS: readonly Channel[] = [
     memberIds: ['u0', 'u1', 'u2', 'u4', 'u5', 'u6', 'u7'],
     isPrivate: false,
     createdLabel: 'Jan 2023',
+    createdBy: 'u4',
   },
   {
     id: 'c-design-system',
@@ -18,6 +19,7 @@ export const MOCK_CHANNELS: readonly Channel[] = [
     memberIds: ['u0', 'u1', 'u2', 'u5'],
     isPrivate: false,
     createdLabel: 'Mar 2023',
+    createdBy: 'u4',
   },
   {
     id: 'c-releases',
@@ -27,6 +29,7 @@ export const MOCK_CHANNELS: readonly Channel[] = [
     memberIds: ['u0', 'u1', 'u4', 'u7', 'u8'],
     isPrivate: false,
     createdLabel: 'Jan 2023',
+    createdBy: 'u4',
   },
   {
     id: 'c-backend',
@@ -36,6 +39,7 @@ export const MOCK_CHANNELS: readonly Channel[] = [
     memberIds: ['u0', 'u3', 'u4', 'u8', 'u11'],
     isPrivate: false,
     createdLabel: 'Jan 2023',
+    createdBy: 'u8',
   },
   {
     id: 'c-api',
@@ -45,6 +49,7 @@ export const MOCK_CHANNELS: readonly Channel[] = [
     memberIds: ['u0', 'u3', 'u8'],
     isPrivate: false,
     createdLabel: 'May 2026',
+    createdBy: 'u8',
   },
   {
     id: 'c-incidents',
@@ -54,6 +59,7 @@ export const MOCK_CHANNELS: readonly Channel[] = [
     memberIds: ['u0', 'u3', 'u4', 'u8'],
     isPrivate: true,
     createdLabel: 'Feb 2023',
+    createdBy: 'u8',
   },
   {
     id: 'c-design',
@@ -63,6 +69,7 @@ export const MOCK_CHANNELS: readonly Channel[] = [
     memberIds: ['u0', 'u2', 'u5', 'u9'],
     isPrivate: false,
     createdLabel: 'Apr 2023',
+    createdBy: 'u5',
   },
   {
     id: 'c-research',
@@ -72,6 +79,7 @@ export const MOCK_CHANNELS: readonly Channel[] = [
     memberIds: ['u2', 'u5', 'u10'],
     isPrivate: false,
     createdLabel: 'Sep 2026',
+    createdBy: 'u5',
   },
   {
     id: 'c-mobile',
@@ -81,6 +89,7 @@ export const MOCK_CHANNELS: readonly Channel[] = [
     memberIds: ['u1', 'u3', 'u6', 'u7'],
     isPrivate: false,
     createdLabel: 'Jun 2023',
+    createdBy: 'u6',
   },
   {
     id: 'c-growth',
@@ -90,6 +99,7 @@ export const MOCK_CHANNELS: readonly Channel[] = [
     memberIds: ['u0', 'u9', 'u10', 'u11'],
     isPrivate: false,
     createdLabel: 'Feb 2024',
+    createdBy: 'u9',
   },
   {
     id: 'c-support',
@@ -99,5 +109,6 @@ export const MOCK_CHANNELS: readonly Channel[] = [
     memberIds: ['u0', 'u4', 'u10'],
     isPrivate: false,
     createdLabel: 'Aug 2024',
+    createdBy: 'u10',
   },
 ];

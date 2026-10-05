@@ -1,0 +1,27 @@
+@if (failed()) {
+  <div class="message-status__alert" role="alert">
+    <app-icon name="circle-alert" [size]="iconSize" />
+    <span>Not sent</span>
+    <button
+      type="button"
+      class="message-status__retry"
+      aria-label="Retry sending"
+      (click)="retry.emit()"
+    >
+      Retry
+    </button>
+    <button
+      type="button"
+      class="message-status__discard"
+      aria-label="Delete unsent message"
+      (click)="discard.emit()"
+    >
+      Delete
+    </button>
+  </div>
+} @else if (status(); as status) {
+  <span class="message-status__line" [class.message-status__line--read]="status.read">
+    <app-icon [name]="status.icon" [size]="iconSize" />
+    {{ status.label }}
+  </span>
+}

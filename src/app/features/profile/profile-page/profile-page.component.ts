@@ -4,6 +4,7 @@ import {
   computed,
   inject,
   Injector,
+  input,
   signal,
   viewChild,
 } from '@angular/core';
@@ -13,6 +14,7 @@ import { PreferencesState } from '../../../core/state/preferences.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 import { SkeletonComponent } from '../../../shared/ui/skeleton/skeleton.component';
+import { PersonProfileComponent } from '../person-profile/person-profile.component';
 import { ProfileAboutComponent } from '../profile-about/profile-about.component';
 import { ProfileDetailsComponent } from '../profile-details/profile-details.component';
 import { ProfileHeaderComponent } from '../profile-header/profile-header.component';
@@ -41,6 +43,7 @@ const EMPTY_DRAFT: ProfileDraft = {
   selector: 'app-profile-page',
   imports: [
     EmptyStateComponent,
+    PersonProfileComponent,
     SkeletonComponent,
     ProfileHeaderComponent,
     ProfileAboutComponent,
@@ -59,8 +62,14 @@ export class ProfilePageComponent {
   private readonly toasts = inject(ToastService);
   private readonly injector = inject(Injector);
 
+  readonly userId = input<string>();
+
   protected readonly status = this.workspace.status;
   protected readonly user = this.workspace.currentUser;
+  protected readonly otherUserId = computed(() => {
+    const userId = this.userId();
+    return userId && userId !== this.user()?.id ? userId : null;
+  });
   protected readonly editing = signal(false);
   protected readonly statusMessage = this.preferences.statusMessage;
 

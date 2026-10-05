@@ -1,77 +1,106 @@
 <header class="page__header">
   <div class="page__title-row">
     <div class="page__heading">
-      <span class="page__kicker">{{ kicker }}</span>
+      <span class="page__kicker">{{ store.kicker() }}</span>
       <h1 class="page__title">Tasks</h1>
     </div>
-    <button appButton type="button" variant="primary" (click)="actions.newTask()">
-      <app-icon name="plus" [size]="16" />
-      New task
-    </button>
+    @if (actions.canCreate()) {
+      <button appButton type="button" variant="primary" (click)="newTask()">
+        <app-icon name="plus" [size]="16" />
+        New task
+      </button>
+    }
   </div>
   <app-tasks-toolbar
-    [(query)]="query"
-    [(assigneeIds)]="assigneeIds"
-    [(priority)]="priority"
-    [people]="people()"
-    [visibleCount]="visibleCount()"
-    [totalCount]="totalCount()"
-    [showCount]="status() === 'ready'"
+    [(query)]="store.query"
+    [(assigneeIds)]="store.assigneeIds"
+    [(sort)]="store.sort"
+    [people]="store.people()"
+    [showPeople]="!breakpoint.isMobile()"
+    [layout]="store.layout()"
+    [filterLabel]="store.filterLabel()"
+    [filtersOpen]="filtersOpen()"
+    [countLabel]="store.status() === 'ready' ? store.countLabel() : ''"
+    (layoutChange)="actions.showLayout($event)"
+    (openFilters)="openFilters($event)"
   />
+  @if (store.chips().length > 0) {
+    <app-tasks-filter-chips
+      [chips]="store.chips()"
+      (remove)="store.removeChip($event)"
+      (clearAll)="store.clearAll()"
+    />
+  }
 </header>
 
-@switch (status()) {
+@switch (store.status()) {
   @case ('loading') {
-    <div class="page__state"><app-skeleton layout="board" label="Loading tasks" /></div>
+    <div class="page__state">
+      <app-skeleton
+        label="Loading tasks"
+        [layout]="store.layout() === 'list' ? 'table' : 'board'"
+      />
+    </div>
   }
   @case ('error') {
     <div class="page__state">
       <app-empty-state
         kind="error"
-        heading="Couldn’t load the board"
+        heading="Couldn’t load tasks"
         message="We couldn’t reach the task service. Your changes weren’t lost."
         actionLabel="Try again"
         (action)="reload()"
       />
     </div>
   }
-  @case ('empty') {
-    <div class="page__state">
-      <app-empty-state
-        icon="square-kanban"
-        heading="No tasks yet"
-        message="Plan the sprint by adding the first task to the board."
-        actionLabel="Create a task"
-        (action)="actions.newTask()"
-      />
-    </div>
-  }
   @default {
-    @if (noMatch()) {
+    @if (isEmpty()) {
       <div class="page__state">
-        <app-empty-state
-          icon="square-kanban"
-          heading="No tasks found"
-          message="Nothing matches these filters. Try removing one."
-          actionLabel="Clear filters"
-          actionIcon="x"
-          (action)="clearFilters()"
+        @if (isFirstRun()) {
+          <app-empty-state
+            icon="square-kanban"
+            heading="No tasks yet"
+            message="Create your first task to start tracking work."
+            [actionLabel]="actions.canCreate() ? 'Create a task' : ''"
+            actionIcon="plus"
+            (action)="newTask()"
+          />
+        } @else {
+          <app-empty-state
+            icon="square-kanban"
+            heading="No tasks match these filters"
+            message="Try removing a filter or searching for something else."
+            actionLabel="Clear all filters"
+            actionIcon="x"
+            (action)="store.clearAll()"
+          />
+        }
+      </div>
+    } @else if (store.layout() === 'list') {
+      <div class="page__list">
+        <app-task-list
+          [rows]="store.rows()"
+          [caption]="store.listCaption()"
+          [compact]="breakpoint.isMobile()"
+          [showTeam]="breakpoint.isDesktop()"
+          (open)="actions.open($event)"
         />
       </div>
     } @else if (breakpoint.isMobile()) {
       <app-task-mobile-board
-        [columns]="columns()"
-        (open)="actions.open($event)"
-        (add)="actions.newTask($event)"
+        [columns]="store.columns()"
+        [canCreate]="actions.canCreate()"
+        (add)="newTask($event)"
       />
     } @else {
       <app-task-board
-        [columns]="columns()"
+        [columns]="store.columns()"
         [selectedId]="task() ?? null"
+        [canCreate]="actions.canCreate()"
         (open)="actions.open($event)"
         (dropped)="actions.move($event.taskId, $event.status, $event.beforeId)"
         (stepped)="actions.moveByStep($event.taskId, $event.step)"
-        (add)="actions.newTask($event)"
+        (add)="newTask($event)"
       />
     }
   }

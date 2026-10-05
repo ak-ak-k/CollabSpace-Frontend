@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { conversationRouteMatcher } from '../messages/conversation-route-matcher';
 
 export const TEAMS_ROUTES: Routes = [
   {
@@ -14,7 +15,7 @@ export const TEAMS_ROUTES: Routes = [
           ),
       },
       {
-        path: ':teamId/c/:channelId',
+        matcher: conversationRouteMatcher([':teamId', 'channels', ':channelId']),
         loadComponent: () =>
           import('./team-channel/team-channel.component').then(
             (module) => module.TeamChannelComponent,

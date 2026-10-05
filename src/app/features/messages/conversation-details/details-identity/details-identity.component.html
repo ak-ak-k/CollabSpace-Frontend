@@ -1,0 +1,58 @@
+@if (view().partner; as partner) {
+  <app-avatar [name]="partner.name" [seed]="partner.seed" [size]="72" [status]="partner.status" />
+  <div class="identity__person">
+    <span class="identity__name">{{ partner.name }}</span>
+    <span class="identity__muted">{{ partner.title }}</span>
+  </div>
+  @if (view().profile; as profile) {
+    <dl class="identity__facts">
+      <dt>Status</dt>
+      <dd class="identity__status">
+        <app-status-dot [status]="partner.status" size="sm" />
+        {{ partner.presence }}
+      </dd>
+      <dt>Local time</dt>
+      <dd>{{ profile.localTime }}</dd>
+      <dt>Email</dt>
+      <dd class="identity__email">
+        <a [href]="mailto()">{{ profile.email }}</a>
+      </dd>
+      <dt>Location</dt>
+      <dd>{{ profile.location }}</dd>
+    </dl>
+  }
+} @else {
+  @if (renaming()) {
+    <form class="identity__rename" (submit)="saveRename($event)">
+      <app-input
+        class="identity__rename-field"
+        label="Group name"
+        hideLabel
+        [maxlength]="nameMaxLength"
+        [(value)]="draftName"
+        (keydown.escape)="cancelRename($event)"
+      />
+      <button appButton type="submit">Save</button>
+    </form>
+  } @else {
+    <div class="identity__title-row">
+      <span class="identity__name">{{ view().title }}</span>
+      @if (canRename()) {
+        <button appButton type="button" variant="ghost" size="sm" (click)="startRename()">
+          <app-icon name="pencil" [size]="14" />
+          Rename
+        </button>
+      }
+    </div>
+  }
+  <p class="identity__about">{{ view().about }}</p>
+  <div class="identity__tags">
+    @if (view().isPrivate) {
+      <app-tag><app-icon name="lock" [size]="12" />Private</app-tag>
+    }
+    <app-tag>{{ view().memberCount | count: 'member' }}</app-tag>
+    @if (view().teamName) {
+      <app-tag>{{ view().teamName }} team</app-tag>
+    }
+  </div>
+}

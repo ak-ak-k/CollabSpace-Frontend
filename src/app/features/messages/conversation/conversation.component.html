@@ -1,5 +1,9 @@
 @if (view(); as conversation) {
-  <section class="conversation" [attr.aria-label]="'Conversation: ' + conversation.title">
+  <section
+    class="conversation"
+    [class.conversation--behind-thread]="threadMode() === 'fullscreen'"
+    [attr.aria-label]="'Conversation: ' + conversation.title"
+  >
     <app-conversation-header
       [view]="conversation"
       [typingText]="thread.typingText()"
@@ -9,14 +13,15 @@
       [detailsOpen]="detailsDocked()"
       [compact]="isMobile()"
       [backLink]="backTarget()"
+      [pinnedCount]="extras().pinned.length"
       (searchToggled)="session.toggleSearch()"
-      (starToggled)="actions.toggleStar(conversationId())"
+      (starToggled)="inbox.toggleFavourite(conversationId())"
       (detailsToggled)="openDetails(true)"
-      (muteToggled)="actions.toggleMute(conversationId())"
-      (markedUnread)="actions.markUnread(conversationId())"
+      (muteToggled)="inbox.toggleMute(conversationId())"
+      (markedUnread)="inbox.markUnread(conversationId())"
       (linkCopied)="actions.copyLink(conversationId())"
       (pinnedRequested)="openDetails(false)"
-      (left)="actions.leave(conversation, backLink())"
+      (left)="leave()"
     />
 
     @if (session.searchOpen()) {
@@ -34,7 +39,8 @@
       [searching]="session.searching()"
       [editingId]="session.editingId()"
       [pointerActions]="!isMobile()"
-      (action)="handle($event)"
+      [canPin]="messages.menuContext().canPin"
+      (action)="messages.handle($event)"
       (retry)="retry()"
     />
 
@@ -42,24 +48,44 @@
       <app-typing-indicator [text]="thread.typingText()" />
     </div>
 
-    <app-message-composer
-      [conversationTitle]="conversation.title"
-      [placeholder]="placeholder()"
-      [archivedWorkspace]="session.archivedWorkspace()"
-      [members]="thread.mentionCandidates()"
-      [replyTo]="session.replyPreview()"
-      [offline]="!network.online()"
-      [enterToSend]="session.enterToSend()"
-      [layout]="isMobile() ? 'mobile' : 'desktop'"
-      [draft]="session.drafts.text(conversationId())"
-      (draftChange)="session.drafts.setText(conversationId(), $event)"
-      [attachments]="session.drafts.attachments(conversationId())"
-      (attachmentsChange)="session.drafts.setAttachments(conversationId(), $event)"
-      (send)="send($event)"
-      (cancelReply)="session.replyTo.set(null)"
-      (editLastRequested)="editLast()"
-    />
+    @if (access().joinBar; as bar) {
+      <app-join-bar [bar]="bar" />
+    } @else {
+      <app-message-composer
+        [conversationTitle]="conversation.title"
+        [placeholder]="placeholder()"
+        [archivedWorkspace]="session.archivedWorkspace()"
+        [mentions]="thread.mentionCandidates()"
+        [replyTo]="session.replyPreview()"
+        [offline]="!network.online()"
+        [enterToSend]="session.enterToSend()"
+        [layout]="isMobile() ? 'mobile' : 'desktop'"
+        [draft]="session.drafts.text(conversationId())"
+        (draftChange)="session.drafts.setText(conversationId(), $event)"
+        [attachments]="session.drafts.attachments(conversationId())"
+        (attachmentsChange)="session.drafts.setAttachments(conversationId(), $event)"
+        (send)="send($event)"
+        (cancelReply)="session.replyTo.set(null)"
+        (editLastRequested)="editLast()"
+      />
+    }
   </section>
+
+  @if (rootId(); as root) {
+    @if (threadMode() === 'overlay') {
+      <div class="conversation__scrim" aria-hidden="true" (click)="closeThread()"></div>
+    }
+    <app-thread-panel
+      [conversationId]="conversationId()"
+      [rootId]="root"
+      [view]="conversation"
+      [drafts]="session.drafts"
+      [joinBar]="access().joinBar"
+      [status]="status()"
+      [mode]="threadMode() ?? 'docked'"
+      (retry)="retry()"
+    />
+  }
 
   @if (detailsDocked()) {
     <aside class="conversation__details" aria-label="Details">
@@ -68,8 +94,8 @@
         [view]="conversation"
         [extras]="extras()"
         (closed)="session.dockedDetailsOpen.set(false)"
+        [access]="access()"
         (jump)="jumpTo($event)"
-        (addPeople)="addPeople()"
       />
     </aside>
   }

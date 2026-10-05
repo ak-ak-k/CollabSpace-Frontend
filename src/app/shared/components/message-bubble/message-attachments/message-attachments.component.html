@@ -1,15 +1,26 @@
 @for (attachment of attachments(); track $index) {
   @if (attachment.kind === 'image') {
     <figure class="attachment-image">
-      <div
-        class="attachment-image__placeholder"
-        role="img"
-        [attr.aria-label]="'Image: ' + attachment.name"
+      <button
+        type="button"
+        class="attachment-image__open"
+        [attr.aria-label]="'Open image ' + attachment.name"
+        (click)="opened.emit(attachment)"
       >
-        <app-icon name="image" [size]="imageIconSize" />
-      </div>
+        @if (attachment.src) {
+          <img class="attachment-image__picture" [src]="attachment.src" alt="" />
+        } @else {
+          <app-icon name="image" [size]="imageIconSize" />
+        }
+      </button>
       <figcaption class="attachment-image__caption">
-        <span class="truncate">{{ attachment.name }}</span>
+        @if (attachment.fileId; as fileId) {
+          <a class="attachment__link" routerLink="/files/recent" [queryParams]="{ file: fileId }">
+            <span class="truncate">{{ attachment.name }}</span>
+          </a>
+        } @else {
+          <span class="truncate">{{ attachment.name }}</span>
+        }
         <span class="attachment-image__meta">{{ attachment.dimensions || attachment.size }}</span>
       </figcaption>
     </figure>
@@ -19,11 +30,22 @@
         <app-icon [name]="attachment.icon" [size]="fileIconSize" />
       </span>
       <span class="attachment-file__details">
-        <span class="attachment-file__name truncate">{{ attachment.name }}</span>
+        @if (attachment.fileId; as fileId) {
+          <a
+            class="attachment-file__name attachment__link"
+            routerLink="/files/recent"
+            [queryParams]="{ file: fileId }"
+          >
+            <span class="truncate">{{ attachment.name }}</span>
+          </a>
+        } @else {
+          <span class="attachment-file__name truncate">{{ attachment.name }}</span>
+        }
         <span class="attachment-file__meta">{{ attachment.label }} · {{ attachment.size }}</span>
       </span>
       <button
         appIconButton
+        type="button"
         [label]="'Download ' + attachment.name"
         (click)="download.emit(attachment.name)"
       >

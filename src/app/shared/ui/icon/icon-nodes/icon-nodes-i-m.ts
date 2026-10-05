@@ -27,6 +27,11 @@ export const ICON_NODES_I_TO_M = {
     ['path', { d: 'M12 16v-4' }],
     ['path', { d: 'M12 8h.01' }],
   ],
+  italic: [
+    ['line', { 'x1': '19', 'x2': '10', 'y1': '4', 'y2': '4' }],
+    ['line', { 'x1': '14', 'x2': '5', 'y1': '20', 'y2': '20' }],
+    ['line', { 'x1': '15', 'x2': '9', 'y1': '4', 'y2': '20' }],
+  ],
   'key-round': [
     [
       'path',
@@ -160,6 +165,7 @@ export const ICON_NODES_I_TO_M = {
     ['path', { d: 'M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z' }],
     ['path', { d: 'M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1' }],
   ],
+  minus: [['path', { d: 'M5 12h14' }]],
   monitor: [
     ['rect', { width: '20', height: '14', x: '2', y: '3', rx: '2' }],
     ['line', { x1: '8', x2: '16', y1: '21', y2: '21' }],

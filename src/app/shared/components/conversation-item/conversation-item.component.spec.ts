@@ -11,6 +11,8 @@ const PREVIEW: ConversationPreview = {
   avatarSeed: 1,
   avatarStatus: 'online',
   memberCount: 2,
+  teamName: '',
+  route: '/messages/dm-u1',
   preview: '@Aarav are we still shipping 2.4 on Thursday?',
   lastMessageAt: Date.now(),
   unreadCount: 1,
@@ -38,6 +40,23 @@ describe('ConversationItemComponent', () => {
     expect(link?.getAttribute('href')).toBe('/messages/dm-u1');
     expect(link?.getAttribute('aria-label')).toContain('Rahul Mehta, 1 unread, last message:');
     expect(host.classList.contains('conversation-item--unread')).toBe(true);
+  });
+
+  it('links a channel to its team route and names the team and favourite', async () => {
+    const host = await render({
+      ...PREVIEW,
+      id: 'c-frontend',
+      type: 'channel',
+      title: '#frontend',
+      teamName: 'Frontend',
+      route: '/teams/t-frontend/channels/c-frontend',
+      starred: true,
+    });
+    const link = host.querySelector('a');
+
+    expect(link?.getAttribute('href')).toBe('/teams/t-frontend/channels/c-frontend');
+    expect(link?.getAttribute('aria-label')).toContain('#frontend, Frontend team, favourite');
+    expect(host.querySelector('.conversation-item__team')?.textContent?.trim()).toBe('Frontend');
   });
 
   it('shows the typing text instead of the preview', async () => {

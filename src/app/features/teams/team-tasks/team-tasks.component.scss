@@ -1,0 +1,65 @@
+:host {
+  display: block;
+}
+
+.tasks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tasks__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tasks__heading {
+  flex: 1;
+  margin: var(--space-0);
+  font-size: var(--font-size-20);
+}
+
+.tasks__list {
+  border-top: var(--rule-strong);
+}
+
+.task {
+  border-bottom: var(--rule-hairline);
+}
+
+.task__link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  min-height: var(--team-task-row-min-height);
+  padding: var(--space-2) var(--space-1);
+  color: var(--text-primary);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--hover);
+  }
+}
+
+.task__id {
+  color: var(--text-muted);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-heavy);
+  white-space: nowrap;
+}
+
+.task__title {
+  flex: 1 1 var(--team-task-title-basis);
+  min-width: 0;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+}
+
+.task__assignee {
+  color: var(--text-muted);
+  font-size: var(--font-size-12);
+  white-space: nowrap;
+}

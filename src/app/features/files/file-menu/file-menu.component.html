@@ -1,32 +1,24 @@
 <button
   appIconButton
   type="button"
-  [size]="size()"
-  [label]="'More actions for ' + file().name"
+  [label]="file().menuLabel"
   [cdkMenuTriggerFor]="menu"
   [cdkMenuPosition]="positions"
 >
-  <app-icon name="ellipsis-vertical" [size]="iconSize()" />
+  <app-icon name="ellipsis" [size]="16" />
 </button>
 
 <ng-template #menu>
-  <div [appDropdownPanel]="'Actions for ' + file().name">
-    <app-dropdown [label]="'Actions for ' + file().name">
-      @if (includeDownload()) {
-        <button appDropdownItem (triggered)="action.emit('download')">
-          <app-icon name="download" [size]="18" />
-          Download
-        </button>
-      }
-      <button appDropdownItem (triggered)="action.emit('share')">
-        <app-icon name="share-2" [size]="18" />
-        Share
-      </button>
-      @if (file().mine) {
-        <app-dropdown-divider />
-        <button appDropdownItem (triggered)="action.emit('remove')">
-          <app-icon name="trash-2" [size]="18" />
-          Delete
+  <div [appDropdownPanel]="menuLabel()">
+    <app-dropdown [label]="menuLabel()">
+      @for (item of items(); track item.kind) {
+        <button
+          appDropdownItem
+          [tone]="item.danger ? 'danger' : 'default'"
+          (triggered)="action.emit(item.kind)"
+        >
+          <app-icon [name]="item.icon" [size]="16" />
+          {{ item.label }}
         </button>
       }
     </app-dropdown>

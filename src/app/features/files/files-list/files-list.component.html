@@ -1,33 +1,30 @@
 <ul class="list">
   @for (file of files(); track file.id) {
     <li class="list__row">
-      <app-file-tile size="md" [type]="file.type" />
-      <span class="list__text">
-        <span class="list__name truncate">{{ file.name }}</span>
-        <span class="list__meta truncate">{{ file.listMeta }}</span>
-      </span>
-      <span class="list__actions">
-        <button
-          appIconButton
-          type="button"
-          size="lg"
-          [label]="file.starLabel"
-          [pressed]="file.starred"
-          (click)="run('star', file)"
-        >
-          <app-icon name="star" [size]="18" [filled]="file.starred" />
-        </button>
-        <button
-          appIconButton
-          type="button"
-          size="lg"
-          [label]="'Download ' + file.name"
-          (click)="run('download', file)"
-        >
-          <app-icon name="download" [size]="18" />
-        </button>
-        <app-file-menu size="lg" [iconSize]="18" [file]="file" (action)="run($event, file)" />
-      </span>
+      <button
+        type="button"
+        class="list__open"
+        [attr.aria-label]="file.openLabel"
+        (click)="run('preview', file)"
+      >
+        <app-file-tile size="md" [type]="file.type" />
+        <span class="list__text">
+          <span class="list__name truncate">{{ file.name }}</span>
+          <span class="list__meta truncate">{{ file.listMeta }}</span>
+          <span class="list__meta truncate">{{ file.source.label }}</span>
+        </span>
+      </button>
+      <button
+        appIconButton
+        type="button"
+        size="lg"
+        aria-haspopup="menu"
+        [label]="file.menuLabel"
+        [attr.aria-expanded]="sheetFileId() === file.id"
+        (click)="openSheet(file)"
+      >
+        <app-icon name="ellipsis-vertical" [size]="20" />
+      </button>
     </li>
   }
 </ul>

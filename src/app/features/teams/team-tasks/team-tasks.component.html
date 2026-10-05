@@ -1,0 +1,47 @@
+<section class="tasks" [attr.aria-labelledby]="headingId">
+  <div class="tasks__header">
+    <h2 class="tasks__heading" [id]="headingId">Open tasks · {{ tasks().length }}</h2>
+    <a appButton [routerLink]="tasksRoute" [queryParams]="boardQuery()">
+      <app-icon name="square-kanban" [size]="16" />
+      Open Tasks board
+    </a>
+  </div>
+
+  @switch (status()) {
+    @case ('loading') {
+      <app-skeleton layout="list" [rows]="4" compact label="Loading tasks" />
+    }
+    @case ('error') {
+      <app-empty-state
+        kind="error"
+        compact
+        heading="Couldn’t load tasks"
+        actionLabel="Try again"
+        (action)="retry.emit()"
+      />
+    }
+    @default {
+      @if (tasks().length === 0) {
+        <app-empty-state
+          compact
+          icon="square-kanban"
+          heading="No open tasks"
+          message="Tasks for this team will show up here."
+        />
+      } @else {
+        <ul class="tasks__list">
+          @for (task of tasks(); track task.id) {
+            <li class="task">
+              <a class="task__link" [routerLink]="tasksRoute" [queryParams]="{ task: task.id }">
+                <span class="task__id">{{ task.id }}</span>
+                <span class="task__title">{{ task.title }}</span>
+                <app-tag>{{ task.statusLabel }}</app-tag>
+                <span class="task__assignee">{{ task.assigneeLabel }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    }
+  }
+</section>

@@ -1,0 +1,41 @@
+@if (!showsPerson()) {
+  <h1 class="visually-hidden">Profile</h1>
+}
+
+@switch (status()) {
+  @case ('loading') {
+    <app-skeleton layout="detail" label="Loading profile" />
+  }
+  @case ('error') {
+    <app-empty-state
+      kind="error"
+      heading="Couldn’t load this profile"
+      actionLabel="Try again"
+      (action)="reload()"
+    />
+  }
+  @default {
+    @if (person(); as person) {
+      <app-profile-header [user]="person" [self]="false" (message)="message()" />
+      <div class="person__grid">
+        <app-profile-about [bio]="person.bio ?? ''" />
+        <app-profile-details [details]="details()" />
+        <section class="person__section" aria-labelledby="person-activity-heading">
+          <h2 class="person__heading" id="person-activity-heading">Recent activity</h2>
+          <app-person-activity-list [userId]="person.id" />
+        </section>
+      </div>
+      <app-profile-teams [teams]="teams()" />
+    } @else {
+      <app-empty-state
+        icon="contact"
+        heading="Person not found"
+        message="They may have left the workspace, or the link is wrong."
+        actionLabel="Go to People"
+        actionIcon="arrow-left"
+        [headingLevel]="2"
+        (action)="goToPeople()"
+      />
+    }
+  }
+}

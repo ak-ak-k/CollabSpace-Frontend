@@ -18,8 +18,9 @@
         <app-breadcrumb [items]="breadcrumb()" />
         <app-team-header
           [team]="team"
-          (invite)="actions.invite(team.id)"
-          (manage)="actions.manage(team.id)"
+          [canManage]="detail.canManage()"
+          (addMembers)="actions.addMembers(team.id)"
+          (openSettings)="actions.openSettings(team.id)"
           (join)="actions.join(team)"
           (leave)="actions.leave(team)"
         />
@@ -28,9 +29,12 @@
         @switch (activeTab()) {
           @case ('members') {
             <app-team-members
+              [teamId]="team.id"
               [members]="detail.members()"
               [compact]="breakpoint.isMobile()"
-              (invite)="actions.invite(team.id)"
+              [canInvite]="canInvite()"
+              (addMembers)="actions.addMembers(team.id)"
+              (inviteByEmail)="actions.inviteByEmail(team.id)"
               (message)="actions.message($event)"
             />
           }
@@ -40,8 +44,17 @@
               (createChannel)="actions.createChannel(team.id)"
             />
           }
+          @case ('tasks') {
+            <app-team-tasks
+              [teamId]="team.id"
+              [tasks]="detail.tasks()"
+              [status]="taskState.status()"
+              (retry)="taskState.reload()"
+            />
+          }
           @case ('files') {
             <app-team-files
+              [teamId]="team.id"
               [files]="detail.files()"
               [status]="fileState.status()"
               (download)="actions.download($event)"

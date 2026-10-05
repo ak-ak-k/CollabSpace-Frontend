@@ -1,7 +1,8 @@
 @mixin when-row-active {
   :host(.message--pointer:hover) &,
   :host(.message--pointer:focus-visible) &,
-  :host(.message--pointer:has(:focus-visible)) & {
+  :host(.message--pointer:has(:focus-visible)) &,
+  :host(.message--active) & {
     @content;
   }
 }
@@ -20,10 +21,20 @@
   padding: var(--message-row-padding-continuation);
 }
 
+:host(.message--mention) {
+  background: var(--message-mention-background);
+}
+
 :host(.message--pointer:hover:not(.message--editing)),
 :host(.message--pointer:focus-visible:not(.message--editing)),
-:host(.message--pointer:has(:focus-visible):not(.message--editing)) {
+:host(.message--pointer:has(:focus-visible):not(.message--editing)),
+:host(.message--active:not(.message--editing)) {
   background: var(--hover);
+}
+
+:host(.message--flash) {
+  background: var(--message-flash-background);
+  box-shadow: var(--message-flash-marker);
 }
 
 .message__aside {
@@ -65,7 +76,13 @@
   color: var(--text-secondary);
 }
 
-.message__pinned {
+.message__flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.message__flag {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
@@ -92,47 +109,6 @@
   color: var(--text-primary);
 }
 
-.message__body {
-  margin: var(--space-0);
-  font-size: var(--font-size-15);
-  line-height: var(--line-height-message);
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.message__highlight {
-  padding: var(--space-0) var(--message-highlight-padding-inline);
-  background: var(--surface-secondary);
-  color: var(--text-primary);
-  font-weight: var(--font-weight-heavy);
-}
-
-.message__edited {
-  font-size: var(--font-size-12);
-  color: var(--text-secondary);
-}
-
-.message__status-inline {
-  display: inline-flex;
-  margin-left: var(--space-1-5);
-  vertical-align: var(--message-status-icon-shift);
-  color: var(--text-secondary);
-}
-
-.message__status-line {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  margin-top: var(--space-1);
-  font-size: var(--font-size-12);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-secondary);
-}
-
-.message__status--read {
-  color: var(--delivery-read);
-}
-
 .message__attachments,
 .message__reactions {
   margin-top: var(--space-1-5);
@@ -144,4 +120,16 @@
   @include when-row-active {
     visibility: visible;
   }
+}
+
+.message__picker {
+  position: absolute;
+  top: var(--message-picker-offset);
+  right: var(--space-3);
+  z-index: var(--z-message-picker);
+}
+
+.message__picker--up {
+  top: auto;
+  bottom: var(--message-picker-offset-up);
 }

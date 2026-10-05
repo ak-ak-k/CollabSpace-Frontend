@@ -31,7 +31,7 @@
                     class="sidebar__channel"
                     [class.sidebar__row--current]="channel.current"
                     [class.sidebar__channel--active]="channel.current || channel.unreadCount > 0"
-                    [routerLink]="['/teams', team.id, 'c', channel.id]"
+                    [routerLink]="['/teams', team.id, 'channels', channel.id]"
                     [attr.aria-current]="channel.current ? 'page' : null"
                   >
                     <app-icon [name]="channel.icon" [size]="14" />

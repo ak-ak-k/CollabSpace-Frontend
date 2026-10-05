@@ -1,29 +1,35 @@
-import { Task, TaskComment } from '../models/task';
-import { minutesAgo } from './mock-clock';
+import { TaskComment } from '../models/task';
+import { MINUTES_PER_DAY, minutesAgo } from './mock-clock';
+import { TASK_SEEDS, TaskSeed } from './task-seeds.mock';
 
 const COMMENT_POOL: readonly string[] = [
   'Picked this up — first pass should be up for review tomorrow.',
   'Left notes on the edge cases in the PR.',
   'Can we split the API change into its own task?',
   'Looks good from design. One spacing nit on mobile.',
+  '@Aarav does this need to ship in 2.4?',
 ];
 
-const FALLBACK_COMMENTER_IDS: readonly string[] = ['u4', 'u7'];
-const MAX_SEEDED_COMMENTS = 2;
-const COMMENT_AGES_IN_MINUTES: readonly number[] = [24 * 60, 5 * 60];
+const FALLBACK_COMMENTER_IDS: readonly string[] = ['u4', 'u7', 'u2'];
+const MAX_SEEDED_COMMENTS = 3;
+const MINUTES_BETWEEN_COMMENTS = 40;
 
-const taskNumberOf = (task: Task): number => Number.parseInt(task.id.split('-')[1] ?? '0', 10) || 0;
-
-export const seedTaskComments = (task: Task): TaskComment[] => {
-  const commenters = [...new Set([task.assigneeId, ...FALLBACK_COMMENTER_IDS])].filter(
+const commentersOf = (taskSeed: TaskSeed): string[] =>
+  [...new Set([taskSeed.assigneeId, ...FALLBACK_COMMENTER_IDS])].filter(
     (id): id is string => id !== null,
   );
-  const count = Math.min(task.commentCount, MAX_SEEDED_COMMENTS);
+
+const commentsOf = (taskSeed: TaskSeed, taskIndex: number): TaskComment[] => {
+  const count = Math.min(taskSeed.commentCount, MAX_SEEDED_COMMENTS);
+  const commenters = commentersOf(taskSeed);
   return Array.from({ length: count }, (_, index) => ({
-    id: `${task.id}-seed-${index}`,
-    taskId: task.id,
+    id: `${taskSeed.id}-c${index}`,
+    taskId: taskSeed.id,
     authorId: commenters[index % commenters.length],
-    text: COMMENT_POOL[(taskNumberOf(task) + index) % COMMENT_POOL.length],
-    createdAt: minutesAgo(COMMENT_AGES_IN_MINUTES[index]),
+    text: COMMENT_POOL[(taskIndex + index) % COMMENT_POOL.length],
+    createdAt: minutesAgo(MINUTES_PER_DAY * (count - index) + MINUTES_BETWEEN_COMMENTS * index),
+    edited: false,
   }));
 };
+
+export const MOCK_TASK_COMMENTS: readonly TaskComment[] = TASK_SEEDS.flatMap(commentsOf);

@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, DestroyRef, DOCUMENT, inject, Injectable, signal } from '@angular/core';
 import { MessageView, ReplyPreview } from '../../../core/models/thread';
 import { PreferencesState } from '../../../core/state/preferences.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
@@ -13,6 +13,7 @@ export class ConversationSessionState {
   readonly dockedDetailsOpen = signal(false);
   readonly drafts = new ComposerDrafts();
   private readonly workspace = inject(WorkspaceState);
+  private readonly urls = inject(DOCUMENT).defaultView?.URL;
 
   readonly enterToSend = inject(PreferencesState).enterToSend;
   readonly archivedWorkspace = computed(() =>
@@ -25,6 +26,10 @@ export class ConversationSessionState {
     const message = this.replyTo();
     return message ? { authorFirstName: message.authorFirstName, text: message.text } : null;
   });
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.releasePreviews());
+  }
 
   toggleSearch(): void {
     this.query.set('');
@@ -44,5 +49,13 @@ export class ConversationSessionState {
     this.closeSearch();
     this.editingId.set(null);
     this.replyTo.set(null);
+  }
+
+  private releasePreviews(): void {
+    for (const attachment of this.drafts.pendingAttachments()) {
+      if (attachment.src) {
+        this.urls?.revokeObjectURL(attachment.src);
+      }
+    }
   }
 }

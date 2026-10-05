@@ -1,0 +1,48 @@
+@use 'touch';
+
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-0-5);
+  padding: var(--space-1);
+  border: var(--rule-hairline);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+:host(.reaction-picker--full) {
+  width: var(--reaction-picker-full-width);
+  max-width: var(--reaction-picker-max-width);
+}
+
+.reaction-picker__item {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--size-message-picker-button);
+  height: var(--size-message-picker-button);
+  padding: var(--space-0);
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: var(--message-picker-emoji-size);
+  line-height: var(--line-height-flat);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover);
+  }
+
+  &:active {
+    background: var(--press);
+  }
+
+  &:focus-visible {
+    outline-offset: calc(var(--border-width-rule) * -1);
+  }
+
+  @include touch.on-touch {
+    width: var(--size-touch-target);
+    height: var(--size-touch-target);
+  }
+}

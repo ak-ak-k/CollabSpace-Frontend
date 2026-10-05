@@ -1,0 +1,106 @@
+<header class="panel__bar">
+  <span class="panel__kicker">Profile</span>
+  <button appIconButton type="button" size="lg" label="Close profile" (click)="close()">
+    <app-icon name="x" [size]="18" />
+  </button>
+</header>
+
+@if (person(); as person) {
+  <div class="panel__body">
+    <div class="panel__identity">
+      <app-avatar
+        class="panel__avatar"
+        [name]="person.name"
+        [seed]="person.seed"
+        [size]="72"
+        [status]="person.status"
+      />
+      <div class="panel__names">
+        <h2 class="panel__name" [id]="titleId">{{ person.label }}</h2>
+        <p class="panel__title">{{ person.title }} · {{ person.department }}</p>
+      </div>
+      <div class="panel__tags">
+        <app-tag>
+          <app-status-dot [status]="person.status" size="sm" />
+          {{ person.statusLine }}
+        </app-tag>
+        @if (person.showRole) {
+          <app-tag tone="outline">{{ person.roleLabel }}</app-tag>
+        }
+      </div>
+    </div>
+
+    @if (person.bio) {
+      <section class="panel__section" [attr.aria-labelledby]="aboutId">
+        <h3 class="panel__heading" [id]="aboutId">About</h3>
+        <p class="panel__bio">{{ person.bio }}</p>
+      </section>
+    }
+
+    <dl class="panel__facts">
+      <dt>Email</dt>
+      <dd class="panel__email">
+        <a class="panel__email-link" [href]="'mailto:' + person.email">{{ person.email }}</a>
+        <button
+          appIconButton
+          type="button"
+          [label]="'Copy ' + person.email"
+          (click)="copyEmail(person.email)"
+        >
+          <app-icon name="copy" [size]="15" />
+        </button>
+      </dd>
+      <dt>Local time</dt>
+      <dd>{{ person.localTime }} · {{ person.timeZoneLabel }}</dd>
+      <dt>Location</dt>
+      <dd>{{ person.location }}</dd>
+      <dt>Member since</dt>
+      <dd>{{ person.memberSince }}</dd>
+    </dl>
+
+    <section [attr.aria-labelledby]="teamsId">
+      <h3 class="panel__heading" [id]="teamsId">Teams · {{ teams().length }}</h3>
+      @if (teams().length > 0) {
+        <ul class="panel__teams">
+          @for (team of teams(); track team.id) {
+            <li class="panel__team">
+              <a class="panel__team-link" [routerLink]="['/teams', team.id]" (click)="close()">
+                <app-avatar variant="inverted" [name]="team.name" [text]="team.code" [size]="28" />
+                <span class="panel__team-name truncate">{{ team.name }}</span>
+                <span class="panel__team-role">{{ team.roleLabel }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="panel__empty">Not in any teams yet.</p>
+      }
+    </section>
+
+    <section [attr.aria-labelledby]="activityId">
+      <h3 class="panel__heading" [id]="activityId">Recent activity</h3>
+      <app-person-activity-list clampSnippets [userId]="person.id" (navigate)="close()" />
+    </section>
+  </div>
+
+  <footer class="panel__footer">
+    @if (!person.isMe) {
+      <button appButton type="button" variant="inverted" size="lg" (click)="close('message')">
+        <app-icon name="message-square" [size]="16" />
+        Message {{ person.firstName }}
+      </button>
+    }
+    <a appButton size="lg" [routerLink]="person.profileRoute" (click)="close()">
+      <app-icon name="user" [size]="16" />
+      View full profile
+    </a>
+    @if (canChangeRole) {
+      <button appButton type="button" size="lg" (click)="close('role')">
+        <app-icon name="user-cog" [size]="16" />
+        Change role
+      </button>
+    }
+  </footer>
+} @else {
+  <p class="panel__missing" [id]="titleId">This person is no longer in the workspace.</p>
+}

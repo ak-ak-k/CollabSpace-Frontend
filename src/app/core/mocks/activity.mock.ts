@@ -20,7 +20,7 @@ export const MOCK_ACTIVITY: readonly ActivityEvent[] = [
     occurredAt: minutesAgo(45),
     teamId: 't-frontend',
     kind: 'pin',
-    route: '/teams/t-frontend/c/c-releases',
+    route: '/teams/t-frontend/channels/c-releases',
   },
   {
     id: 'a3',
@@ -70,7 +70,7 @@ export const MOCK_ACTIVITY: readonly ActivityEvent[] = [
     occurredAt: minutesAgo(4320),
     teamId: 't-frontend',
     kind: 'pin',
-    route: '/teams/t-frontend/c/c-design-system',
+    route: '/teams/t-frontend/channels/c-design-system',
   },
   {
     id: 'a8',
@@ -100,6 +100,6 @@ export const MOCK_ACTIVITY: readonly ActivityEvent[] = [
     occurredAt: minutesAgo(1640),
     teamId: 't-platform',
     kind: 'hash',
-    route: '/teams/t-platform/c/c-api',
+    route: '/teams/t-platform/channels/c-api',
   },
 ];

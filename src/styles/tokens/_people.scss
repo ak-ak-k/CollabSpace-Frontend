@@ -1,0 +1,26 @@
+@mixin people-tokens {
+  --status-shape-away-angle: 135deg;
+  --status-shape-away-split: 55%;
+  --status-shape-bar-start: 36%;
+  --status-shape-bar-end: 64%;
+  --status-shape-hole-size: 46%;
+
+  --people-page-max-width: 1320px;
+  --people-page-padding: clamp(var(--space-4), 3vw, var(--space-10));
+  --people-heading-basis: 280px;
+  --people-search-basis: 360px;
+  --people-search-max-width: 480px;
+  --people-card-min-width: 264px;
+  --people-organisation-basis: 220px;
+  --people-name-min-height: 24px;
+  --people-chip-dot-size: 10px;
+  --people-pill-height: 32px;
+
+  --person-panel-width: min(420px, 100vw);
+  --person-panel-bar-height: 60px;
+  --person-panel-avatar-size: 80px;
+  --person-panel-status-size: 18px;
+  --person-panel-status-offset: -5px;
+  --person-activity-icon-column: 20px;
+  --person-activity-snippet-lines: 2;
+}

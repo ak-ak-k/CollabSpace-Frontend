@@ -1,15 +1,16 @@
 import { formatWhen } from '../../shared/pipes/time-format';
 import { presenceLabelOf } from '../../shared/pipes/presence-label';
-import { MOCK_CHANNELS } from '../mocks/channels.mock';
-import { MOCK_CONVERSATIONS } from '../mocks/conversations.mock';
-import { MOCK_TEAMS } from '../mocks/teams.mock';
-import { CURRENT_USER_ID, MOCK_USERS } from '../mocks/users.mock';
+import { CURRENT_USER_ID } from '../mocks/users.mock';
 import { Channel } from '../models/channel';
+import { Conversation, conversationRoute, messageRoute, threadRoute } from '../models/conversation';
 import { FILE_TYPE_ICONS, FILE_TYPE_LABELS, FileItem } from '../models/file-item';
+import { sourceLabelOf } from '../models/file-source';
 import { Message } from '../models/message';
 import { Task, TASK_PRIORITY_LABELS, TASK_STATUS_LABELS } from '../models/task';
 import { Team } from '../models/team';
 import { firstNameOf, User, userColorSeed } from '../models/user';
+import { channelConversation } from './chat-store';
+import { conversationOf, FILE_LOOKUP, teamOf, userNameOf } from './search-context';
 import type { SearchHighlight, SearchResult } from './search.data';
 
 const SNIPPET_LEAD_LENGTH = 36;
@@ -18,11 +19,9 @@ const SEPARATOR = ' · ';
 const ELLIPSIS = '…';
 const TASK_TITLE_GAP = '  ';
 const OWN_FILE_OWNER = 'You';
-
-const usersById = new Map(MOCK_USERS.map((user) => [user.id, user]));
-const teamsById = new Map(MOCK_TEAMS.map((team) => [team.id, team]));
-
-const nameOf = (userId: string | null): string => usersById.get(userId ?? '')?.name ?? '';
+const THREAD_NOTE = 'in a thread';
+const FILE_PREVIEW_PATH = '/files/recent';
+const PROFILE_PATH = '/profile';
 
 const joined = (parts: readonly string[]): string => parts.filter(Boolean).join(SEPARATOR);
 
@@ -35,16 +34,24 @@ export const highlight = (text: string, needle: string): SearchHighlight => {
   return { before: text.slice(0, start), match: text.slice(start, end), after: text.slice(end) };
 };
 
-const channelPath = (channel: Channel): string => `/teams/${channel.teamId}/c/${channel.id}`;
-
-const placeOf = (conversationId: string): { title: string; path: string } => {
-  const channel = MOCK_CHANNELS.find((candidate) => candidate.id === conversationId);
-  if (channel) {
-    return { title: `#${channel.name}`, path: channelPath(channel) };
+const conversationTitleOf = (conversation: Conversation | null): string => {
+  switch (conversation?.type) {
+    case 'channel':
+      return `#${conversation.name}`;
+    case 'dm':
+      return userNameOf(conversation.userId);
+    default:
+      return conversation?.name ?? '';
   }
-  const conversation = MOCK_CONVERSATIONS.find((candidate) => candidate.id === conversationId);
-  const title = conversation?.type === 'dm' ? nameOf(conversation.userId) : conversation?.name;
-  return { title: title ?? '', path: `/messages/${conversationId}` };
+};
+
+const messagePathOf = (conversation: Conversation | null, message: Message): string => {
+  if (!conversation) {
+    return `/messages/${message.conversationId}`;
+  }
+  return message.threadRootId
+    ? threadRoute(conversation, message.threadRootId)
+    : messageRoute(conversation, message.id);
 };
 
 const snippetOf = (text: string, needle: string): string => {
@@ -61,20 +68,24 @@ export const toPerson = (user: User, needle: string): SearchResult => ({
   colorSeed: userColorSeed(user.id),
   status: user.status,
   title: highlight(user.name, needle),
-  subtitle: joined([user.title, presenceLabelOf(user)]),
-  target: { path: `/messages/dm-${user.id}` },
+  subtitle: joined([user.title, user.department, presenceLabelOf(user)]),
+  target: { path: `${PROFILE_PATH}/${user.id}` },
 });
 
 export const toMessage = (message: Message, needle: string): SearchResult => {
-  const place = placeOf(message.conversationId);
-  const author = firstNameOf(nameOf(message.authorId));
+  const conversation = conversationOf(message.conversationId);
+  const author = firstNameOf(userNameOf(message.authorId));
   return {
     kind: 'message',
     id: message.id,
     icon: 'message-square',
     title: highlight(snippetOf(message.text, needle), needle),
-    subtitle: joined([`${author} in ${place.title}`, formatWhen(message.sentAt)]),
-    target: { path: place.path },
+    subtitle: joined([
+      `${author} in ${conversationTitleOf(conversation)}`,
+      message.threadRootId ? THREAD_NOTE : '',
+      formatWhen(message.sentAt),
+    ]),
+    target: { path: messagePathOf(conversation, message) },
   };
 };
 
@@ -83,8 +94,8 @@ export const toChannel = (channel: Channel, needle: string): SearchResult => ({
   id: channel.id,
   icon: channel.isPrivate ? 'lock' : 'hash',
   title: highlight(channel.name, needle),
-  subtitle: joined([teamsById.get(channel.teamId)?.name ?? '', channel.description]),
-  target: { path: channelPath(channel) },
+  subtitle: joined([teamOf(channel.teamId)?.name ?? '', channel.description]),
+  target: { path: conversationRoute(channelConversation(channel)) },
 });
 
 export const toTeam = (team: Team, needle: string): SearchResult => ({
@@ -105,10 +116,14 @@ export const toTask = (task: Task, needle: string): SearchResult => ({
   subtitle: joined([
     TASK_STATUS_LABELS[task.status],
     `${TASK_PRIORITY_LABELS[task.priority]} priority`,
-    nameOf(task.assigneeId),
+    userNameOf(task.assigneeId),
+    teamOf(task.teamId)?.name ?? '',
   ]),
   target: { path: '/tasks', queryParams: { task: task.id } },
 });
+
+export const fileOwnerOf = (file: FileItem): string =>
+  file.ownerId === CURRENT_USER_ID ? OWN_FILE_OWNER : userNameOf(file.ownerId);
 
 export const toFile = (file: FileItem, needle: string): SearchResult => ({
   kind: 'file',
@@ -117,9 +132,8 @@ export const toFile = (file: FileItem, needle: string): SearchResult => ({
   title: highlight(file.name, needle),
   subtitle: joined([
     FILE_TYPE_LABELS[file.type],
-    file.sizeLabel,
-    file.ownerId === CURRENT_USER_ID ? OWN_FILE_OWNER : nameOf(file.ownerId),
-    formatWhen(file.modifiedAt),
+    fileOwnerOf(file),
+    sourceLabelOf(file, FILE_LOOKUP),
   ]),
-  target: { path: '/files' },
+  target: { path: FILE_PREVIEW_PATH, queryParams: { file: file.id } },
 });

@@ -1,0 +1,45 @@
+@let current = comment();
+
+<app-avatar [name]="authorName()" [seed]="seed()" [size]="28" />
+<div class="comment__body">
+  <div class="comment__meta">
+    <strong class="comment__author">{{ authorName() }}</strong>
+    <span class="comment__muted">{{ when() }}</span>
+    @if (current.edited) {
+      <span class="comment__muted">(edited)</span>
+    }
+    <span class="comment__spacer"></span>
+    @if (mine() && !editing()) {
+      <button #editButton appButton type="button" variant="ghost" size="sm" (click)="startEdit()">
+        Edit
+      </button>
+      <button
+        appButton
+        type="button"
+        variant="ghost"
+        size="sm"
+        class="comment__delete"
+        (click)="remove()"
+      >
+        Delete
+      </button>
+    }
+  </div>
+  @if (editing()) {
+    <form class="comment__edit" (submit)="save($event)" (keydown.escape)="cancelEdit($event)">
+      <app-textarea label="Edit comment" hideLabel [rows]="3" [(value)]="draft" />
+      <div class="comment__actions">
+        <button appButton type="submit" size="sm" [disabled]="!draft().trim()">Save</button>
+        <button appButton type="button" variant="ghost" size="sm" (click)="cancelEdit()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  } @else {
+    <p class="comment__text">
+      @for (segment of segments(); track $index) {
+        <span [class.comment__mention]="segment.mention">{{ segment.text }}</span>
+      }
+    </p>
+  }
+</div>

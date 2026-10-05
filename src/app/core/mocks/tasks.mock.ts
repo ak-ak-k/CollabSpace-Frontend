@@ -1,203 +1,78 @@
-import { Task } from '../models/task';
-import { daysFromToday } from './mock-clock';
+import { Subtask, Task } from '../models/task';
+import { daysFromToday, MINUTES_PER_DAY, minutesAgo } from './mock-clock';
+import { TASK_SEEDS, TaskSeed } from './task-seeds.mock';
 
-export const MOCK_TASKS: readonly Task[] = [
-  {
-    id: 'NS-160',
-    workspaceId: 'w1',
-    title: 'Audit colour contrast on the dark theme',
-    description: '',
-    status: 'backlog',
-    priority: 'low',
-    assigneeId: 'u2',
-    dueAt: daysFromToday(15),
-    labels: ['Design', 'Accessibility'],
-    commentCount: 1,
-    attachmentCount: 0,
-  },
-  {
-    id: 'NS-158',
-    workspaceId: 'w1',
-    title: 'Queue outgoing messages while offline',
-    description:
-      'Persist unsent messages in IndexedDB and replay them in order when the socket reconnects.',
-    status: 'backlog',
-    priority: 'medium',
-    assigneeId: 'u1',
-    dueAt: daysFromToday(21),
-    labels: ['Frontend'],
-    commentCount: 2,
-    attachmentCount: 0,
-  },
-  {
-    id: 'NS-161',
-    workspaceId: 'w1',
-    title: 'Research: threaded replies',
-    description: '',
-    status: 'backlog',
-    priority: 'low',
-    assigneeId: 'u5',
-    dueAt: daysFromToday(31),
-    labels: ['Research'],
-    commentCount: 0,
-    attachmentCount: 1,
-  },
-  {
-    id: 'NS-151',
-    workspaceId: 'w1',
-    title: 'Fix flaky file uploader retry test',
-    description:
-      'The retry timer races the mocked clock in CI. Reproduce with --runInBand and stabilise.',
-    status: 'todo',
-    priority: 'high',
-    assigneeId: 'u1',
-    dueAt: daysFromToday(1),
-    labels: ['Bug', 'Frontend'],
-    commentCount: 3,
-    attachmentCount: 0,
-  },
-  {
-    id: 'NS-149',
-    workspaceId: 'w1',
-    title: 'Notification preferences per channel',
-    description: '',
-    status: 'todo',
-    priority: 'medium',
-    assigneeId: 'u6',
-    dueAt: daysFromToday(4),
-    labels: ['Frontend', 'Mobile'],
-    commentCount: 1,
-    attachmentCount: 0,
-  },
-  {
-    id: 'NS-153',
-    workspaceId: 'w1',
-    title: 'Rate-limit headers in the API client',
-    description: '',
-    status: 'todo',
-    priority: 'medium',
-    assigneeId: 'u3',
-    dueAt: daysFromToday(3),
-    labels: ['API'],
-    commentCount: 4,
-    attachmentCount: 0,
-  },
-  {
-    id: 'NS-142',
-    workspaceId: 'w1',
-    title: 'Message composer refactor',
-    description:
-      'Split the composer into input, toolbar and suggestion list. Fix mention keyboard handling in Safari.',
-    status: 'progress',
-    priority: 'high',
-    assigneeId: 'u1',
-    dueAt: daysFromToday(1),
-    labels: ['Frontend'],
-    commentCount: 8,
-    attachmentCount: 2,
-  },
-  {
-    id: 'NS-145',
-    workspaceId: 'w1',
-    title: 'Kanban drag-and-drop on touch devices',
-    description: '',
-    status: 'progress',
-    priority: 'medium',
-    assigneeId: 'u6',
-    dueAt: daysFromToday(6),
-    labels: ['Frontend', 'Mobile'],
-    commentCount: 2,
-    attachmentCount: 0,
-  },
-  {
-    id: 'NS-147',
-    workspaceId: 'w1',
-    title: 'Onboarding flow v3',
-    description: '',
-    status: 'progress',
-    priority: 'high',
-    assigneeId: 'u2',
-    dueAt: daysFromToday(2),
-    labels: ['Design'],
-    commentCount: 5,
-    attachmentCount: 3,
-  },
-  {
-    id: 'NS-150',
-    workspaceId: 'w1',
-    title: 'Search indexing for shared files',
-    description: '',
-    status: 'progress',
-    priority: 'urgent',
-    assigneeId: 'u3',
-    dueAt: daysFromToday(0),
-    labels: ['API', 'Performance'],
-    commentCount: 6,
-    attachmentCount: 1,
-  },
-  {
-    id: 'NS-139',
-    workspaceId: 'w1',
-    title: 'Presence service heartbeat',
-    description: '',
-    status: 'review',
-    priority: 'high',
-    assigneeId: 'u8',
-    dueAt: daysFromToday(-1),
-    labels: ['API'],
-    commentCount: 3,
-    attachmentCount: 0,
-  },
-  {
-    id: 'NS-141',
-    workspaceId: 'w1',
-    title: 'Settings: roles and permissions UI',
-    description: '',
-    status: 'review',
-    priority: 'medium',
-    assigneeId: 'u0',
-    dueAt: daysFromToday(3),
-    labels: ['Frontend', 'Design'],
-    commentCount: 2,
-    attachmentCount: 1,
-  },
-  {
-    id: 'NS-131',
-    workspaceId: 'w1',
-    title: 'Virtualized inbox list',
-    description: '',
-    status: 'done',
-    priority: 'high',
-    assigneeId: 'u1',
-    dueAt: daysFromToday(-3),
-    labels: ['Frontend', 'Performance'],
-    commentCount: 4,
-    attachmentCount: 0,
-  },
-  {
-    id: 'NS-133',
-    workspaceId: 'w1',
-    title: 'Dark theme tokens',
-    description: '',
-    status: 'done',
-    priority: 'medium',
-    assigneeId: 'u5',
-    dueAt: daysFromToday(-5),
-    labels: ['Design'],
-    commentCount: 2,
-    attachmentCount: 0,
-  },
-  {
-    id: 'NS-135',
-    workspaceId: 'w1',
-    title: 'Push notification copy for 2.4',
-    description: '',
-    status: 'done',
-    priority: 'low',
-    assigneeId: 'u9',
-    dueAt: daysFromToday(-2),
-    labels: ['Content'],
-    commentCount: 1,
-    attachmentCount: 0,
-  },
-];
+export interface SeededTask extends Task {
+  readonly attachmentCount: number;
+}
+
+type SubtaskSeed = readonly [title: string, done: boolean];
+
+const WORKSPACE_ID = 'w1';
+const REPORTER_IDS: readonly string[] = ['u4', 'u0', 'u5'];
+const CREATED_DAYS_BEFORE = 12;
+const CREATED_SPREAD = 9;
+const MINUTES_PER_HOUR = 60;
+
+const TEAM_BY_LABEL: Readonly<Record<string, string>> = {
+  Frontend: 't-frontend',
+  Backend: 't-platform',
+  API: 't-platform',
+  Infra: 't-platform',
+  DevOps: 't-platform',
+  Design: 't-design',
+  Mobile: 't-mobile',
+  Growth: 't-growth',
+  Marketing: 't-growth',
+  Support: 't-success',
+};
+
+const SUBTASK_SEEDS: Readonly<Record<string, readonly SubtaskSeed[]>> = {
+  'NS-142': [
+    ['Split input and toolbar', true],
+    ['Keyboard handling for suggestions', true],
+    ['Fix the Safari mention bug', false],
+    ['Add tests', false],
+  ],
+  'NS-145': [
+    ['Long-press to pick up a card', true],
+    ['Auto-scroll while dragging', false],
+    ['“Move to…” menu fallback', false],
+  ],
+};
+
+const teamIdOf = (labels: readonly string[]): string | null =>
+  labels.map((label) => TEAM_BY_LABEL[label]).find((teamId) => teamId !== undefined) ?? null;
+
+const subtasksOf = (taskId: string): Subtask[] =>
+  (SUBTASK_SEEDS[taskId] ?? []).map(([title, done], index) => ({
+    id: `${taskId}-s${index}`,
+    title,
+    done,
+  }));
+
+export const taskReporterOf = (index: number): string => REPORTER_IDS[index % REPORTER_IDS.length];
+
+export const taskCreatedAtOf = (index: number): number =>
+  minutesAgo(MINUTES_PER_DAY * (CREATED_DAYS_BEFORE - (index % CREATED_SPREAD)));
+
+const taskFromSeed = (taskSeed: TaskSeed, index: number): SeededTask => ({
+  workspaceId: WORKSPACE_ID,
+  id: taskSeed.id,
+  title: taskSeed.title,
+  description: taskSeed.description,
+  status: taskSeed.status,
+  priority: taskSeed.priority,
+  assigneeId: taskSeed.assigneeId,
+  dueAt: daysFromToday(taskSeed.dueInDays),
+  labels: taskSeed.labels,
+  teamId: teamIdOf(taskSeed.labels),
+  subtasks: subtasksOf(taskSeed.id),
+  reporterId: taskReporterOf(index),
+  createdAt: taskCreatedAtOf(index),
+  updatedAt: minutesAgo(MINUTES_PER_HOUR * (index + 1)),
+  pending: false,
+  attachmentCount: taskSeed.attachmentCount,
+});
+
+export const MOCK_TASKS: readonly SeededTask[] = TASK_SEEDS.map(taskFromSeed);

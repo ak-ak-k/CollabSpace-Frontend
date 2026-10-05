@@ -1,9 +1,9 @@
 <section class="section" aria-labelledby="profile-details-heading">
   <h2 class="section__heading" id="profile-details-heading">Details</h2>
-  @if (editing()) {
-    <app-input label="Phone" type="tel" autocomplete="tel" [formField]="form().phone" />
-    <app-input label="Location" [formField]="form().location" />
-    <app-select label="Timezone" [options]="timeZoneOptions" [formField]="form().timeZone" />
+  @if (editing() && form(); as fields) {
+    <app-input label="Phone" type="tel" autocomplete="tel" [formField]="fields.phone" />
+    <app-input label="Location" [formField]="fields.location" />
+    <app-select label="Timezone" [options]="timeZoneOptions" [formField]="fields.timeZone" />
   } @else {
     <dl class="details">
       @for (detail of details(); track detail.label) {

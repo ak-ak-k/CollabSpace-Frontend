@@ -16,7 +16,7 @@ describe('EmojiPickerComponent', () => {
     expect(host.getAttribute('role')).toBe('group');
     expect(host.getAttribute('aria-label')).toBe('Insert emoji');
     expect(buttons).toHaveLength(EMOJI_PALETTE.length);
-    expect(buttons[0].getAttribute('aria-label')).toBe(`Insert ${EMOJI_PALETTE[0]}`);
+    expect(buttons[0].getAttribute('aria-label')).toBe('Insert grinning face');
   });
 
   it('emits the picked emoji', async () => {

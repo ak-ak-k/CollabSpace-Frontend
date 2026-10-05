@@ -1,63 +1,48 @@
 import { DOCUMENT, inject, Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { conversationRoute, messageRoute, threadRoute } from '../../../core/models/conversation';
+import { Message } from '../../../core/models/message';
+import { AttachmentView } from '../../../core/models/thread';
 import { DialogService } from '../../../core/services/dialog.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { conversationRoute } from '../../../core/models/conversation';
 import { ChatMessagesState } from '../../../core/state/chat-messages.state';
 import { ChatState } from '../../../core/state/chat.state';
-import { ConversationView } from './conversation-view';
+import { FileState } from '../../../core/state/file.state';
+import {
+  ImageViewerComponent,
+  ImageViewerData,
+} from '../../../shared/components/image-viewer/image-viewer.component';
+import { IconName } from '../../../shared/ui/icon/icon-registry';
 
 @Injectable()
 export class ConversationActions {
   private readonly chat = inject(ChatState);
   private readonly messages = inject(ChatMessagesState);
+  private readonly files = inject(FileState);
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
-  private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
-
-  toggleStar(conversationId: string): void {
-    const starred = this.chat.toggleStar(conversationId);
-    this.toasts.show(starred ? 'Added to starred' : 'Removed from starred', { icon: 'star' });
-  }
-
-  toggleMute(conversationId: string): void {
-    const muted = this.chat.toggleMute(conversationId);
-    this.toasts.show(muted ? 'Conversation muted' : 'Conversation unmuted', {
-      icon: muted ? 'bell-off' : 'bell',
-    });
-  }
-
-  markUnread(conversationId: string): void {
-    this.chat.markUnread(conversationId);
-    this.toasts.show('Marked as unread', { icon: 'circle-dot' });
-  }
 
   async copyLink(conversationId: string): Promise<void> {
     const conversation = this.chat.conversation(conversationId);
-    if (!conversation) {
+    if (conversation) {
+      await this.copyPath(conversationRoute(conversation));
+    }
+  }
+
+  async copyMessageLink(conversationId: string, messageId: string): Promise<void> {
+    const conversation = this.chat.conversation(conversationId);
+    const message = this.find(conversationId, messageId);
+    if (!conversation || !message) {
       return;
     }
-    const path = conversationRoute(conversation);
-    await this.writeClipboard(`${this.document.location.origin}${path}`, 'Link copied', 'link');
+    const rootId = message.threadRootId;
+    await this.copyPath(
+      rootId ? threadRoute(conversation, rootId) : messageRoute(conversation, messageId),
+    );
   }
 
   async copyText(text: string): Promise<void> {
     await this.writeClipboard(text, 'Copied to clipboard', 'copy');
-  }
-
-  async leave(view: ConversationView, backLink: string): Promise<void> {
-    const kind = view.type === 'channel' ? 'channel' : 'group';
-    const confirmed = await this.dialogs.confirm({
-      title: `Leave ${view.title}?`,
-      body: `You’ll stop getting messages from this ${kind}. You can rejoin any time.`,
-      confirmLabel: 'Leave',
-      icon: 'log-out',
-    });
-    if (confirmed) {
-      this.toasts.show(`You left ${view.title}`, { icon: 'log-out' });
-      await this.router.navigateByUrl(backLink);
-    }
   }
 
   async togglePin(conversationId: string, messageId: string): Promise<void> {
@@ -65,6 +50,29 @@ export class ConversationActions {
     this.toasts.show(pinned ? 'Message pinned' : 'Message unpinned', {
       icon: pinned ? 'pin' : 'pin-off',
     });
+  }
+
+  markUnreadFrom(conversationId: string, messageId: string): void {
+    if (this.chat.markUnreadFrom(conversationId, messageId)) {
+      this.toasts.show('Marked unread from here', { icon: 'circle-dot' });
+    }
+  }
+
+  async retry(conversationId: string, messageId: string): Promise<void> {
+    if (!(await this.messages.retry(conversationId, messageId))) {
+      this.toasts.show('Still offline — try again when you reconnect', { icon: 'cloud-off' });
+    }
+  }
+
+  async discard(conversationId: string, messageId: string): Promise<void> {
+    const removed = await this.messages.remove(conversationId, messageId);
+    if (removed) {
+      this.toasts.show('Unsent message deleted', {
+        icon: 'trash-2',
+        actionLabel: 'Undo',
+        onAction: () => void this.messages.restore(removed),
+      });
+    }
   }
 
   async remove(conversationId: string, messageId: string): Promise<boolean> {
@@ -97,15 +105,43 @@ export class ConversationActions {
     void this.messages.react(conversationId, messageId, emoji);
   }
 
+  showReactors(description: string): void {
+    this.toasts.show(description, { icon: 'smile' });
+  }
+
   download(name: string): void {
     this.toasts.show(`Downloading ${name}`, { icon: 'download' });
   }
 
-  private async writeClipboard(
-    text: string,
-    success: string,
-    icon: 'copy' | 'link',
-  ): Promise<void> {
+  openImage(attachment: AttachmentView): void {
+    this.dialogs.open<void, ImageViewerData>(ImageViewerComponent, {
+      data: { name: attachment.name, size: attachment.size, src: attachment.src },
+      size: 'lg',
+    });
+  }
+
+  registerAttachments(message: Message): void {
+    for (const attachment of message.attachments) {
+      void this.files.attachToMessage(message.conversationId, message.id, {
+        name: attachment.name,
+        sizeLabel: attachment.size,
+        bytes: attachment.bytes ?? 0,
+        type: attachment.type,
+        previewUrl: attachment.src ?? null,
+      });
+    }
+  }
+
+  private find(conversationId: string, messageId: string): Message | null {
+    const thread = this.chat.messages()[conversationId] ?? [];
+    return thread.find((message) => message.id === messageId) ?? null;
+  }
+
+  private async copyPath(path: string): Promise<void> {
+    await this.writeClipboard(`${this.document.location.origin}${path}`, 'Link copied', 'link');
+  }
+
+  private async writeClipboard(text: string, success: string, icon: IconName): Promise<void> {
     try {
       await this.document.defaultView?.navigator.clipboard.writeText(text);
       this.toasts.show(success, { icon });

@@ -1,5 +1,5 @@
 <form class="message-composer" (submit)="onSubmit($event)">
-  <label class="visually-hidden" [for]="inputId">Message {{ conversationTitle() }}</label>
+  <label class="visually-hidden" [for]="inputId">{{ inputLabel() }}</label>
 
   @if (replyTo(); as reply) {
     <app-reply-banner [reply]="reply" (cancel)="cancelReply.emit()" />
@@ -7,6 +7,10 @@
 
   @if (attachments().length > 0) {
     <app-attachment-chips [attachments]="attachments()" (remove)="removeAttachment($event)" />
+  }
+
+  @if (showsFormatting()) {
+    <app-formatting-toolbar (format)="applyFormat($event)" />
   }
 
   <div class="message-composer__box">
@@ -17,7 +21,7 @@
         size="md"
         label="More options"
         [attr.aria-expanded]="extrasOpen()"
-        (click)="toggleExtras()"
+        (click)="toggle(extrasOpen)"
       >
         <app-icon name="plus" [size]="20" />
       </button>
@@ -58,9 +62,19 @@
         appIconButton
         type="button"
         size="md"
+        label="Formatting"
+        [pressed]="formatOpen()"
+        (click)="toggle(formatOpen)"
+      >
+        <app-icon name="type" [size]="20" />
+      </button>
+      <button
+        appIconButton
+        type="button"
+        size="md"
         label="Insert emoji"
         [attr.aria-expanded]="emojiOpen()"
-        (click)="toggleEmoji()"
+        (click)="toggle(emojiOpen)"
       >
         <app-icon name="smile" [size]="20" />
       </button>
@@ -99,7 +113,7 @@
         type="button"
         class="message-composer__extra"
         [attr.aria-expanded]="emojiOpen()"
-        (click)="toggleEmoji()"
+        (click)="toggle(emojiOpen)"
       >
         <app-icon name="smile" [size]="18" />
         Emoji
@@ -115,6 +129,7 @@
     <app-mention-list
       class="message-composer__mentions"
       [listId]="listId"
+      [heading]="mention.heading()"
       [candidates]="mention.candidates()"
       [activeIndex]="mention.activeIndex()"
       (pick)="insertMention($event)"

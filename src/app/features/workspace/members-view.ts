@@ -8,8 +8,8 @@ import {
   WorkspaceRole,
 } from '../../core/models/user';
 import { isWorkspaceManager, WORKSPACE_ROLE_LABELS } from '../../core/models/workspace-role';
+import { relativePhrase } from '../../core/state/person-status';
 import { formatCount } from '../../shared/pipes/count.pipe';
-import { formatRelative } from '../../shared/pipes/time-format';
 import { IconName } from '../../shared/ui/icon/icon-registry';
 import { TagTone } from '../../shared/ui/tag/tag.component';
 import { WORKSPACE_ROUTE } from './workspace-actions.service';
@@ -49,10 +49,6 @@ export interface MembersEmptyView {
 
 export const MEMBERS_ROUTE = `${WORKSPACE_ROUTE}/members`;
 export const MANAGE_INVITATIONS_ROUTE = `${WORKSPACE_ROUTE}/settings/members`;
-
-const MILLISECONDS_PER_DAY = 86_400_000;
-const RECENT_DAYS = 6;
-const LOWERCASE_PHRASES: ReadonlySet<string> = new Set(['Just now', 'Yesterday']);
 
 const FILTER_LABELS: Record<MemberFilter, string> = {
   all: 'All',
@@ -119,19 +115,6 @@ export const visibleMembers = (
   return people
     .filter((user) => FILTER_MATCHERS[filter](user) && matchesQuery(user, normalized))
     .sort((first, second) => first.name.localeCompare(second.name));
-};
-
-const relativePhrase = (timestamp: number, now: number): string => {
-  const relative = formatRelative(timestamp, now);
-  if (LOWERCASE_PHRASES.has(relative)) {
-    return relative.toLowerCase();
-  }
-  if (relative.endsWith('ago')) {
-    return relative;
-  }
-  const recent = now - timestamp < RECENT_DAYS * MILLISECONDS_PER_DAY;
-  const weekday = new Date(timestamp).toLocaleDateString('en-US', { weekday: 'long' });
-  return `on ${recent ? weekday : relative}`;
 };
 
 export const activeLabelOf = (user: User, now = Date.now()): string => {

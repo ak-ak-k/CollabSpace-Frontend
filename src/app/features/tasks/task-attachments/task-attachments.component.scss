@@ -1,0 +1,76 @@
+@use 'touch';
+@use '../task-section';
+
+:host {
+  display: block;
+}
+
+.section {
+  @include task-section.section;
+}
+
+.section__head {
+  @include task-section.head;
+}
+
+.section__title {
+  @include task-section.title;
+}
+
+.section__empty {
+  @include task-section.meta;
+
+  margin: var(--space-0);
+  font-size: var(--font-size-13);
+}
+
+.attachments {
+  margin: var(--space-0);
+  padding: var(--space-0);
+  list-style: none;
+}
+
+.attachment {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--task-attachment-row-height);
+  border-bottom: var(--rule-hairline);
+}
+
+.attachment__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--task-attachment-icon-size);
+  height: var(--task-attachment-icon-size);
+  background: var(--surface);
+}
+
+.attachment__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  color: var(--text-primary);
+  text-decoration: none;
+
+  @include touch.on-touch {
+    min-height: var(--size-touch-target);
+  }
+}
+
+.attachment__name {
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: underline;
+}
+
+.attachment__text:hover .attachment__name {
+  text-decoration-thickness: var(--border-width-rule);
+}
+
+.attachment__meta {
+  @include task-section.meta;
+}

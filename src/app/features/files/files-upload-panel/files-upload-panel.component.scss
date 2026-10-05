@@ -1,0 +1,74 @@
+@use 'breakpoints';
+
+:host {
+  display: block;
+  border: var(--rule-hairline);
+}
+
+.panel__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--files-upload-header-height);
+  padding: var(--space-1) var(--space-3);
+  border-bottom: var(--rule-hairline);
+}
+
+.panel__title {
+  flex: 1;
+  font-size: var(--font-size-13);
+}
+
+.upload {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--rule-hairline);
+
+  &:last-child {
+    border-bottom: var(--space-0);
+  }
+}
+
+.upload__icon {
+  flex: none;
+}
+
+.upload__name {
+  flex: 1 1 var(--files-upload-name-basis);
+  min-width: var(--space-0);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+}
+
+.upload__status {
+  color: var(--text-muted);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+}
+
+.upload__status--done {
+  color: var(--text-primary);
+}
+
+.upload__status--failed {
+  color: var(--danger);
+}
+
+.upload__track {
+  flex: 1 1 100%;
+  height: var(--files-upload-bar-height);
+  background: var(--surface-secondary);
+}
+
+.upload__fill {
+  height: 100%;
+  background: var(--text-primary);
+  transition: width var(--duration-fast);
+
+  @include breakpoints.reduced-motion {
+    transition: none;
+  }
+}

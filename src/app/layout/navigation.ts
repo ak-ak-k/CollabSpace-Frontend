@@ -22,6 +22,7 @@ export const PRIMARY_NAVIGATION: readonly NavigationItem[] = [
     badge: 'messages',
   },
   { id: 'teams', label: 'Teams', accessibleLabel: 'Teams', icon: 'users', route: '/teams' },
+  { id: 'people', label: 'People', accessibleLabel: 'People', icon: 'contact', route: '/people' },
   {
     id: 'tasks',
     label: 'Tasks',
@@ -54,6 +55,7 @@ export const DRAWER_NAVIGATION: readonly NavigationItem[] = [
     icon: 'building-2',
     route: '/workspace',
   },
+  { id: 'people', label: 'People', accessibleLabel: 'People', icon: 'contact', route: '/people' },
   {
     id: 'notifications',
     label: 'Notifications',
@@ -75,6 +77,7 @@ export const DRAWER_NAVIGATION: readonly NavigationItem[] = [
 
 export const MORE_SECTION_ROUTES: readonly string[] = [
   '/workspace',
+  '/people',
   '/files',
   '/notifications',
   '/profile',

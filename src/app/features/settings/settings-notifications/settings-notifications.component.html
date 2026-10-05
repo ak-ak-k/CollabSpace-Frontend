@@ -22,7 +22,7 @@
             <td class="matrix__cell">
               <app-toggle
                 hideLabel
-                [label]="row.label + ' on ' + channel"
+                [label]="row.label + ' — ' + channelLabels[channel]"
                 [checked]="preferences().notifications[row.topic][channel]"
                 (checkedChange)="setChannel(row.topic, channel, $event)"
               />
@@ -33,6 +33,12 @@
     </tbody>
   </table>
 </app-table>
+
+<p class="matrix__note">
+  In-app notifications are delivered now. Push and email choices are saved for when those channels
+  are connected. To change what a single channel sends you, open its details and pick All, Mentions
+  or Muted.
+</p>
 
 <ul class="notification-switches">
   <li

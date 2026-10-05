@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import type { FormValueControl } from '@angular/forms/signals';
 import { IconComponent } from '../icon/icon.component';
+import { IconName } from '../icon/icon-registry';
 import { FieldSize } from '../input/field/field-control';
 
 @Component({
@@ -26,6 +27,8 @@ export class SearchInputComponent implements FormValueControl<string> {
   readonly clearable = input(true, { transform: booleanAttribute });
   readonly disabled = input(false, { transform: booleanAttribute });
   readonly name = input('');
+  readonly describedBy = input('');
+  readonly icon = input<IconName>('search');
   readonly touch = output<void>();
   readonly cleared = output<void>();
 

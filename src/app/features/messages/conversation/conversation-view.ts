@@ -1,4 +1,8 @@
-import { Conversation } from '../../../core/models/conversation';
+import {
+  Conversation,
+  conversationRoute,
+  GroupConversation,
+} from '../../../core/models/conversation';
 import { Team } from '../../../core/models/team';
 import { Channel } from '../../../core/models/channel';
 import { firstNameOf, PresenceStatus, User, userColorSeed } from '../../../core/models/user';
@@ -26,6 +30,7 @@ export interface PartnerProfile {
 
 export interface ConversationView {
   readonly id: string;
+  readonly route: string;
   readonly type: Conversation['type'];
   readonly title: string;
   readonly subtitle: string;
@@ -40,6 +45,8 @@ export interface ConversationView {
   readonly about: string;
   readonly intro: string;
   readonly teamName: string;
+  readonly teamId: string | null;
+  readonly createdBy: string | null;
   readonly partner: MemberView | null;
   readonly profile: PartnerProfile | null;
 }
@@ -74,7 +81,13 @@ const listNames = (members: readonly MemberView[]): string =>
     .map((member) => member.firstName)
     .join(', ');
 
-const directView = (id: string, userId: string, context: ConversationContext): ConversationView => {
+type ConversationIdentity = Omit<ConversationView, 'route'>;
+
+const directView = (
+  id: string,
+  userId: string,
+  context: ConversationContext,
+): ConversationIdentity => {
   const user = context.usersById.get(userId);
   const partner = user ? memberView(user, context.currentUserId) : null;
   const members = membersOf([userId, context.currentUserId], context);
@@ -96,6 +109,8 @@ const directView = (id: string, userId: string, context: ConversationContext): C
     about: '',
     intro: `This is the beginning of your direct message history with ${partner?.firstName ?? 'them'}. Only the two of you are in this conversation.`,
     teamName: '',
+    teamId: null,
+    createdBy: null,
     partner,
     profile: user
       ? {
@@ -108,11 +123,9 @@ const directView = (id: string, userId: string, context: ConversationContext): C
 };
 
 const groupView = (
-  id: string,
-  name: string,
-  memberIds: readonly string[],
+  { id, name, memberIds, createdBy }: GroupConversation,
   context: ConversationContext,
-): ConversationView => {
+): ConversationIdentity => {
   const members = membersOf(memberIds, context);
   const names = listNames(members);
   return {
@@ -131,6 +144,8 @@ const groupView = (
     about: `Group conversation with ${names}.`,
     intro: `This is the start of the ${name} group with ${names}.`,
     teamName: '',
+    teamId: null,
+    createdBy,
     partner: null,
     profile: null,
   };
@@ -141,7 +156,7 @@ const channelView = (
   name: string,
   memberIds: readonly string[],
   context: ConversationContext,
-): ConversationView => {
+): ConversationIdentity => {
   const members = membersOf(memberIds, context);
   const description = context.channel?.description ?? '';
   const isPrivate = context.channel?.isPrivate ?? false;
@@ -161,20 +176,30 @@ const channelView = (
     about: `${description} Created ${context.channel?.createdLabel ?? ''}.`,
     intro: `This is the start of #${name}. ${description}`,
     teamName: context.team?.name ?? '',
+    teamId: context.channel?.teamId ?? null,
+    createdBy: context.channel?.createdBy ?? null,
     partner: null,
     profile: null,
   };
 };
 
-export const buildConversationView = (
+const identityOf = (
   conversation: Conversation,
   context: ConversationContext,
-): ConversationView => {
+): ConversationIdentity => {
   if (conversation.type === 'dm') {
     return directView(conversation.id, conversation.userId, context);
   }
   if (conversation.type === 'group') {
-    return groupView(conversation.id, conversation.name, conversation.memberIds, context);
+    return groupView(conversation, context);
   }
   return channelView(conversation.id, conversation.name, conversation.memberIds, context);
 };
+
+export const buildConversationView = (
+  conversation: Conversation,
+  context: ConversationContext,
+): ConversationView => ({
+  ...identityOf(conversation, context),
+  route: conversationRoute(conversation),
+});

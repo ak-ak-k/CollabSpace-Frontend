@@ -49,10 +49,17 @@
   />
 
   <div class="panel__body" #body>
+    @if (offline()) {
+      <p class="panel__offline" role="status">
+        <app-icon name="cloud-off" [size]="14" />
+        You’re offline — showing results from data already on this device.
+      </p>
+    }
     <app-search-status
       [status]="session.status()"
       [term]="session.term()"
       [total]="session.total()"
+      (retry)="retry()"
     />
     @if (hasOptions()) {
       <app-search-options
@@ -62,6 +69,8 @@
         (hovered)="requestedIndex.set($event)"
         (expanded)="pickFilter($event)"
         (removed)="removeRecent($event)"
+        (cleared)="clearRecent()"
+        (messaged)="messagePerson($event)"
       />
     }
   </div>

@@ -1,4 +1,4 @@
-<div class="mention-list__header caps-label" aria-hidden="true">Members</div>
+<div class="mention-list__header caps-label" aria-hidden="true">{{ heading() }}</div>
 @for (candidate of candidates(); track candidate.id; let index = $index) {
   <div
     class="mention-list__option"
@@ -9,7 +9,11 @@
     (mousedown)="$event.preventDefault()"
     (click)="pick.emit(candidate)"
   >
-    <app-avatar [name]="candidate.name" [seed]="candidate.seed" [size]="24" />
+    @if (candidate.kind === 'member' || candidate.kind === 'outsider') {
+      <app-avatar [name]="candidate.name" [seed]="candidate.seed" [size]="24" />
+    } @else {
+      <span class="mention-list__tile" aria-hidden="true">{{ tileOf(candidate) }}</span>
+    }
     <span class="mention-list__name">{{ candidate.name }}</span>
     <span class="mention-list__title truncate">{{ candidate.title }}</span>
   </div>

@@ -3,24 +3,31 @@
 <div class="task-card__top">
   <span class="task-card__id">{{ task.id }}</span>
   <app-tag [tone]="task.priorityTone">{{ task.priorityLabel }}</app-tag>
-  <span class="task-card__spacer"></span>
-  @if (showGrip()) {
-    <app-icon class="task-card__grip" name="grip-vertical" [size]="14" />
+  @if (task.teamName) {
+    <span class="task-card__team truncate">{{ task.teamName }}</span>
   }
+  <span class="task-card__spacer"></span>
+  <app-task-menu [card]="task" (moved)="moved.emit($event)" />
 </div>
 <p class="task-card__title" [class.task-card__title--done]="task.done">{{ task.title }}</p>
-@if (task.labels.length > 0) {
+@if (task.shortLabels.length > 0) {
   <div class="task-card__labels">
-    @for (label of task.labels; track label) {
+    @for (label of task.shortLabels; track label) {
       <app-tag class="task-card__label">{{ label }}</app-tag>
     }
   </div>
 }
 <div class="task-card__meta">
   <span class="task-card__due" [class]="'task-card__due--' + task.dueState">
-    <app-icon name="calendar" [size]="13" />
-    {{ task.dueLabel }}
+    <app-icon [name]="task.dueIcon" [size]="13" />
+    {{ task.dueText }}
   </span>
+  @if (task.subtaskLabel) {
+    <span class="task-card__count" title="Subtasks">
+      <app-icon name="list-checks" [size]="13" />
+      {{ task.subtaskLabel }}
+    </span>
+  }
   @if (task.commentCount > 0) {
     <span class="task-card__count" title="Comments">
       <app-icon name="message-circle" [size]="13" />
@@ -31,6 +38,12 @@
     <span class="task-card__count" title="Attachments">
       <app-icon name="paperclip" [size]="13" />
       {{ task.attachmentCount }}
+    </span>
+  }
+  @if (task.pending) {
+    <span class="task-card__count" [appTooltip]="pendingHint">
+      <app-icon name="clock" [size]="13" />
+      Pending
     </span>
   }
   <span class="task-card__spacer"></span>

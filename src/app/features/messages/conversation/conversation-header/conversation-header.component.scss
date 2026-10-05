@@ -1,5 +1,11 @@
 @use 'breakpoints';
 
+@mixin touch-size {
+  min-width: var(--size-touch-target);
+  height: var(--size-touch-target);
+  justify-content: center;
+}
+
 :host {
   display: block;
   flex: none;
@@ -87,6 +93,33 @@
 
 .header__members-text {
   font-weight: var(--font-weight-semibold);
+}
+
+.header__pins {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  height: var(--pin-chip-height);
+  padding: var(--space-0) var(--space-2);
+  border: var(--rule-hairline);
+  background: none;
+  color: var(--text-primary);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover);
+  }
+
+  @include breakpoints.tablet-and-down {
+    @include touch-size;
+  }
+
+  @include breakpoints.touch-device {
+    @include touch-size;
+  }
 }
 
 .header__actions {

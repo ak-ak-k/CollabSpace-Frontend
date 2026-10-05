@@ -1,0 +1,14 @@
+@for (chip of chips(); track chip.key) {
+  <button
+    type="button"
+    class="chip"
+    [attr.aria-label]="chip.removeLabel"
+    (click)="remove.emit(chip.removal)"
+  >
+    {{ chip.label }}
+    <app-icon name="x" [size]="12" />
+  </button>
+}
+<button appButton type="button" variant="ghost" size="sm" (click)="clearAll.emit()">
+  Clear all
+</button>

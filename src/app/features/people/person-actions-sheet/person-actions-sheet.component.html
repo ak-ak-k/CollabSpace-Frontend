@@ -1,0 +1,32 @@
+<div class="sheet__person">
+  <app-avatar [name]="person.name" [seed]="person.seed" [size]="36" />
+  <span class="sheet__identity">
+    <strong class="sheet__name truncate">{{ person.name }}</strong>
+    <span class="sheet__meta truncate">{{ person.title }}</span>
+  </span>
+</div>
+
+<div
+  class="sheet__menu"
+  cdkMenu
+  [attr.aria-label]="'Actions for ' + person.name"
+  (keydown.tab)="cancel($event)"
+  (keydown.shift.tab)="cancel($event)"
+>
+  @for (item of items; track item.id) {
+    <button
+      cdkMenuItem
+      type="button"
+      class="sheet__item"
+      [attr.cdkFocusInitial]="$first ? '' : null"
+      (cdkMenuItemTriggered)="choose(item)"
+    >
+      <app-icon [name]="item.icon" [size]="20" />
+      <span class="truncate">{{ item.label }}</span>
+    </button>
+  }
+  <button cdkMenuItem type="button" class="sheet__item" (cdkMenuItemTriggered)="cancel()">
+    <app-icon name="x" [size]="20" />
+    Cancel
+  </button>
+</div>

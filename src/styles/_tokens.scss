@@ -24,6 +24,7 @@
 @use 'tokens/workspace-switcher';
 @use 'tokens/workspace-dialogs';
 @use 'tokens/workspace-settings';
+@use 'tokens/people';
 @use 'tokens/density';
 
 :root {
@@ -50,6 +51,7 @@
   @include workspace-switcher.workspace-switcher-tokens;
   @include workspace-dialogs.workspace-dialog-tokens;
   @include workspace-settings.workspace-settings-tokens;
+  @include people.people-tokens;
 }
 
 :root,

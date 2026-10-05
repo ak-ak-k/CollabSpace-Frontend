@@ -1,0 +1,28 @@
+<section class="section" [attr.aria-labelledby]="headingId">
+  <div class="section__head">
+    <h3 class="section__title" [id]="headingId">History</h3>
+    <button
+      appButton
+      type="button"
+      variant="ghost"
+      size="sm"
+      [attr.aria-expanded]="expanded()"
+      (click)="toggle()"
+    >
+      <app-icon name="history" [size]="14" />
+      {{ toggleLabel() }}
+    </button>
+  </div>
+  @if (expanded()) {
+    <ol class="entries">
+      @for (row of rows(); track row.id) {
+        <li class="entry">
+          <strong class="entry__who">{{ row.who }}</strong>
+          <span>{{ row.text }}</span>
+          <span class="entry__when">· {{ row.when }}</span>
+        </li>
+      }
+    </ol>
+  }
+  <p class="section__meta">{{ metaLine() }}</p>
+</section>

@@ -7,12 +7,18 @@ export interface FilterEmptyState {
   readonly message: string;
 }
 
+export interface ConversationSection {
+  readonly label: string | null;
+  readonly conversations: readonly ConversationPreview[];
+}
+
 export const CONVERSATION_FILTERS: readonly ConversationFilter[] = [
   'all',
   'unread',
   'direct',
   'groups',
-  'starred',
+  'channels',
+  'favourites',
 ];
 
 export const FILTER_LABELS: Record<ConversationFilter, string> = {
@@ -20,10 +26,14 @@ export const FILTER_LABELS: Record<ConversationFilter, string> = {
   unread: 'Unread',
   direct: 'Direct',
   groups: 'Groups',
-  starred: 'Starred',
+  channels: 'Channels',
+  favourites: 'Favourites',
 };
 
-const COUNTED_FILTERS: ReadonlySet<ConversationFilter> = new Set(['unread', 'starred']);
+const COUNTED_FILTERS: ReadonlySet<ConversationFilter> = new Set<ConversationFilter>([
+  'unread',
+  'favourites',
+]);
 
 export const isCountedFilter = (filter: ConversationFilter): boolean => COUNTED_FILTERS.has(filter);
 
@@ -36,22 +46,27 @@ export const FILTER_EMPTY_STATES: Record<ConversationFilter, FilterEmptyState> =
   unread: {
     icon: 'check-check',
     heading: 'No unread messages',
-    message: 'You’re all caught up on conversations.',
+    message: 'You’re all caught up.',
   },
   direct: {
     icon: 'user',
     heading: 'No direct messages',
-    message: 'Search for a teammate to start one.',
+    message: 'Message someone from People or ⌘K.',
   },
   groups: {
     icon: 'users',
     heading: 'No group chats',
-    message: 'Create a group from the New group chat button.',
+    message: 'Create one with the New group chat button.',
   },
-  starred: {
+  channels: {
+    icon: 'hash',
+    heading: 'No channels',
+    message: 'Join a team to see its channels here.',
+  },
+  favourites: {
     icon: 'star',
-    heading: 'Nothing starred yet',
-    message: 'Star a conversation from its header to pin it here.',
+    heading: 'No favourites yet',
+    message: 'Add a conversation to favourites from its menu to keep it at the top.',
   },
 };
 
@@ -66,9 +81,25 @@ export const matchesFilter = (preview: ConversationPreview, filter: Conversation
   (filter === 'unread' && preview.unreadCount > 0) ||
   (filter === 'direct' && preview.type === 'dm') ||
   (filter === 'groups' && preview.type === 'group') ||
-  (filter === 'starred' && preview.starred);
+  (filter === 'channels' && preview.type === 'channel') ||
+  (filter === 'favourites' && preview.starred);
 
 export const matchesQuery = (preview: ConversationPreview, query: string): boolean =>
   query === '' ||
   preview.title.toLowerCase().includes(query) ||
   preview.preview.toLowerCase().includes(query);
+
+export const sectionsOf = (
+  conversations: readonly ConversationPreview[],
+  grouped: boolean,
+): readonly ConversationSection[] => {
+  if (!grouped) {
+    return [{ label: null, conversations }];
+  }
+  const favourites = conversations.filter((conversation) => conversation.starred);
+  const recent = conversations.filter((conversation) => !conversation.starred);
+  return [
+    { label: 'Favourites', conversations: favourites },
+    { label: 'Recent', conversations: recent },
+  ].filter((section) => section.conversations.length > 0);
+};

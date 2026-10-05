@@ -1,0 +1,11 @@
+@if (source().link; as link) {
+  <a class="source source--link" [routerLink]="link.path" [queryParams]="link.queryParams">
+    <app-icon [name]="source().icon" [size]="iconSize()" />
+    <span class="source__label truncate">{{ source().label }}</span>
+  </a>
+} @else {
+  <span class="source source--plain">
+    <app-icon [name]="source().icon" [size]="iconSize()" />
+    <span class="source__label truncate">{{ source().label }}</span>
+  </span>
+}

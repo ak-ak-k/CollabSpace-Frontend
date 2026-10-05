@@ -13,6 +13,20 @@ describe('StatusDotComponent', () => {
     expect(host.textContent?.trim()).toBe('');
   });
 
+  it('gives every status its own shape class and size', async () => {
+    const fixture = TestBed.createComponent(StatusDotComponent);
+    fixture.componentRef.setInput('size', 'lg');
+    const host = fixture.nativeElement as HTMLElement;
+
+    for (const status of ['online', 'away', 'dnd', 'offline'] as const) {
+      fixture.componentRef.setInput('status', status);
+      await fixture.whenStable();
+      expect([...host.classList].sort()).toEqual(
+        [`status-dot--${status}`, 'status-dot--lg'].sort(),
+      );
+    }
+  });
+
   it('announces the status as text when requested', async () => {
     const fixture = TestBed.createComponent(StatusDotComponent);
     fixture.componentRef.setInput('status', 'dnd');

@@ -1,4 +1,5 @@
 @use 'touch';
+@use '../task-section';
 
 :host {
   display: block;
@@ -11,41 +12,10 @@
 }
 
 .comments__heading {
-  margin: var(--space-0);
+  @include task-section.title;
+
   padding-bottom: var(--space-2);
   border-bottom: var(--rule-strong);
-  font-size: var(--font-size-11);
-  font-weight: var(--font-weight-heavy);
-  letter-spacing: var(--letter-spacing-caps);
-  text-transform: uppercase;
-}
-
-.comment {
-  display: flex;
-  gap: var(--space-3);
-}
-
-.comment__body {
-  flex: 1;
-  min-width: 0;
-}
-
-.comment__meta {
-  font-size: var(--font-size-13);
-
-  strong {
-    font-weight: var(--font-weight-heavy);
-  }
-}
-
-.comment__when {
-  color: var(--text-muted);
-}
-
-.comment__text {
-  margin: var(--space-0-5) var(--space-0) var(--space-0);
-  font-size: var(--font-size-14);
-  line-height: var(--line-height-message);
 }
 
 .comments__form {

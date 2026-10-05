@@ -4,6 +4,7 @@ import { IconName } from '../../../shared/ui/icon/icon-registry';
 
 export type CommandAction =
   | { readonly type: 'navigate'; readonly path: string }
+  | { readonly type: 'message-person'; readonly userId: string }
   | { readonly type: 'create-task' }
   | { readonly type: 'invite-people' }
   | { readonly type: 'toggle-theme' };
@@ -39,6 +40,7 @@ export const jumpCommands = (
 ): readonly PaletteCommand[] => [
   goTo('Go to Dashboard', 'house', '/home'),
   goTo('Go to Messages', 'message-square', '/messages'),
+  goTo('Go to People', 'contact', '/people'),
   goTo('Go to Tasks board', 'square-kanban', '/tasks'),
   goTo('Go to Files', 'folder', '/files'),
   goTo('Workspace overview', 'building-2', '/workspace', workspaceName),
@@ -58,5 +60,5 @@ export const messageCommands = (users: readonly User[]): readonly PaletteCommand
       label: `Message ${user.name}`,
       icon: 'message-square',
       hint: PRESENCE_LABELS[user.status],
-      action: { type: 'navigate', path: `/messages/dm-${user.id}` },
+      action: { type: 'message-person', userId: user.id },
     }));

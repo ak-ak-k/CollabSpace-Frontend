@@ -1,0 +1,97 @@
+@use 'touch';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  background: var(--surface);
+}
+
+.card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.card__identity {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.card__avatar {
+  --avatar-ring: var(--surface);
+}
+
+.card__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  min-width: 0;
+}
+
+.card__name {
+  min-width: 0;
+  margin: var(--space-0);
+  font-size: var(--font-size-16);
+  line-height: var(--line-height-compact);
+}
+
+.card__open {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  padding: var(--space-0);
+  border: var(--space-0);
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: var(--font-weight-heavy);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include touch.on-touch {
+    @include touch.minimum-hit-area;
+  }
+}
+
+.card__open-text {
+  display: block;
+}
+
+.card__title {
+  font-size: var(--font-size-13);
+}
+
+.card__organisation,
+.card__status {
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+}
+
+.card__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+
+.card__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-top: var(--rule-strong);
+}
+
+.card__spacer {
+  flex: 1;
+}

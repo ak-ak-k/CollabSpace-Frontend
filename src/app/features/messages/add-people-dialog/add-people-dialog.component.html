@@ -1,0 +1,13 @@
+<form class="add-people" [formRoot]="peopleForm">
+  <app-modal [heading]="data.title" [description]="data.description" size="md">
+    <app-member-picker [people]="people()" [formField]="peopleForm.memberIds" />
+
+    <ng-container modalActions>
+      <button appButton type="button" (click)="cancel()">Cancel</button>
+      <button appButton type="submit" variant="primary" [busy]="peopleForm().submitting()">
+        <app-icon name="user-plus" [size]="16" />
+        {{ submitLabel() }}
+      </button>
+    </ng-container>
+  </app-modal>
+</form>

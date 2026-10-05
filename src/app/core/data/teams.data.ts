@@ -4,10 +4,20 @@ import { MOCK_CHANNELS } from '../mocks/channels.mock';
 import { MOCK_TEAMS } from '../mocks/teams.mock';
 import { CURRENT_USER_ID, MOCK_USERS } from '../mocks/users.mock';
 import { ActivityEvent } from '../models/activity';
-import { Channel, NewChannel } from '../models/channel';
-import { NewTeam, Team } from '../models/team';
+import { Channel, ChannelChanges, NewChannel } from '../models/channel';
+import { AssignableTeamRole, NewTeam, Team, TeamChanges } from '../models/team';
+import {
+  channelWithMembers,
+  channelWithoutMember,
+  withoutTeamMember,
+  withTeamMembers,
+  withTeamRole,
+} from '../models/team-rules';
 import { PresenceStatus, User } from '../models/user';
 import { MockRequest } from './mock-request';
+import { buildTeam, CreatedTeam, monthAndYear, slugOf } from './team-factory';
+
+export type { CreatedTeam } from './team-factory';
 
 export interface WorkspaceDirectory {
   readonly users: readonly User[];
@@ -16,9 +26,9 @@ export interface WorkspaceDirectory {
   readonly activity: readonly ActivityEvent[];
 }
 
-export interface CreatedTeam {
+export interface TeamMembership {
   readonly team: Team;
-  readonly channel: Channel;
+  readonly channels: readonly Channel[];
 }
 
 const EMPTY_DIRECTORY_LISTS = { teams: [], channels: [], activity: [] };
@@ -59,7 +69,7 @@ export class TeamsData {
 
   createTeam(newTeam: NewTeam, workspaceId: string): Promise<CreatedTeam> {
     return this.request.write(() => {
-      const created = this.buildTeam(newTeam, workspaceId);
+      const created = buildTeam(newTeam, workspaceId, ++this.createdTeams, CURRENT_USER_ID);
       this.teams = [...this.teams, created.team];
       this.channels = [...this.channels, created.channel];
       return created;
@@ -79,6 +89,7 @@ export class TeamsData {
           : [...new Set([...team.memberIds, CURRENT_USER_ID])],
         isPrivate: newChannel.isPrivate,
         createdLabel: monthAndYear(new Date()),
+        createdBy: CURRENT_USER_ID,
       };
       const updatedTeam = { ...team, channelIds: [...team.channelIds, channel.id] };
       this.channels = [...this.channels, channel];
@@ -87,6 +98,52 @@ export class TeamsData {
       );
       return { team: updatedTeam, channel };
     });
+  }
+
+  updateChannel(channelId: string, changes: ChannelChanges): Promise<Channel> {
+    return this.request.write(() => {
+      const channel = this.channels.find((candidate) => candidate.id === channelId);
+      if (!channel) {
+        throw new Error(`Unknown channel ${channelId}`);
+      }
+      const updated = { ...channel, ...changes };
+      this.channels = this.channels.map((candidate) =>
+        candidate.id === channelId ? updated : candidate,
+      );
+      return updated;
+    });
+  }
+
+  addMembers(teamId: string, userIds: readonly string[]): Promise<TeamMembership> {
+    return this.request.write(() =>
+      this.changeMembership(
+        withTeamMembers(this.requireTeam(teamId), userIds, CURRENT_USER_ID),
+        (channel) => channelWithMembers(channel, userIds),
+      ),
+    );
+  }
+
+  removeMember(teamId: string, userId: string): Promise<TeamMembership> {
+    return this.request.write(() =>
+      this.changeMembership(
+        withoutTeamMember(this.requireTeam(teamId), userId, CURRENT_USER_ID),
+        (channel) => channelWithoutMember(channel, userId),
+      ),
+    );
+  }
+
+  setRole(teamId: string, userId: string, role: AssignableTeamRole): Promise<Team> {
+    return this.request.write(() =>
+      this.saveTeam(withTeamRole(this.requireTeam(teamId), userId, role)),
+    );
+  }
+
+  updateTeam(teamId: string, changes: TeamChanges): Promise<Team> {
+    return this.request.write(() => this.saveTeam({ ...this.requireTeam(teamId), ...changes }));
+  }
+
+  setArchived(teamId: string, archived: boolean): Promise<Team> {
+    return this.request.write(() => this.saveTeam({ ...this.requireTeam(teamId), archived }));
   }
 
   private directory(): WorkspaceDirectory {
@@ -113,6 +170,21 @@ export class TeamsData {
     return team;
   }
 
+  private saveTeam(team: Team): Team {
+    this.teams = this.teams.map((candidate) => (candidate.id === team.id ? team : candidate));
+    return team;
+  }
+
+  private changeMembership(team: Team, change: (channel: Channel) => Channel): TeamMembership {
+    this.saveTeam(team);
+    const channels = this.channels
+      .filter((channel) => team.channelIds.includes(channel.id))
+      .map(change);
+    const changed = new Map(channels.map((channel) => [channel.id, channel]));
+    this.channels = this.channels.map((channel) => changed.get(channel.id) ?? channel);
+    return { team, channels };
+  }
+
   private join(team: Team): Team {
     return { ...team, joined: true, memberIds: [...team.memberIds, CURRENT_USER_ID] };
   }
@@ -121,58 +193,4 @@ export class TeamsData {
     const memberIds = team.memberIds.filter((memberId) => memberId !== CURRENT_USER_ID);
     return { ...team, joined: false, memberIds };
   }
-
-  private buildTeam(newTeam: NewTeam, workspaceId: string): CreatedTeam {
-    const sequence = ++this.createdTeams;
-    const slug = slugOf(newTeam.name);
-    const teamId = `t-${slug}-${sequence}`;
-    const channelId = `c-${slug}-${sequence}`;
-    const createdLabel = monthAndYear(new Date());
-    const isPrivate = newTeam.privacy === 'private';
-    const team: Team = {
-      id: teamId,
-      workspaceId,
-      name: newTeam.name,
-      code: teamCodeOf(newTeam.name),
-      description: newTeam.description || 'No description yet.',
-      memberIds: [CURRENT_USER_ID],
-      leadId: CURRENT_USER_ID,
-      channelIds: [channelId],
-      activityLevel: 'New',
-      weeklyMessageCount: 0,
-      createdLabel,
-      joined: true,
-      isPrivate,
-    };
-    const channel: Channel = {
-      id: channelId,
-      teamId,
-      name: 'general',
-      description: `Announcements and day-to-day conversation for ${newTeam.name}.`,
-      memberIds: [CURRENT_USER_ID],
-      isPrivate,
-      createdLabel,
-    };
-    return { team, channel };
-  }
 }
-
-const CODE_LENGTH = 2;
-
-const slugOf = (name: string): string =>
-  name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '') || 'team';
-
-const teamCodeOf = (name: string): string => {
-  const words = name.trim().split(/\s+/);
-  const letters =
-    words.length > 1
-      ? words[0][0] + words[1][0]
-      : name.replace(/[^A-Za-z0-9]/g, '').slice(0, CODE_LENGTH);
-  return letters.toUpperCase();
-};
-
-const monthAndYear = (date: Date): string =>
-  date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });

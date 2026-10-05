@@ -16,6 +16,10 @@
   --search-result-line-gap: 1px;
   --search-mark-inset: 1px;
   --search-remove-reserve: calc(var(--size-touch-target) + var(--space-4));
+  --size-search-message-width: 92px;
+  --size-search-message-height: 32px;
+  --size-search-enter-icon: 14px;
+  --search-message-offset: calc(var(--space-4) + var(--size-search-enter-icon) + var(--space-3));
 
   --size-search-command-tile: 28px;
   --size-search-result-tile: var(--size-avatar-32);

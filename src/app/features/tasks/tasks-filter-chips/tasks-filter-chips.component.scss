@@ -1,0 +1,34 @@
+@use 'breakpoints';
+
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--task-chip-height);
+  padding: var(--space-0) var(--space-2);
+  border: var(--rule-hairline);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover);
+  }
+
+  @include breakpoints.tablet-and-down {
+    min-height: var(--size-touch-target);
+  }
+
+  @include breakpoints.touch-device {
+    min-height: var(--size-touch-target);
+  }
+}

@@ -1,7 +1,8 @@
 import { CURRENT_USER_ID } from '../mocks/users.mock';
-import { Conversation, ConversationPreview } from '../models/conversation';
+import { Conversation, ConversationPreview, conversationRoute } from '../models/conversation';
 import { Message } from '../models/message';
 import { firstNameOf, User, userColorSeed } from '../models/user';
+import { plainTextOf } from './chat-format';
 
 export interface PreviewContext {
   readonly usersById: ReadonlyMap<string, User>;
@@ -10,15 +11,18 @@ export interface PreviewContext {
   readonly starredIds: ReadonlySet<string>;
   readonly mutedIds: ReadonlySet<string>;
   readonly typingUserIds: Readonly<Record<string, readonly string[]>>;
+  readonly teamNames: ReadonlyMap<string, string>;
 }
 
 const NO_MESSAGES = 'No messages yet';
 const GROUP_SEED = 0;
 
-const firstNames = (userIds: readonly string[], context: PreviewContext): string[] =>
+type NameContext = Pick<PreviewContext, 'usersById'>;
+
+const firstNames = (userIds: readonly string[], context: NameContext): string[] =>
   userIds.map((userId) => firstNameOf(context.usersById.get(userId)?.name ?? ''));
 
-export const typingLabel = (userIds: readonly string[], context: PreviewContext): string => {
+export const typingLabel = (userIds: readonly string[], context: NameContext): string => {
   const names = firstNames(userIds, context);
   if (names.length === 0) {
     return '';
@@ -27,6 +31,14 @@ export const typingLabel = (userIds: readonly string[], context: PreviewContext)
     return `${names[0]} is typing`;
   }
   return names.length === 2 ? `${names.join(' and ')} are typing` : 'Several people are typing';
+};
+
+export const typingTextOf = (userIds: readonly string[], context: NameContext): string => {
+  const label = typingLabel(
+    userIds.filter((userId) => userId !== CURRENT_USER_ID),
+    context,
+  );
+  return label ? `${label}…` : '';
 };
 
 const authorPrefix = (
@@ -49,7 +61,7 @@ const previewText = (
     return NO_MESSAGES;
   }
   const attachment = message.attachments[0];
-  const body = message.text || (attachment ? `Shared ${attachment.name}` : '');
+  const body = plainTextOf(message.text) || (attachment ? `Shared ${attachment.name}` : '');
   return authorPrefix(conversation, message, context) + body;
 };
 
@@ -77,20 +89,19 @@ export const buildPreview = (
 ): ConversationPreview => {
   const thread = context.messages[conversation.id] ?? [];
   const lastMessage = thread[thread.length - 1];
-  const typingIds = (context.typingUserIds[conversation.id] ?? []).filter(
-    (userId) => userId !== CURRENT_USER_ID,
-  );
-  const typing = typingLabel(typingIds, context);
   return {
     ...identityOf(conversation, context),
     id: conversation.id,
     type: conversation.type,
     memberCount: conversation.type === 'dm' ? 2 : conversation.memberIds.length,
+    teamName:
+      conversation.type === 'channel' ? (context.teamNames.get(conversation.teamId) ?? '') : '',
+    route: conversationRoute(conversation),
     preview: previewText(conversation, lastMessage, context),
     lastMessageAt: lastMessage?.sentAt ?? 0,
     unreadCount: context.unreadCounts[conversation.id] ?? 0,
     starred: context.starredIds.has(conversation.id),
     muted: context.mutedIds.has(conversation.id),
-    typingText: typing ? `${typing}…` : '',
+    typingText: typingTextOf(context.typingUserIds[conversation.id] ?? [], context),
   };
 };

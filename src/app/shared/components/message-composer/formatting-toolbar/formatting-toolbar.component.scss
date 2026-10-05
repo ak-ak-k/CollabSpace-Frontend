@@ -1,0 +1,16 @@
+:host {
+  display: flex;
+  align-items: center;
+  gap: var(--space-0-5);
+  padding: var(--space-0-5);
+  border: var(--border-width-hairline) solid var(--border-control);
+  border-bottom: var(--space-0);
+  background: var(--surface);
+}
+
+.formatting-toolbar__hint {
+  margin-left: auto;
+  padding-right: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+}

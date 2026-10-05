@@ -1,0 +1,38 @@
+<nav class="chips" aria-label="Filter people by status">
+  @for (chip of chips(); track chip.filter) {
+    <a
+      class="chip"
+      [class.chip--current]="chip.filter === current()"
+      [routerLink]="chip.link"
+      [attr.aria-current]="chip.filter === current() ? 'page' : null"
+    >
+      @if (chip.dot; as dot) {
+        <app-status-dot class="chip__dot" [status]="dot" />
+      }
+      {{ chip.label }}
+      @if (showCounts()) {
+        <span class="chip__count">{{ chip.count }}</span>
+      }
+    </a>
+  }
+</nav>
+
+@if (activeFilters().length > 0) {
+  <div class="active">
+    <span class="active__label">Filtered by</span>
+    @for (filter of activeFilters(); track filter.kind) {
+      <button
+        type="button"
+        class="active__pill"
+        [attr.aria-label]="filter.removeLabel"
+        (click)="remove.emit(filter.kind)"
+      >
+        {{ filter.label }}
+        <app-icon name="x" [size]="12" />
+      </button>
+    }
+    <button appButton type="button" variant="ghost" size="sm" (click)="clearAll.emit()">
+      Clear all
+    </button>
+  </div>
+}

@@ -1,0 +1,11 @@
+:host {
+  display: inline-flex;
+  flex: none;
+}
+
+.menu__trigger {
+  --icon-button-base-size: var(--task-card-menu-size);
+
+  margin-block: var(--task-card-menu-pull);
+  margin-inline-end: var(--task-card-menu-pull-end);
+}

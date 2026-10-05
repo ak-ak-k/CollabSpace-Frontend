@@ -2,7 +2,7 @@
 
 <a
   class="conversation-item"
-  [routerLink]="['/messages', item.id]"
+  [routerLink]="item.route"
   [attr.aria-current]="selected() ? 'page' : null"
   [attr.aria-label]="accessibleLabel()"
 >
@@ -12,8 +12,9 @@
     [size]="avatarSize()"
     [status]="item.avatarStatus"
     [variant]="isDirect() ? 'tone' : 'inverted'"
+    [text]="avatarText()"
   >
-    @if (isComfortable() && !isDirect()) {
+    @if (isComfortable() && isGroup()) {
       <span class="conversation-item__members">{{ item.memberCount }}</span>
     }
   </app-avatar>
@@ -21,6 +22,9 @@
   <span class="conversation-item__body">
     <span class="conversation-item__heading">
       <span class="conversation-item__title truncate">{{ item.title }}</span>
+      @if (item.teamName) {
+        <span class="conversation-item__team">{{ item.teamName }}</span>
+      }
       @if (isComfortable() && item.starred) {
         <app-icon name="star" [size]="12" filled />
       }

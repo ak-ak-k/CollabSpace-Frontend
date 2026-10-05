@@ -44,9 +44,7 @@
       <strong class="notification__actor">{{ actorName }}</strong>
     }
     {{ notification().text }}
-    @if (notification().unread) {
-      <span class="visually-hidden">(unread)</span>
-    }
+    <span class="visually-hidden">{{ notification().unread ? '(unread)' : '(read)' }}</span>
   </span>
   @if (notification().snippet) {
     <span class="notification__snippet">{{ notification().snippet }}</span>
@@ -56,6 +54,8 @@
       <app-icon [name]="notification().categoryIcon" [size]="11" />
       {{ notification().categoryLabel }}
     </app-tag>
-    {{ notification().when }}
+    <time [attr.datetime]="notification().whenIso" [title]="notification().whenFull">
+      {{ notification().when }}
+    </time>
   </span>
 </ng-template>

@@ -21,6 +21,10 @@ export class ComposerDrafts {
     this.files.update((files) => ({ ...files, [conversationId]: attachments }));
   }
 
+  pendingAttachments(): readonly Attachment[] {
+    return Object.values(this.files()).flat();
+  }
+
   clear(conversationId: string): void {
     this.setText(conversationId, '');
     this.setAttachments(conversationId, []);

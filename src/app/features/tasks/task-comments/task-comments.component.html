@@ -1,23 +1,14 @@
 <section class="comments" [attr.aria-labelledby]="headingId">
-  <h3 class="comments__heading" [id]="headingId">{{ heading() }}</h3>
+  <h3 class="comments__heading" [id]="headingId">Comments · {{ items().length }}</h3>
   @for (comment of items(); track comment.id) {
-    <div class="comment">
-      <app-avatar [name]="comment.authorName" [seed]="comment.seed" [size]="28" />
-      <div class="comment__body">
-        <div class="comment__meta">
-          <strong>{{ comment.authorName }}</strong>
-          <span class="comment__when">· {{ comment.when }}</span>
-        </div>
-        <p class="comment__text">{{ comment.text }}</p>
-      </div>
-    </div>
+    <app-task-comment [comment]="comment" />
   }
   <form class="comments__form" (submit)="submit($event)">
     <app-textarea
       class="comments__field"
       label="Add a comment"
       hideLabel
-      placeholder="Write a comment…"
+      placeholder="Write a comment… use @ to mention"
       [rows]="1"
       [(value)]="draft"
     />

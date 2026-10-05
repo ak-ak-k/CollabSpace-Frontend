@@ -1,0 +1,69 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--background);
+}
+
+.people {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: var(--people-page-max-width);
+  padding: var(--people-page-padding);
+}
+
+.people__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.people__heading {
+  display: flex;
+  flex: 1 1 var(--people-heading-basis);
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.people__title {
+  margin: var(--space-0);
+  font-size: var(--font-size-display-sm);
+}
+
+.people__subtitle {
+  margin: var(--space-0);
+  color: var(--text-muted);
+  font-size: var(--font-size-15);
+}
+
+.people__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--people-card-min-width)), 1fr));
+  gap: var(--space-3);
+  margin: var(--space-0);
+  padding: var(--space-0);
+  list-style: none;
+}
+
+.people__cell {
+  min-width: 0;
+}
+
+.people__list {
+  margin: var(--space-0);
+  padding: var(--space-0);
+  border-top: var(--rule-strong);
+  list-style: none;
+}
+
+.people__count {
+  margin: var(--space-0);
+  color: var(--text-secondary);
+  font-size: var(--font-size-13);
+
+  &:empty {
+    display: none;
+  }
+}

@@ -8,7 +8,8 @@ import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { CardComponent } from '../../../shared/ui/card/card.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { TeamStat } from '../team-detail/team-detail-data';
-import { ChannelRowView, TeamActivityItem, TeamMemberView } from '../team-view';
+import { TeamMemberView } from '../team-member-view';
+import { ChannelRowView, TeamActivityItem } from '../team-view';
 
 const OVERVIEW_ACTIVITY_LIMIT = 4;
 

@@ -3,6 +3,7 @@ import { FILE_TYPE_ICONS } from '../../../core/models/file-item';
 import { Message } from '../../../core/models/message';
 import { firstNameOf, User } from '../../../core/models/user';
 import { ChatState } from '../../../core/state/chat.state';
+import { FileState } from '../../../core/state/file.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import { formatWhen } from '../../../shared/pipes/time-format';
 import { IconName } from '../../../shared/ui/icon/icon-registry';
@@ -20,6 +21,7 @@ export interface SharedFileItem {
   readonly name: string;
   readonly icon: IconName;
   readonly meta: string;
+  readonly fileId: string | null;
 }
 
 export interface ConversationExtras {
@@ -43,7 +45,11 @@ const pinnedItems = (messages: readonly Message[], usersById: ReadonlyMap<string
       text: message.text || (message.attachments[0]?.name ?? ''),
     }));
 
-const sharedFiles = (messages: readonly Message[], usersById: ReadonlyMap<string, User>) =>
+const sharedFiles = (
+  messages: readonly Message[],
+  usersById: ReadonlyMap<string, User>,
+  fileIdOf: (name: string) => string | null,
+) =>
   messages
     .flatMap((message) =>
       message.attachments.map<SharedFileItem>((attachment, index) => ({
@@ -51,6 +57,7 @@ const sharedFiles = (messages: readonly Message[], usersById: ReadonlyMap<string
         name: attachment.name,
         icon: FILE_TYPE_ICONS[attachment.type] ?? 'file',
         meta: `${attachment.size} · ${authorFirstName(usersById, message.authorId)} · ${formatWhen(message.sentAt)}`,
+        fileId: fileIdOf(attachment.name),
       })),
     )
     .reverse();
@@ -63,7 +70,7 @@ export const injectConversationView = (
   return computed(() => {
     const id = conversationId();
     const conversation = id ? chat.conversations().find((candidate) => candidate.id === id) : null;
-    if (!conversation) {
+    if (!conversation || (conversation.type === 'group' && chat.hasLeft(conversation.id))) {
       return null;
     }
     const channel =
@@ -85,12 +92,15 @@ export const injectConversationExtras = (
 ): Signal<ConversationExtras> => {
   const chat = inject(ChatState);
   const workspace = inject(WorkspaceState);
+  const fileState = inject(FileState);
   return computed(() => {
     const id = conversationId();
     const messages = id ? (chat.messages()[id] ?? []) : [];
-    const files = sharedFiles(messages, workspace.usersById());
+    const files = sharedFiles(messages, workspace.usersById(), (name) =>
+      id ? (fileState.fileForAttachment(id, name)?.id ?? null) : null,
+    );
     return {
-      pinned: pinnedItems(messages, workspace.usersById()),
+      pinned: pinnedItems(id ? chat.timeline(id) : [], workspace.usersById()),
       files: files.slice(0, VISIBLE_SHARED_FILES),
       fileCount: files.length,
     };

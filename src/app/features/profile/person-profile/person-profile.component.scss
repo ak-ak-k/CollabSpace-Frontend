@@ -1,0 +1,21 @@
+@use '../profile-section';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.person__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--profile-section-min-width)), 1fr));
+  gap: var(--space-8);
+}
+
+.person__section {
+  @include profile-section.section;
+}
+
+.person__heading {
+  @include profile-section.heading;
+}

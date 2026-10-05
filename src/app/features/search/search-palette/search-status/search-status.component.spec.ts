@@ -11,11 +11,11 @@ describe('SearchStatusComponent', () => {
     fixture.componentRef.setInput('term', 'priya');
   });
 
-  it('is a status region that stays empty while idle', async () => {
+  it('keeps a polite live region that stays empty while idle', async () => {
     fixture.componentRef.setInput('status', 'idle');
     await fixture.whenStable();
 
-    expect(host.getAttribute('role')).toBe('status');
+    expect(host.querySelector('[aria-live="polite"]')).not.toBeNull();
     expect(host.textContent?.trim()).toBe('');
   });
 
@@ -41,6 +41,17 @@ describe('SearchStatusComponent', () => {
     fixture.componentRef.setInput('total', 12);
     await fixture.whenStable();
 
-    expect(host.querySelector('.visually-hidden')?.textContent).toBe('12 results');
+    expect(host.querySelector('[aria-live="polite"]')?.textContent).toBe('12 results for priya');
+  });
+
+  it('raises an alert with a retry button when search fails', async () => {
+    let retried = false;
+    fixture.componentInstance.retry.subscribe(() => (retried = true));
+    fixture.componentRef.setInput('status', 'failed');
+    await fixture.whenStable();
+
+    expect(host.querySelector('[role="alert"]')?.textContent).toContain('Search unavailable');
+    host.querySelector<HTMLButtonElement>('button')?.click();
+    expect(retried).toBe(true);
   });
 });

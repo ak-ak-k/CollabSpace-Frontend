@@ -36,7 +36,7 @@ describe('IconComponent', () => {
   });
 
   it('registers every icon the design uses', () => {
-    expect(ICON_NAMES.length).toBe(144);
+    expect(ICON_NAMES.length).toBe(153);
     expect(ICON_NAMES).toContain('github');
     expect(ICON_NAMES).toContain('figma');
   });

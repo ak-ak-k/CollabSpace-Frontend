@@ -1,0 +1,100 @@
+<div class="people">
+  <header class="people__header">
+    <div class="people__heading">
+      <h1 class="people__title">People</h1>
+      <p class="people__subtitle">Find and connect with people in your workspace.</p>
+    </div>
+    @if (canInvite()) {
+      <button appButton type="button" variant="primary" size="lg" (click)="invite()">
+        <app-icon name="user-plus" [size]="16" />
+        Invite people
+      </button>
+    }
+  </header>
+
+  <app-people-toolbar
+    [compact]="isMobile()"
+    [teamOptions]="directory.teamOptions()"
+    [departmentOptions]="directory.departmentOptions()"
+    [activeFilterCount]="directory.activeFilters().length"
+    [filtersOpen]="filtersOpen()"
+    [(query)]="query"
+    [(teamId)]="teamId"
+    [(department)]="department"
+    [(layout)]="layout"
+    (openFilters)="openFilters()"
+  />
+
+  <app-people-filter-bar
+    [chips]="directory.chips()"
+    [current]="filter()"
+    [showCounts]="ready()"
+    [activeFilters]="directory.activeFilters()"
+    (remove)="removeFilter($event)"
+    (clearAll)="clearFilters()"
+  />
+
+  @switch (view()) {
+    @case ('loading') {
+      <app-skeleton
+        compact
+        [layout]="grid() ? 'cards' : 'list'"
+        [rows]="9"
+        label="Loading people"
+      />
+    }
+    @case ('error') {
+      <app-empty-state
+        kind="error"
+        heading="Couldn’t load people"
+        message="The directory didn’t load. Try again in a moment."
+        actionLabel="Try again"
+        (action)="retry()"
+      />
+    }
+    @case ('solo') {
+      <app-empty-state
+        icon="contact"
+        heading="It’s just you for now"
+        actionIcon="user-plus"
+        [message]="soloMessage()"
+        [actionLabel]="canInvite() ? 'Invite people' : ''"
+        (action)="invite()"
+      />
+    }
+    @case ('none') {
+      @let empty = directory.empty();
+      <app-empty-state
+        compact
+        actionIcon="x"
+        [icon]="empty.icon"
+        [heading]="empty.heading"
+        [message]="empty.message"
+        [actionLabel]="empty.actionLabel"
+        (action)="runEmptyAction()"
+      />
+    }
+    @case ('grid') {
+      <ul class="people__grid" [attr.aria-label]="listLabel()">
+        @for (person of directory.rows(); track person.id) {
+          <li class="people__cell"><app-person-card [person]="person" /></li>
+        }
+      </ul>
+    }
+    @case ('list') {
+      <ul class="people__list" [attr.aria-label]="listLabel()">
+        @for (person of directory.rows(); track person.id) {
+          <li>
+            <app-person-row [person]="person" [wide]="isDesktop()" [compact]="isMobile()" />
+          </li>
+        }
+      </ul>
+    }
+  }
+
+  <p class="people__count" role="status">
+    @if (view() === 'grid' || view() === 'list') {
+      {{ countLabel() }}
+    }
+  </p>
+</div>

@@ -41,6 +41,7 @@ export const messagesFromSeeds = (
     reactions: seed.reactions ?? [],
     replyToId:
       seed.replyToIndex === undefined ? null : messageId(conversationId, seed.replyToIndex),
+    threadRootId: null,
     pinned: seed.pinned ?? false,
     deliveryState: deliveryStateOf(seeds, index),
   }));

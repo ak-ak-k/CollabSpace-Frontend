@@ -117,7 +117,7 @@ describe('SearchPaletteComponent', () => {
 
     await press('Enter');
 
-    expect(navigate).toHaveBeenCalledWith(['/messages/dm-u2'], { queryParams: undefined });
+    expect(navigate).toHaveBeenCalledWith(['/profile/u2'], { queryParams: undefined });
     expect(search.recentSearches()[0]).toBe('priya');
     expect(search.isOpen()).toBe(false);
   });

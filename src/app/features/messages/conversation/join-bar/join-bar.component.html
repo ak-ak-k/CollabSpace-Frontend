@@ -1,0 +1,7 @@
+<app-icon [name]="bar().icon" [size]="18" />
+<span class="join-bar__text">{{ bar().text }}</span>
+@if (bar().action) {
+  <button appButton type="button" variant="inverted" (click)="run()">
+    {{ bar().actionLabel }}
+  </button>
+}

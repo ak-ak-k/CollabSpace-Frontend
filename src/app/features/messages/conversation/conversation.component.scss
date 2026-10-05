@@ -16,6 +16,17 @@
   min-height: 0;
 }
 
+.conversation--behind-thread {
+  display: none;
+}
+
+.conversation__scrim {
+  position: fixed;
+  inset: var(--space-0);
+  z-index: var(--z-thread-scrim);
+  background: var(--scrim);
+}
+
 .conversation__typing {
   display: flex;
   flex: none;

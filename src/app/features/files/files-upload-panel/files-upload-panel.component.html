@@ -1,0 +1,56 @@
+<div class="panel__header">
+  <strong class="panel__title">{{ uploads.title() }}</strong>
+  @if (uploads.hasFinished()) {
+    <button appButton type="button" variant="ghost" size="sm" (click)="uploads.clearFinished()">
+      Clear
+    </button>
+  }
+</div>
+
+<ul class="panel__list">
+  @for (item of uploads.items(); track item.id) {
+    <li class="upload">
+      <app-icon class="upload__icon" [name]="iconOf(item)" [size]="16" />
+      <span class="upload__name truncate">{{ item.name }}</span>
+      <span
+        class="upload__status"
+        [class.upload__status--done]="item.status === 'done'"
+        [class.upload__status--failed]="item.status === 'failed'"
+      >
+        {{ statusOf(item) }}
+      </span>
+      @if (item.status === 'failed') {
+        <button
+          appButton
+          type="button"
+          size="sm"
+          [attr.aria-label]="'Retry uploading ' + item.name"
+          (click)="uploads.retry(item.id)"
+        >
+          Retry
+        </button>
+      }
+      @if (item.status !== 'uploading') {
+        <button
+          appIconButton
+          type="button"
+          [label]="'Dismiss ' + item.name"
+          (click)="uploads.dismiss(item.id)"
+        >
+          <app-icon name="x" [size]="14" />
+        </button>
+      } @else {
+        <div
+          class="upload__track"
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [attr.aria-label]="item.name + ' upload progress'"
+          [attr.aria-valuenow]="item.progress"
+        >
+          <div class="upload__fill" [style.width.%]="item.progress"></div>
+        </div>
+      }
+    </li>
+  }
+</ul>

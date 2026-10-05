@@ -3,6 +3,28 @@ import { minutesAgo } from './mock-clock';
 
 export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
   {
+    id: 'n-th1',
+    workspaceId: 'w1',
+    category: 'mention',
+    actorId: 'u4',
+    text: 'mentioned you in a thread in #frontend',
+    snippet: '@Aarav can you join the 4 pm review?',
+    createdAt: minutesAgo(20),
+    read: false,
+    route: '/teams/t-frontend/channels/c-frontend/thread/c-frontend-t1',
+  },
+  {
+    id: 'n-th2',
+    workspaceId: 'w1',
+    category: 'message',
+    actorId: 'u2',
+    text: 'replied to a thread you’re in',
+    snippet: 'Added screenshots for the new composer.',
+    createdAt: minutesAgo(35),
+    read: false,
+    route: '/messages/g-launch/thread/g-launch-0',
+  },
+  {
     id: 'n1',
     workspaceId: 'w1',
     category: 'message',
@@ -22,7 +44,7 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
     snippet: '@Aarav can you sign off on the final nav changes today?',
     createdAt: minutesAgo(12),
     read: false,
-    route: '/teams/t-frontend/c/c-frontend',
+    route: '/teams/t-frontend/channels/c-frontend',
   },
   {
     id: 'n3',
@@ -55,7 +77,7 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
     snippet: '@Aarav tokens v2 needs your sign-off for the release notes.',
     createdAt: minutesAgo(180),
     read: false,
-    route: '/teams/t-frontend/c/c-design-system',
+    route: '/teams/t-frontend/channels/c-design-system',
   },
   {
     id: 'n6',
@@ -99,7 +121,7 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
     snippet: 'The v2 public API rollout.',
     createdAt: minutesAgo(1640),
     read: true,
-    route: '/teams/t-platform/c/c-api',
+    route: '/teams/t-platform/channels/c-api',
   },
   {
     id: 'n10',
@@ -132,6 +154,6 @@ export const MOCK_NOTIFICATIONS: readonly AppNotification[] = [
     snippet: '@Aarav a customer is asking about the SSO timeline.',
     createdAt: minutesAgo(2880),
     read: true,
-    route: '/teams/t-success/c/c-support',
+    route: '/teams/t-success/channels/c-support',
   },
 ];

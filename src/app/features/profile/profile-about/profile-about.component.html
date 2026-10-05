@@ -1,14 +1,14 @@
 <section class="section" aria-labelledby="profile-about-heading">
   <h2 class="section__heading" id="profile-about-heading">About</h2>
-  @if (editing()) {
-    <app-input label="Full name" autocomplete="name" [formField]="form().name" />
-    <app-input label="Title" autocomplete="organization-title" [formField]="form().title" />
+  @if (editing() && form(); as fields) {
+    <app-input label="Full name" autocomplete="name" [formField]="fields.name" />
+    <app-input label="Title" autocomplete="organization-title" [formField]="fields.title" />
     <app-textarea
       label="Bio"
       showCount
       [rows]="4"
       [maxlength]="bioMaxLength"
-      [formField]="form().bio"
+      [formField]="fields.bio"
     />
   } @else {
     <p class="section__bio">{{ bio() }}</p>

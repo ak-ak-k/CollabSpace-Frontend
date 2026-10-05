@@ -8,7 +8,8 @@ import {
   output,
   viewChild,
 } from '@angular/core';
-import { PRESENCE_LABELS, User, userColorSeed } from '../../../core/models/user';
+import { RouterLink } from '@angular/router';
+import { firstNameOf, PRESENCE_LABELS, User, userColorSeed } from '../../../core/models/user';
 import { WORKSPACE_ROLE_LABELS } from '../../../core/models/workspace-role';
 import { BreakpointService } from '../../../core/services/breakpoint.service';
 import { AvatarComponent } from '../../../shared/ui/avatar/avatar.component';
@@ -28,6 +29,7 @@ const AVATAR_SIZE = 128;
     ButtonComponent,
     IconButtonComponent,
     IconComponent,
+    RouterLink,
     StatusDotComponent,
     TagComponent,
   ],
@@ -38,6 +40,7 @@ export class ProfileHeaderComponent {
   private readonly breakpoint = inject(BreakpointService);
 
   readonly user = input.required<User>();
+  readonly self = input(true, { transform: booleanAttribute });
   readonly statusMessage = input('');
   readonly editing = input(false, { transform: booleanAttribute });
   readonly saving = input(false, { transform: booleanAttribute });
@@ -46,6 +49,7 @@ export class ProfileHeaderComponent {
   readonly cancel = output<void>();
   readonly save = output<void>();
   readonly changePhoto = output<void>();
+  readonly message = output<void>();
 
   private readonly editButton = viewChild('editButton', { read: ElementRef<HTMLButtonElement> });
 
@@ -55,6 +59,7 @@ export class ProfileHeaderComponent {
   protected readonly seed = computed(() => userColorSeed(this.user().id));
   protected readonly roleLabel = computed(() => WORKSPACE_ROLE_LABELS[this.user().role]);
   protected readonly statusLabel = computed(() => PRESENCE_LABELS[this.user().status]);
+  protected readonly firstName = computed(() => firstNameOf(this.user().name));
 
   focusEdit(): void {
     this.editButton()?.nativeElement.focus();

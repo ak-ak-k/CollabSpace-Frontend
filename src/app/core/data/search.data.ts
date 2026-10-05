@@ -1,15 +1,26 @@
 import { inject, Service } from '@angular/core';
 import { IconName } from '../../shared/ui/icon/icon-registry';
 import { MOCK_CHANNELS } from '../mocks/channels.mock';
-import { MOCK_CONVERSATIONS } from '../mocks/conversations.mock';
 import { MOCK_FILES } from '../mocks/files.mock';
-import { buildMockMessages } from '../mocks/messages.mock';
 import { MOCK_TASKS } from '../mocks/tasks.mock';
 import { MOCK_TEAMS } from '../mocks/teams.mock';
 import { CURRENT_USER_ID, MOCK_USERS } from '../mocks/users.mock';
+import { FILE_TYPE_LABELS } from '../models/file-item';
+import { canSeeFile, sourceLabelOf } from '../models/file-source';
 import { PresenceStatus } from '../models/user';
 import type { SearchFilter } from '../services/search.service';
 import { MockRequest } from './mock-request';
+import {
+  canSeeChannel,
+  canSeeConversation,
+  canSeeTeam,
+  conversationOf,
+  FILE_ACCESS,
+  FILE_LOOKUP,
+  SEARCHABLE_MESSAGES,
+  teamOf,
+  userNameOf,
+} from './search-context';
 import { toChannel, toFile, toMessage, toPerson, toTask, toTeam } from './search-results';
 
 export { highlight } from './search-results';
@@ -85,15 +96,41 @@ export const FILTERED_GROUP_LIMIT = 30;
 
 type Finder = (needle: string) => readonly SearchResult[];
 
-const otherUsers = MOCK_USERS.filter((user) => user.id !== CURRENT_USER_ID);
-const newestMessages = Object.values(buildMockMessages())
-  .flat()
-  .sort((first, second) => second.sentAt - first.sentAt);
-const teamWorkspaces = new Map(MOCK_TEAMS.map((team) => [team.id, team.workspaceId]));
-const conversationWorkspaces = new Map<string, string | undefined>([
-  ...MOCK_CONVERSATIONS.map((conversation) => [conversation.id, conversation.workspaceId] as const),
-  ...MOCK_CHANNELS.map((channel) => [channel.id, teamWorkspaces.get(channel.teamId)] as const),
+const RANKED_GROUPS: ReadonlySet<SearchGroupKey> = new Set([
+  'people',
+  'channels',
+  'teams',
+  'tasks',
+  'files',
 ]);
+
+const otherUsers = MOCK_USERS.filter((user) => user.id !== CURRENT_USER_ID);
+const teamWorkspaces = new Map(MOCK_TEAMS.map((team) => [team.id, team.workspaceId]));
+
+const workspaceOfConversation = (conversationId: string): string | undefined => {
+  const conversation = conversationOf(conversationId);
+  if (conversation?.type === 'channel') {
+    return teamWorkspaces.get(conversation.teamId);
+  }
+  return conversation?.workspaceId;
+};
+
+const hiddenByTeam = (teamId: string | null): boolean => {
+  const team = teamOf(teamId);
+  return !!team?.isPrivate && !team.memberIds.includes(CURRENT_USER_ID);
+};
+
+export const rankOf = (result: SearchResult, needle: string): number => {
+  const { before, match, after } = result.title;
+  const text = `${before}${match}${after}`.toLowerCase();
+  if (text === needle) {
+    return 0;
+  }
+  if (text.startsWith(needle)) {
+    return 1;
+  }
+  return match ? 2 : 3;
+};
 
 const finder =
   <Item>(
@@ -111,45 +148,71 @@ const findersFor = (scope?: SearchScope): Record<SearchGroupKey, Finder> => {
   return {
     people: finder(
       otherUsers.filter((user) => !scope || scope.memberIds.has(user.id)),
-      (user) => [user.name, user.title, user.email],
+      (user) => [user.name, user.title, user.email, user.department],
       toPerson,
     ),
     messages: finder(
-      newestMessages.filter((message) =>
-        inScope(conversationWorkspaces.get(message.conversationId)),
+      SEARCHABLE_MESSAGES.filter(
+        (message) =>
+          inScope(workspaceOfConversation(message.conversationId)) &&
+          canSeeConversation(conversationOf(message.conversationId)),
       ),
       (message) => [message.text],
       toMessage,
     ),
     channels: finder(
-      MOCK_CHANNELS.filter((channel) => inScope(teamWorkspaces.get(channel.teamId))),
-      (channel) => [channel.name, channel.description],
+      MOCK_CHANNELS.filter(
+        (channel) => inScope(teamWorkspaces.get(channel.teamId)) && canSeeChannel(channel),
+      ),
+      (channel) => [channel.name, channel.description, teamOf(channel.teamId)?.name ?? ''],
       toChannel,
     ),
     teams: finder(
-      MOCK_TEAMS.filter((team) => inScope(team.workspaceId)),
+      MOCK_TEAMS.filter((team) => inScope(team.workspaceId) && canSeeTeam(team)),
       (team) => [team.name, team.description],
       toTeam,
     ),
     tasks: finder(
-      MOCK_TASKS.filter((task) => inScope(task.workspaceId)),
-      (task) => [task.title, task.id],
+      MOCK_TASKS.filter((task) => inScope(task.workspaceId) && !hiddenByTeam(task.teamId)),
+      (task) => [
+        task.title,
+        task.id,
+        task.description,
+        userNameOf(task.assigneeId),
+        teamOf(task.teamId)?.name ?? '',
+        ...task.labels,
+      ],
       toTask,
     ),
     files: finder(
-      MOCK_FILES.filter((file) => inScope(file.workspaceId)),
-      (file) => [file.name],
+      MOCK_FILES.filter((file) => inScope(file.workspaceId) && canSeeFile(file, FILE_ACCESS)),
+      (file) => [
+        file.name,
+        FILE_TYPE_LABELS[file.type],
+        userNameOf(file.ownerId),
+        sourceLabelOf(file, FILE_LOOKUP),
+        teamOf(file.teamId)?.name ?? '',
+      ],
       toFile,
     ),
   };
 };
+
+const ranked = (
+  key: SearchGroupKey,
+  found: readonly SearchResult[],
+  needle: string,
+): readonly SearchResult[] =>
+  RANKED_GROUPS.has(key)
+    ? [...found].sort((first, second) => rankOf(first, needle) - rankOf(second, needle))
+    : found;
 
 const groupsFor = (needle: string, filter: SearchFilter, scope?: SearchScope): SearchGroup[] => {
   const overview = filter === 'all';
   const limit = overview ? OVERVIEW_GROUP_LIMIT : FILTERED_GROUP_LIMIT;
   const finders = findersFor(scope);
   return SEARCH_GROUPS.filter((group) => overview || group.key === filter)
-    .map((group) => ({ group, found: finders[group.key](needle) }))
+    .map((group) => ({ group, found: ranked(group.key, finders[group.key](needle), needle) }))
     .filter(({ found }) => found.length > 0)
     .map(({ group, found }) => ({
       ...group,

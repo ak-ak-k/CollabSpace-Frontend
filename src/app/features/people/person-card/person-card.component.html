@@ -1,0 +1,51 @@
+@let row = person();
+
+<div class="card__body">
+  <div class="card__identity">
+    <app-avatar
+      class="card__avatar"
+      [name]="row.name"
+      [seed]="row.seed"
+      [size]="48"
+      [status]="row.status"
+    />
+    <div class="card__text">
+      <h2 class="card__name">
+        <button
+          type="button"
+          class="card__open"
+          aria-haspopup="dialog"
+          [attr.aria-label]="'View profile of ' + row.label"
+          (click)="actions.openProfile(row.id)"
+        >
+          <span class="card__open-text truncate">{{ row.label }}</span>
+        </button>
+      </h2>
+      <span class="card__title truncate">{{ row.title }}</span>
+      <span class="card__organisation truncate">{{ row.organisation }}</span>
+    </div>
+  </div>
+  <span class="card__status">
+    <app-status-dot [status]="row.status" size="sm" />
+    {{ row.statusLine }}
+  </span>
+</div>
+
+<div class="card__footer">
+  @if (row.isMe) {
+    <a appButton variant="ghost" size="sm" [routerLink]="row.profileRoute">Your profile</a>
+  } @else {
+    <button
+      appButton
+      type="button"
+      size="sm"
+      [attr.aria-label]="'Message ' + row.name"
+      (click)="actions.message(row.id)"
+    >
+      <app-icon name="message-square" [size]="16" />
+      Message
+    </button>
+  }
+  <span class="card__spacer"></span>
+  <app-person-menu [person]="row" />
+</div>

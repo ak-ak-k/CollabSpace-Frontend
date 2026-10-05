@@ -1,5 +1,6 @@
 import { User } from '../models/user';
 import { minutesAgo } from './mock-clock';
+import { withDepartmentBio } from './member-seeds.mock';
 import { MOCK_WORKSPACE_MEMBERS } from './workspace-members.mock';
 
 export const CURRENT_USER_ID = 'u0';
@@ -32,6 +33,7 @@ const CORE_TEAM: readonly User[] = [
     location: 'Pune, India',
     role: 'member',
     joinedLabel: 'Jun 2022',
+    bio: 'Frontend engineer on Atlas. I care about fast, accessible UI and tidy pull requests. Ping me about the composer or virtualised lists.',
   },
   {
     id: 'u2',
@@ -46,6 +48,7 @@ const CORE_TEAM: readonly User[] = [
     location: 'Bengaluru, India',
     role: 'member',
     joinedLabel: 'Sep 2022',
+    bio: 'Product designer working on onboarding and settings. I sketch on paper first and love a good usability session.',
   },
   {
     id: 'u3',
@@ -60,6 +63,7 @@ const CORE_TEAM: readonly User[] = [
     location: 'Singapore',
     role: 'member',
     joinedLabel: 'Jan 2023',
+    bio: 'Backend engineer looking after APIs, rate limiting and search indexing. Based in Singapore, usually online in the mornings IST.',
   },
   {
     id: 'u4',
@@ -73,6 +77,7 @@ const CORE_TEAM: readonly User[] = [
     location: 'Hyderabad, India',
     role: 'admin',
     joinedLabel: 'Mar 2022',
+    bio: 'Engineering manager for Frontend and Platform. Happy to talk career growth, planning and incident reviews.',
   },
   {
     id: 'u5',
@@ -86,6 +91,7 @@ const CORE_TEAM: readonly User[] = [
     location: 'Chennai, India',
     role: 'member',
     joinedLabel: 'Jun 2022',
+    bio: 'Design lead for the Northstar design language. Tokens, components and critique every Thursday.',
   },
   {
     id: 'u6',
@@ -126,6 +132,7 @@ const CORE_TEAM: readonly User[] = [
     location: 'Gurugram, India',
     role: 'admin',
     joinedLabel: 'Mar 2022',
+    bio: 'DevOps engineer. Pipelines, deploys and on-call tooling. If staging is red, I probably already know.',
   },
   {
     id: 'u9',
@@ -170,4 +177,6 @@ const CORE_TEAM: readonly User[] = [
   },
 ];
 
-export const MOCK_USERS: readonly User[] = [...CORE_TEAM, ...MOCK_WORKSPACE_MEMBERS];
+export const MOCK_USERS: readonly User[] = [...CORE_TEAM, ...MOCK_WORKSPACE_MEMBERS].map(
+  withDepartmentBio,
+);

@@ -1,0 +1,56 @@
+:host {
+  display: block;
+}
+
+.message-text {
+  margin: var(--space-0);
+  font-size: var(--font-size-15);
+  line-height: var(--line-height-message);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.message-text__mention {
+  padding: var(--space-0) var(--message-highlight-padding-inline);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-heavy);
+}
+
+.message-text__bold {
+  font-weight: var(--font-weight-heavy);
+}
+
+.message-text__code {
+  padding: var(--message-code-padding-block) var(--message-code-padding-inline);
+  background: var(--surface-secondary);
+  font-family: var(--message-font-mono);
+  font-size: var(--font-size-13);
+}
+
+.message-text__link {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: var(--message-link-underline-offset);
+  overflow-wrap: anywhere;
+
+  &:hover {
+    text-decoration-thickness: var(--border-width-rule);
+  }
+}
+
+.message-text__edited {
+  font-size: var(--font-size-12);
+  color: var(--text-secondary);
+}
+
+.message-text__status {
+  display: inline-flex;
+  margin-left: var(--space-1-5);
+  vertical-align: var(--message-status-icon-shift);
+  color: var(--text-secondary);
+}
+
+.message-text__status--read {
+  color: var(--delivery-read);
+}

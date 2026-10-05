@@ -5,8 +5,9 @@ import {
   NotificationFilter,
 } from '../../core/models/notification';
 import { User, userColorSeed } from '../../core/models/user';
-import { formatDayLabel, formatRelative } from '../../shared/pipes/time-format';
+import { formatDayLabel } from '../../shared/pipes/time-format';
 import { IconName } from '../../shared/ui/icon/icon-registry';
+import { compactWhenOf, fullDateOf, isoDateOf } from './notification-time';
 
 export type NotificationShowFilter = 'all' | 'unread';
 
@@ -21,6 +22,8 @@ export interface NotificationRowView {
   readonly categoryLabel: string;
   readonly categoryIcon: IconName;
   readonly when: string;
+  readonly whenIso: string;
+  readonly whenFull: string;
   readonly unread: boolean;
   readonly route: string | null;
 }
@@ -38,6 +41,7 @@ export interface NotificationCategoryView extends NotificationCategoryOption {
 
 const NOTIFICATIONS_ROUTE = '/notifications';
 const SIGN_IN_TEXT = /sign-in/i;
+const MARK_ALL_READ = 'Mark all as read';
 const CATEGORY_BY_ID = new Map(NOTIFICATION_CATEGORIES.map((option) => [option.id, option]));
 
 export const isNotificationFilter = (value: string | undefined): value is NotificationFilter =>
@@ -45,6 +49,12 @@ export const isNotificationFilter = (value: string | undefined): value is Notifi
 
 export const notificationFilterOf = (value: string | undefined): NotificationFilter =>
   isNotificationFilter(value) ? value : 'all';
+
+export const markAllLabelOf = (filter: NotificationFilter): string =>
+  filter === 'all' ? MARK_ALL_READ : `Mark all read in ${CATEGORY_BY_ID.get(filter)?.label ?? ''}`;
+
+const systemIconOf = (notification: AppNotification): IconName =>
+  notification.icon ?? (SIGN_IN_TEXT.test(notification.text) ? 'shield-check' : 'triangle-alert');
 
 export const categoryLinkOf = (filter: NotificationFilter): string =>
   filter === 'all' ? NOTIFICATIONS_ROUTE : `${NOTIFICATIONS_ROUTE}/${filter}`;
@@ -77,13 +87,15 @@ const rowViewOf = (
     id: notification.id,
     actorName,
     avatarSeed: actor ? userColorSeed(actor.id) : 0,
-    systemIcon: SIGN_IN_TEXT.test(notification.text) ? 'shield-check' : 'triangle-alert',
+    systemIcon: systemIconOf(notification),
     text: notification.text,
     snippet: notification.snippet,
     summary: actorName ? `${actorName} ${notification.text}` : notification.text,
     categoryLabel: category?.label ?? '',
     categoryIcon: category?.icon ?? 'inbox',
-    when: formatRelative(notification.createdAt, now),
+    when: compactWhenOf(notification.createdAt, now),
+    whenIso: isoDateOf(notification.createdAt),
+    whenFull: fullDateOf(notification.createdAt),
     unread: !notification.read,
     route: notification.route,
   };

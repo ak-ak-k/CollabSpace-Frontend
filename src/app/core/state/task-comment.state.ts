@@ -1,33 +1,90 @@
-import { inject, Service, signal } from '@angular/core';
-import { seedTaskComments } from '../mocks/task-comments.mock';
-import { Task, TaskComment } from '../models/task';
+import { computed, effect, inject, Service, signal, untracked } from '@angular/core';
+import { TaskActivityData } from '../data/task-activity.data';
+import { CURRENT_USER_ID } from '../mocks/users.mock';
+import { TaskComment } from '../models/task';
+import { DataModeState } from './data-mode.state';
+import { Loadable } from './loadable';
 import { TaskState } from './task.state';
 
 @Service()
 export class TaskCommentState {
+  private readonly data = inject(TaskActivityData);
+  private readonly dataMode = inject(DataModeState);
   private readonly tasks = inject(TaskState);
-  private readonly added = signal<Readonly<Record<string, readonly TaskComment[]>>>({});
-  private createdComments = 0;
 
-  commentsFor(task: Task): readonly TaskComment[] {
-    const added = this.added()[task.id] ?? [];
-    const seeded = seedTaskComments({ ...task, commentCount: task.commentCount - added.length });
-    return [...seeded, ...added];
+  private readonly comments = signal<readonly TaskComment[]>([]);
+  private created = 0;
+
+  private readonly loader = new Loadable<readonly TaskComment[]>({
+    fetch: () => this.data.getComments(),
+    store: (comments) => this.comments.set(comments),
+    isEmpty: (comments) => comments.length === 0,
+  });
+
+  private readonly commentsByTask = computed(() => {
+    const byTask = new Map<string, TaskComment[]>();
+    this.comments().forEach((comment) =>
+      byTask.set(comment.taskId, [...(byTask.get(comment.taskId) ?? []), comment]),
+    );
+    return byTask;
+  });
+
+  readonly counts = computed<ReadonlyMap<string, number>>(
+    () =>
+      new Map([...this.commentsByTask()].map(([taskId, comments]) => [taskId, comments.length])),
+  );
+
+  constructor() {
+    effect(() => {
+      this.dataMode.mode();
+      untracked(() => void this.loader.load());
+    });
   }
 
-  async add(task: Task, authorId: string, text: string): Promise<TaskComment> {
+  commentsFor(taskId: string): readonly TaskComment[] {
+    return this.commentsByTask().get(taskId) ?? [];
+  }
+
+  countFor(taskId: string): number {
+    return this.counts().get(taskId) ?? 0;
+  }
+
+  add(taskId: string, text: string, authorId = CURRENT_USER_ID): TaskComment {
     const comment: TaskComment = {
-      id: `${task.id}-comment-${++this.createdComments}`,
-      taskId: task.id,
+      id: `${taskId}-tc${Date.now().toString(36)}${++this.created}`,
+      taskId,
       authorId,
       text: text.trim(),
       createdAt: Date.now(),
+      edited: false,
     };
-    this.added.update((comments) => ({
-      ...comments,
-      [task.id]: [...(comments[task.id] ?? []), comment],
-    }));
-    await this.tasks.update(task.id, { commentCount: task.commentCount + 1 });
+    this.comments.update((comments) => [...comments, comment]);
+    this.tasks.markPendingWhileOffline(taskId);
+    void this.data.saveComment(comment);
     return comment;
+  }
+
+  edit(commentId: string, text: string): void {
+    const current = this.comments().find((comment) => comment.id === commentId);
+    const trimmed = text.trim();
+    if (!current || !trimmed || trimmed === current.text) {
+      return;
+    }
+    const edited: TaskComment = { ...current, text: trimmed, edited: true };
+    this.comments.update((comments) =>
+      comments.map((comment) => (comment.id === commentId ? edited : comment)),
+    );
+    this.tasks.markPendingWhileOffline(current.taskId);
+    void this.data.saveComment(edited);
+  }
+
+  remove(commentId: string): TaskComment | null {
+    const removed = this.comments().find((comment) => comment.id === commentId) ?? null;
+    if (removed) {
+      this.comments.update((comments) => comments.filter((comment) => comment.id !== commentId));
+      this.tasks.markPendingWhileOffline(removed.taskId);
+      void this.data.deleteComment(commentId);
+    }
+    return removed;
   }
 }

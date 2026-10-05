@@ -10,6 +10,7 @@
   --task-card-title-line-height: 1.35;
   --task-filter-avatar-size: 34px;
   --task-filter-avatar-overlap: -6px;
+  --task-drawer-width: min(560px, 100vw);
   --task-drawer-title-size: var(--font-size-25);
   --task-drawer-field-min-width: 180px;
   --task-description-min-height: 110px;
@@ -22,4 +23,23 @@
   --size-task-dot: var(--space-2);
   --task-drag-duration: 250ms;
   --task-column-add-size: 30px;
+  --task-card-menu-size: 28px;
+  --task-card-menu-pull: calc(var(--space-1) * -1);
+  --task-card-menu-pull-end: calc(var(--space-1-5) * -1);
+  --task-team-max-width: 110px;
+  --task-mobile-card-menu-room: 52px;
+  --task-chip-height: 32px;
+  --tasks-filters-width: 360px;
+  --tasks-filters-max-height: calc(100dvh - var(--space-16) * 3);
+  --task-list-col-status: 118px;
+  --task-list-col-priority: 96px;
+  --task-list-col-assignee: 156px;
+  --task-list-col-team: 128px;
+  --task-list-col-due: 136px;
+  --task-progress-height: var(--space-1);
+  --task-row-min-height: var(--size-touch-target);
+  --task-attachment-row-height: var(--size-control-xl);
+  --task-attachment-icon-size: var(--space-8);
+  --task-comment-edit-min-height: 64px;
+  --task-subtask-input-height: var(--size-control-sm);
 }

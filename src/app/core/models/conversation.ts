@@ -13,6 +13,7 @@ export interface GroupConversation {
   readonly type: 'group';
   readonly name: string;
   readonly memberIds: readonly string[];
+  readonly createdBy: string;
 }
 
 export interface ChannelConversation {
@@ -26,7 +27,13 @@ export interface ChannelConversation {
 
 export type Conversation = DirectConversation | GroupConversation | ChannelConversation;
 
-export type ConversationFilter = 'all' | 'unread' | 'direct' | 'groups' | 'starred';
+export type MemberConversation = GroupConversation | ChannelConversation;
+
+export type ConversationFilter = 'all' | 'unread' | 'direct' | 'groups' | 'channels' | 'favourites';
+
+export type NotifyLevel = 'all' | 'mentions' | 'muted';
+
+export const NOTIFY_LEVELS: readonly NotifyLevel[] = ['all', 'mentions', 'muted'];
 
 export interface ConversationPreview {
   readonly id: string;
@@ -36,6 +43,8 @@ export interface ConversationPreview {
   readonly avatarSeed: number;
   readonly avatarStatus: 'online' | 'away' | 'dnd' | 'offline' | null;
   readonly memberCount: number;
+  readonly teamName: string;
+  readonly route: string;
   readonly preview: string;
   readonly lastMessageAt: number;
   readonly unreadCount: number;
@@ -46,5 +55,14 @@ export interface ConversationPreview {
 
 export const conversationRoute = (conversation: Conversation): string =>
   conversation.type === 'channel'
-    ? `/teams/${conversation.teamId}/c/${conversation.channelId}`
+    ? `/teams/${conversation.teamId}/channels/${conversation.channelId}`
     : `/messages/${conversation.id}`;
+
+export const messageRoute = (conversation: Conversation, messageId: string): string =>
+  `${conversationRoute(conversation)}/m/${messageId}`;
+
+export const threadPath = (conversationPath: string, rootId: string): string =>
+  `${conversationPath}/thread/${rootId}`;
+
+export const threadRoute = (conversation: Conversation, rootId: string): string =>
+  threadPath(conversationRoute(conversation), rootId);

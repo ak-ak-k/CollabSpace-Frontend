@@ -1,0 +1,70 @@
+<div class="saved">
+  <div class="saved__inner">
+    @if (isMobile()) {
+      <a class="saved__back" routerLink="/messages">
+        <app-icon name="arrow-left" [size]="16" />
+        Messages
+      </a>
+    }
+    <header class="saved__header">
+      <h1 class="saved__title">Saved messages</h1>
+      <p class="saved__lede">Only you can see what you’ve saved. {{ countLabel() }}</p>
+    </header>
+
+    @switch (status()) {
+      @case ('loading') {
+        <app-skeleton layout="list" compact label="Loading saved messages" />
+      }
+      @case ('error') {
+        <app-empty-state
+          kind="error"
+          heading="Couldn’t load saved messages"
+          actionLabel="Try again"
+          (action)="retry()"
+        />
+      }
+      @default {
+        @if (rows().length === 0) {
+          <app-empty-state
+            icon="bookmark"
+            heading="Nothing saved yet"
+            message="Save a message from its actions to come back to it later."
+          />
+        } @else {
+          <ul class="saved__list" aria-label="Saved messages">
+            @for (row of rows(); track row.id) {
+              <li class="saved__item">
+                <app-avatar [name]="row.authorName" [seed]="row.authorSeed" [size]="40" />
+                <div class="saved__body">
+                  <div class="saved__meta">
+                    <strong class="saved__author">{{ row.authorName }}</strong>
+                    <span class="saved__where">in {{ row.where }} · {{ row.when }}</span>
+                  </div>
+                  <p class="saved__text">{{ row.text }}</p>
+                  <div class="saved__actions">
+                    <a appButton size="sm" [routerLink]="row.link">
+                      <app-icon name="corner-down-right" [size]="15" />
+                      {{ row.linkLabel }}
+                    </a>
+                    <button
+                      appButton
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      [attr.aria-label]="row.removeLabel"
+                      (click)="remove(row)"
+                    >
+                      <app-icon name="bookmark-x" [size]="15" />
+                      Remove
+                    </button>
+                    <span class="saved__when">Saved {{ row.savedWhen }}</span>
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      }
+    }
+  </div>
+</div>

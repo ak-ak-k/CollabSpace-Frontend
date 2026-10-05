@@ -51,6 +51,7 @@ export class ConversationHeaderComponent {
   readonly detailsOpen = input(false, { transform: booleanAttribute });
   readonly compact = input(false, { transform: booleanAttribute });
   readonly backLink = input<string | null>(null);
+  readonly pinnedCount = input(0);
 
   readonly searchToggled = output<void>();
   readonly starToggled = output<void>();
@@ -65,8 +66,15 @@ export class ConversationHeaderComponent {
   protected readonly isChannel = computed(() => this.view().type === 'channel');
   protected readonly subtitle = computed(() => this.typingText() || this.view().subtitle);
   protected readonly starLabel = computed(() =>
-    this.starred() ? 'Remove from starred' : 'Add to starred',
+    this.starred() ? 'Remove from favourites' : 'Add to favourites',
   );
+  protected readonly showPinChip = computed(
+    () => this.view().type !== 'dm' && this.pinnedCount() > 0 && !this.compact(),
+  );
+  protected readonly pinChipLabel = computed(() => {
+    const count = this.pinnedCount();
+    return `View ${count} pinned ${count === 1 ? 'message' : 'messages'}`;
+  });
   protected readonly membersLabel = computed(
     () => `View ${formatCount(this.view().memberCount, 'member')}`,
   );

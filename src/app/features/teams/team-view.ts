@@ -3,12 +3,10 @@ import { Channel } from '../../core/models/channel';
 import { FILE_TYPE_ICONS, FILE_TYPE_LABELS, FileItem } from '../../core/models/file-item';
 import { Message } from '../../core/models/message';
 import { Team } from '../../core/models/team';
-import { firstNameOf, PresenceStatus, User, userColorSeed } from '../../core/models/user';
-import { WORKSPACE_ROLE_LABELS } from '../../core/models/workspace-role';
-import { formatLocalTime, formatRelative, formatWhen } from '../../shared/pipes/time-format';
+import { firstNameOf, User, userColorSeed } from '../../core/models/user';
+import { formatRelative, formatWhen } from '../../shared/pipes/time-format';
 import { AvatarGroupMember } from '../../shared/ui/avatar-group/avatar-group.component';
 import { IconName } from '../../shared/ui/icon/icon-registry';
-import { presenceLabelOf } from '../../shared/pipes/presence-label';
 
 export type UsersById = ReadonlyMap<string, User>;
 
@@ -22,7 +20,15 @@ export interface TeamCardView {
   readonly members: readonly AvatarGroupMember[];
   readonly memberCount: number;
   readonly channelCount: number;
+  readonly unreadCount: number;
+  readonly unreadLabel: string;
+  readonly isPrivate: boolean;
   readonly joined: boolean;
+}
+
+export interface TeamCardCounts {
+  readonly channelCount: number;
+  readonly unreadCount: number;
 }
 
 export interface ChannelRowView {
@@ -36,19 +42,6 @@ export interface ChannelRowView {
   readonly preview: string;
   readonly memberCount: number;
   readonly link: readonly string[];
-}
-
-export interface TeamMemberView {
-  readonly id: string;
-  readonly name: string;
-  readonly label: string;
-  readonly title: string;
-  readonly role: string;
-  readonly status: PresenceStatus;
-  readonly presence: string;
-  readonly localTime: string;
-  readonly seed: number;
-  readonly isMe: boolean;
 }
 
 export interface TeamFileView {
@@ -79,6 +72,7 @@ export const teamCardView = (
   team: Team,
   usersById: UsersById,
   currentUserId: string,
+  counts: TeamCardCounts,
 ): TeamCardView => ({
   id: team.id,
   name: team.name,
@@ -92,7 +86,10 @@ export const teamCardView = (
     seed: userColorSeed(id),
   })),
   memberCount: team.memberIds.length,
-  channelCount: team.channelIds.length,
+  channelCount: counts.channelCount,
+  unreadCount: counts.unreadCount,
+  unreadLabel: `${counts.unreadCount} unread messages`,
+  isPrivate: team.isPrivate,
   joined: team.joined,
 });
 
@@ -125,23 +122,7 @@ export const channelRowView = (
     when: last ? formatWhen(last.sentAt) : '',
     preview: channelPreview(channel, last, usersById),
     memberCount: channel.memberIds.length,
-    link: ['/teams', channel.teamId, 'c', channel.id],
-  };
-};
-
-export const teamMemberView = (user: User, team: Team, currentUserId: string): TeamMemberView => {
-  const isMe = user.id === currentUserId;
-  return {
-    id: user.id,
-    name: user.name,
-    label: isMe ? `${user.name} (you)` : user.name,
-    title: user.title,
-    role: user.id === team.leadId ? 'Lead' : WORKSPACE_ROLE_LABELS[user.role],
-    status: user.status,
-    presence: presenceLabelOf(user),
-    localTime: formatLocalTime(user.timeZone),
-    seed: userColorSeed(user.id),
-    isMe,
+    link: ['/teams', channel.teamId, 'channels', channel.id],
   };
 };
 
@@ -159,13 +140,9 @@ export const teamFileView = (
   };
 };
 
-export const teamFileLocations = (team: Team, channels: readonly Channel[]): ReadonlySet<string> =>
-  new Set([
-    team.name,
-    ...channels
-      .filter((channel) => team.channelIds.includes(channel.id))
-      .map((channel) => `#${channel.name}`),
-  ]);
+export const isTeamFile = (file: FileItem, team: Pick<Team, 'id' | 'channelIds'>): boolean =>
+  file.teamId === team.id ||
+  (file.source.type === 'message' && team.channelIds.includes(file.source.conversationId));
 
 export const teamActivityItem = (event: ActivityEvent, usersById: UsersById): TeamActivityItem => {
   const actorName = nameOf(usersById, event.actorId);

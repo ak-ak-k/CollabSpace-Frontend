@@ -1,8 +1,9 @@
 import { IconName } from '../../shared/ui/icon/icon-registry';
 
-export type NotificationChannel = 'desktop' | 'mobile' | 'email';
+export type NotificationChannel = 'inapp' | 'push' | 'email';
 
-export type NotificationTopic = 'mentions' | 'dms' | 'tasks' | 'team' | 'system';
+export type NotificationTopic =
+  'mentions' | 'dms' | 'threads' | 'tasks' | 'due' | 'team' | 'system';
 
 export type NotificationMatrix = Readonly<
   Record<NotificationTopic, Readonly<Record<NotificationChannel, boolean>>>
@@ -58,12 +59,20 @@ export interface RolePermission {
   readonly allowed: readonly boolean[];
 }
 
-export const NOTIFICATION_CHANNELS: readonly NotificationChannel[] = ['desktop', 'mobile', 'email'];
+export const NOTIFICATION_CHANNELS: readonly NotificationChannel[] = ['inapp', 'push', 'email'];
+
+export const NOTIFICATION_CHANNEL_LABELS: Record<NotificationChannel, string> = {
+  inapp: 'In-app',
+  push: 'Push',
+  email: 'Email',
+};
 
 export const NOTIFICATION_TOPICS: readonly NotificationTopic[] = [
   'mentions',
   'dms',
+  'threads',
   'tasks',
+  'due',
   'team',
   'system',
 ];

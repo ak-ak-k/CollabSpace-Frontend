@@ -66,19 +66,33 @@ export const draftOf = (user: User): ProfileDraft => ({
   timeZone: user.timeZone,
 });
 
-export const profileDetails = (
-  user: User,
-  manager: User | null,
-  twentyFourHour: boolean,
-): ProfileDetail[] => [
+const contactDetails = (user: User, twentyFourHour: boolean): ProfileDetail[] => [
   { label: 'Email', value: user.email, link: `mailto:${user.email}` },
   { label: 'Phone', value: user.phone || EMPTY_VALUE },
   { label: 'Location', value: user.location },
   { label: 'Timezone', value: timeZoneOf(user.timeZone)?.label ?? user.timeZoneLabel },
   { label: 'Local time', value: formatLocalTime(user.timeZone, Date.now(), twentyFourHour) },
   { label: 'Department', value: user.department },
+];
+
+const memberSinceDetail = (user: User): ProfileDetail => ({
+  label: 'Member since',
+  value: user.joinedLabel ?? EMPTY_VALUE,
+});
+
+export const profileDetails = (
+  user: User,
+  manager: User | null,
+  twentyFourHour: boolean,
+): ProfileDetail[] => [
+  ...contactDetails(user, twentyFourHour),
   { label: 'Manager', value: manager ? `${manager.name} · ${manager.title}` : EMPTY_VALUE },
-  { label: 'Member since', value: user.joinedLabel ?? EMPTY_VALUE },
+  memberSinceDetail(user),
+];
+
+export const personDetails = (user: User, twentyFourHour: boolean): ProfileDetail[] => [
+  ...contactDetails(user, twentyFourHour),
+  memberSinceDetail(user),
 ];
 
 export const profileTeams = (teams: readonly Team[], userId: string): ProfileTeamView[] =>

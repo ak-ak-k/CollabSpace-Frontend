@@ -1,12 +1,9 @@
 import { ConnectedPosition } from '@angular/cdk/overlay';
-import { booleanAttribute, Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { DROPDOWN_IMPORTS } from '../../../shared/ui/dropdown/dropdown-imports';
-import {
-  IconButtonComponent,
-  IconButtonSize,
-} from '../../../shared/ui/icon-button/icon-button.component';
+import { IconButtonComponent } from '../../../shared/ui/icon-button/icon-button.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
-import { FileActionKind, FileRow } from '../files-view';
+import { FileActionKind, fileMenuItems, FileRow } from '../files-view';
 
 const MENU_BELOW_END: ConnectedPosition = {
   originX: 'end',
@@ -29,10 +26,9 @@ const MENU_ABOVE_END: ConnectedPosition = {
 })
 export class FileMenuComponent {
   readonly file = input.required<FileRow>();
-  readonly size = input<IconButtonSize>('sm');
-  readonly iconSize = input(16);
-  readonly includeDownload = input(false, { transform: booleanAttribute });
   readonly action = output<FileActionKind>();
 
   protected readonly positions = [MENU_BELOW_END, MENU_ABOVE_END];
+  protected readonly items = computed(() => fileMenuItems(this.file()));
+  protected readonly menuLabel = computed(() => `Actions for ${this.file().name}`);
 }

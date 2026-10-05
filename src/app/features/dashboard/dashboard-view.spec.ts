@@ -21,8 +21,12 @@ const task = (id: string, daysFromToday: number, overrides: Partial<Task> = {}):
   assigneeId: null,
   dueAt: new Date().setHours(0, 0, 0, 0) + daysFromToday * DAY,
   labels: [],
-  commentCount: 0,
-  attachmentCount: 0,
+  teamId: null,
+  subtasks: [],
+  reporterId: 'u0',
+  createdAt: 0,
+  updatedAt: 0,
+  pending: false,
   ...overrides,
 });
 
@@ -34,12 +38,15 @@ const team = (id: string, weeklyMessageCount: number): Team => ({
   description: '',
   memberIds: [],
   leadId: 'u0',
+  ownerId: 'u0',
+  adminIds: [],
   channelIds: [],
   activityLevel: 'Active',
   weeklyMessageCount,
   createdLabel: 'Jan 2023',
   joined: true,
   isPrivate: false,
+  archived: false,
 });
 
 describe('dashboard view', () => {

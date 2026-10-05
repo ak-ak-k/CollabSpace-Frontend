@@ -24,6 +24,7 @@ import {
   categoryLinkOf,
   emptyMessageOf,
   groupNotificationsByDay,
+  markAllLabelOf,
   matchesNotificationFilter,
   NotificationCategoryView,
   notificationFilterOf,
@@ -100,6 +101,7 @@ export class NotificationsPageComponent {
     notificationSummaryOf(this.unreadInCategory(), this.inCategory().length, this.ready()),
   );
   protected readonly canMarkAllRead = computed(() => this.ready() && this.unreadInCategory() > 0);
+  protected readonly markAllLabel = computed(() => markAllLabelOf(this.filter()));
   protected readonly emptyMessage = computed(() => emptyMessageOf(this.showFilter()));
   protected readonly groups = computed(() =>
     groupNotificationsByDay(this.visible(), this.workspace.usersById(), Date.now()),

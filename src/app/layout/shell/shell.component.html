@@ -24,6 +24,12 @@
   </div>
 </div>
 
+<p class="visually-hidden" aria-live="polite">
+  @for (message of [announcement()]; track message.id) {
+    <span>{{ message.text }}</span>
+  }
+</p>
+
 @defer (on idle; when search.isOpen()) {
   <app-search-palette />
 }

@@ -1,57 +1,119 @@
+@use 'breakpoints';
+
 :host {
   display: block;
 }
 
-.table__name {
-  width: var(--files-name-column-width);
-  max-width: var(--space-0);
+.files-table {
+  table-layout: fixed;
+}
+
+.files-table__source {
+  width: var(--files-col-source);
+}
+
+.files-table--wide .files-table__source {
+  width: var(--files-col-source-wide);
+}
+
+.files-table__owner {
+  width: var(--files-col-owner);
+}
+
+.files-table__size {
+  width: var(--files-col-size);
+}
+
+.files-table__modified {
+  width: var(--files-col-modified);
+}
+
+.files-table__actions-head {
+  width: var(--files-col-actions);
+
+  @include breakpoints.tablet-and-down {
+    width: var(--files-col-actions-touch);
+  }
+
+  @include breakpoints.touch-device {
+    width: var(--files-col-actions-touch);
+  }
+}
+
+.files-table__name {
   padding-block: var(--space-3);
   font-weight: var(--font-weight-regular);
 }
 
-.table__file {
+.files-table__open {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  max-width: 100%;
   min-width: var(--space-0);
+  padding: var(--space-0);
+  border: var(--space-0);
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  @include breakpoints.tablet-and-down {
+    min-height: var(--size-touch-target);
+  }
+
+  @include breakpoints.touch-device {
+    min-height: var(--size-touch-target);
+  }
+
+  &:hover .files-table__title {
+    text-decoration: underline;
+    text-underline-offset: var(--underline-offset);
+  }
 }
 
-.table__text {
+.files-table__text {
   display: flex;
   flex-direction: column;
   min-width: var(--space-0);
 }
 
-.table__title {
+.files-table__title {
   font-weight: var(--font-weight-semibold);
 }
 
-.table__location {
+.files-table__type {
   color: var(--text-muted);
   font-size: var(--font-size-12);
 }
 
-.table__cell {
+.files-table__cell {
   font-size: var(--font-size-13);
   white-space: nowrap;
 }
 
-.table__numeric {
+.files-table__numeric {
   text-align: end;
   font-variant-numeric: tabular-nums;
 }
 
-.table__owner {
-  display: inline-flex;
+.files-table__person {
+  display: flex;
   align-items: center;
   gap: var(--space-2);
+  min-width: var(--space-0);
 }
 
-.table__muted {
+.files-table__muted {
   color: var(--text-muted);
 }
 
-.table__actions {
+.files-table__actions {
   text-align: end;
   white-space: nowrap;
+}
+
+.files-table__actions > * {
+  vertical-align: middle;
 }

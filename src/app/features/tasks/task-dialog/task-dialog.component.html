@@ -1,5 +1,5 @@
 <form class="task-dialog" [formRoot]="taskForm">
-  <app-modal heading="New task" description="Atlas Web · Sprint 24" size="lg">
+  <app-modal heading="New task" size="lg" [description]="subtitle()">
     <app-input label="Title" placeholder="What needs to be done?" [formField]="taskForm.title" />
     <app-textarea
       label="Description"
@@ -13,6 +13,7 @@
         [options]="assigneeOptions()"
         [formField]="taskForm.assigneeId"
       />
+      <app-select label="Team" [options]="teamOptions()" [formField]="taskForm.teamId" />
       <app-input label="Due date" type="date" [formField]="taskForm.dueDate" />
     </div>
     <app-radio-group

@@ -9,6 +9,41 @@
   --files-tile-size-md: 40px;
   --files-preview-aspect-ratio: 16 / 10;
   --files-card-min-width: 220px;
-  --files-name-column-width: 44%;
   --files-storage-bar-height: 8px;
+  --files-list-row-height: 56px;
+  --files-chip-height: 32px;
+  --files-drop-background: color-mix(in srgb, var(--background) 88%, transparent);
+  --files-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --files-col-source: 30%;
+  --files-col-source-wide: 22%;
+  --files-col-owner: 16%;
+  --files-col-size: 88px;
+  --files-col-modified: 120px;
+  --files-col-actions: calc(var(--size-control-sm) * 2 + var(--space-6));
+  --files-col-actions-touch: calc(var(--size-touch-target) * 2 + var(--space-4));
+
+  --files-upload-header-height: var(--size-control-sm);
+  --files-upload-name-basis: 160px;
+  --files-upload-bar-height: 4px;
+
+  --files-filters-width: 360px;
+  --files-filters-max-height: calc(100dvh - var(--space-16) * 3);
+
+  --files-preview-width: 1040px;
+  --files-preview-height: 720px;
+  --files-preview-max-width: calc(100vw - var(--space-4) * 2);
+  --files-preview-max-height: calc(100dvh - var(--dialog-inset-top) - var(--space-4));
+  --files-preview-header-height: 60px;
+  --files-preview-details-width: 320px;
+  --files-preview-stage-min-height: 280px;
+  --files-preview-image-max-width: 640px;
+  --files-preview-image-aspect-ratio: 4 / 3;
+  --files-preview-page-width: 400px;
+  --files-preview-page-aspect-ratio: 1 / 1.29;
+  --files-preview-page-title-width: 60%;
+  --files-preview-page-title-height: 14px;
+  --files-preview-page-line-height: 8px;
+  --files-preview-tile-size: 64px;
+  --files-preview-message-max-width: 360px;
 }

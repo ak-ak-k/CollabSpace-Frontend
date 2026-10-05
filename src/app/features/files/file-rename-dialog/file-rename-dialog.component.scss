@@ -1,0 +1,41 @@
+@use '../../../shared/ui/input/field/field';
+
+:host {
+  display: block;
+}
+
+.rename {
+  @include field.host;
+}
+
+.rename__label {
+  @include field.label;
+}
+
+.rename__field {
+  display: flex;
+  align-items: stretch;
+  min-width: var(--space-0);
+}
+
+.rename__input {
+  @include field.control;
+
+  flex: 1;
+  min-width: var(--space-0);
+}
+
+.rename__input--invalid {
+  @include field.control-invalid;
+}
+
+.rename__extension {
+  display: flex;
+  align-items: center;
+  padding: var(--space-0) var(--space-2-5);
+  border: var(--border-width-hairline) solid var(--border-control);
+  border-left: var(--space-0);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  font-size: var(--font-size-13);
+}

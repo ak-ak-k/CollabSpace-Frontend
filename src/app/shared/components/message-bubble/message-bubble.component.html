@@ -9,18 +9,15 @@
 </div>
 
 <div class="message__main">
-  @if (showsHeading()) {
+  @if (!m.continuation) {
     <div class="message__heading">
-      @if (!m.continuation) {
-        <span class="message__author">{{ m.authorName }}</span>
-        <span class="message__time">{{ m.time }}</span>
-      }
-      @if (m.pinned) {
-        <span class="message__pinned">
-          <app-icon name="pin" [size]="pinIconSize" />
-          Pinned
-        </span>
-      }
+      <span class="message__author">{{ m.authorName }}</span>
+      <span class="message__time">{{ m.time }}</span>
+      <ng-container [ngTemplateOutlet]="flags" />
+    </div>
+  } @else if (hasFlags()) {
+    <div class="message__flags">
+      <ng-container [ngTemplateOutlet]="flags" />
     </div>
   }
 
@@ -40,29 +37,7 @@
     />
   } @else {
     @if (hasText()) {
-      <p class="message__body">
-        @for (segment of m.segments; track $index) {
-          @if (segment.highlighted) {
-            <span class="message__highlight">{{ segment.text }}</span>
-          } @else {
-            <span>{{ segment.text }}</span>
-          }
-        }
-        @if (m.edited) {
-          <span class="message__edited"> (edited)</span>
-        }
-        @if (showsInlineStatus() && status(); as status) {
-          <span
-            class="message__status-inline"
-            [class.message__status--read]="status.read"
-            role="img"
-            [attr.aria-label]="status.accessibleLabel"
-            [attr.title]="status.label"
-          >
-            <app-icon [name]="status.icon" [size]="statusIconSize" />
-          </span>
-        }
-      </p>
+      <app-message-text [segments]="m.segments" [edited]="m.edited" [status]="inlineStatus()" />
     }
 
     @if (m.attachments.length > 0) {
@@ -70,14 +45,17 @@
         class="message__attachments"
         [attachments]="m.attachments"
         (download)="download.emit($event)"
+        (opened)="imageOpened.emit($event)"
       />
     }
 
-    @if (showsStatusLine() && status(); as status) {
-      <span class="message__status-line" [class.message__status--read]="status.read">
-        <app-icon [name]="status.icon" [size]="statusIconSize" />
-        {{ status.label }}
-      </span>
+    @if (failed() || lineStatus()) {
+      <app-message-status
+        [status]="lineStatus()"
+        [failed]="failed()"
+        (retry)="command.emit('retry')"
+        (discard)="command.emit('discard')"
+      />
     }
 
     @if (hasReactions()) {
@@ -86,24 +64,50 @@
         [reactions]="m.reactions"
         showAdd
         (toggle)="react.emit($event)"
-        (add)="onAddReaction()"
+        (add)="openPicker($event)"
+        (reactorsShown)="reactorsShown.emit($event)"
       />
     }
+
+    <ng-content />
   }
 </div>
 
 @if (showsToolbar()) {
   <app-message-toolbar
     class="message__toolbar"
-    [(pickerOpen)]="pickerOpen"
-    [hasText]="hasText()"
-    [pinned]="m.pinned"
-    [mine]="m.mine"
-    (reactionPicked)="react.emit($event)"
-    (reply)="reply.emit()"
-    (copy)="copy.emit()"
-    (pin)="pin.emit()"
-    (edit)="editRequested.emit()"
-    (deleteRequested)="deleteRequested.emit()"
+    [items]="toolbarItems()"
+    [inThread]="inThread()"
+    [pickerOpen]="pickerOpen()"
+    [saveLabel]="saveLabel()"
+    [saveIcon]="saveIcon()"
+    (reactionRequested)="openPicker($event)"
+    (command)="command.emit($event)"
+    (menuOpenChange)="menuOpen.set($event)"
   />
 }
+
+@if (pickerOpen()) {
+  <app-reaction-picker
+    class="message__picker"
+    [class.message__picker--up]="pickerUp()"
+    [(expanded)]="pickerExpanded"
+    (picked)="pick($event)"
+    (closed)="closePicker(true)"
+  />
+}
+
+<ng-template #flags>
+  @if (message().pinned) {
+    <span class="message__flag">
+      <app-icon name="pin" [size]="flagIconSize" />
+      Pinned
+    </span>
+  }
+  @if (message().saved) {
+    <span class="message__flag">
+      <app-icon name="bookmark" [size]="flagIconSize" />
+      Saved
+    </span>
+  }
+</ng-template>

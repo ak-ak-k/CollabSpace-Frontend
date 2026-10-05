@@ -1,0 +1,96 @@
+@use 'breakpoints';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  width: min(var(--files-preview-width), var(--files-preview-max-width));
+  height: min(var(--files-preview-height), var(--files-preview-max-height));
+  overflow: hidden;
+  background: var(--background);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-primary);
+
+  @include breakpoints.mobile {
+    position: fixed;
+    inset: var(--space-0);
+    width: 100vw;
+    height: 100dvh;
+  }
+}
+
+.preview__header {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--files-preview-header-height);
+  padding: var(--space-0) var(--space-2) var(--space-0) var(--space-4);
+  border-bottom: var(--rule-strong);
+}
+
+.preview__icon {
+  flex: none;
+}
+
+.preview__title {
+  flex: 1;
+  min-width: var(--space-0);
+  margin: var(--space-0);
+  font-size: var(--font-size-17);
+}
+
+.preview__main {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) var(--files-preview-details-width);
+  min-height: var(--space-0);
+  overflow-y: auto;
+
+  @include breakpoints.mobile {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.preview__main > * {
+  @include breakpoints.mobile {
+    flex: none;
+  }
+}
+
+.preview__details {
+  border-left: var(--rule-strong);
+
+  @include breakpoints.mobile {
+    border-top: var(--rule-strong);
+    border-left: var(--space-0);
+  }
+}
+
+.preview__missing {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background: var(--surface);
+  text-align: center;
+}
+
+.preview__missing-tile {
+  display: grid;
+  place-items: center;
+  width: var(--files-preview-tile-size);
+  height: var(--files-preview-tile-size);
+  background: var(--text-primary);
+  color: var(--background);
+}
+
+.preview__missing-text {
+  max-width: var(--files-preview-message-max-width);
+  margin: var(--space-0);
+  color: var(--text-muted);
+  font-size: var(--font-size-14);
+}

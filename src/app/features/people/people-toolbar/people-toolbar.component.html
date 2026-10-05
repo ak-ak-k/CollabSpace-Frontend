@@ -1,0 +1,41 @@
+<span class="visually-hidden" [id]="hintId">Matches name, email, job title or department</span>
+<app-search-input
+  class="toolbar__search"
+  label="Search people"
+  placeholder="Search people"
+  size="lg"
+  [describedBy]="hintId"
+  [(value)]="query"
+  (keydown.escape)="clearQuery($event)"
+/>
+
+@if (compact()) {
+  <button
+    appButton
+    type="button"
+    size="lg"
+    aria-haspopup="dialog"
+    [attr.aria-expanded]="filtersOpen()"
+    (click)="openFilters.emit()"
+  >
+    <app-icon name="sliders-horizontal" [size]="16" />
+    {{ filtersLabel() }}
+  </button>
+} @else {
+  <app-select inlineLabel label="Team" size="lg" [options]="teamOptions()" [(value)]="teamId" />
+  <app-select
+    inlineLabel
+    label="Department"
+    size="lg"
+    [options]="departmentOptions()"
+    [(value)]="department"
+  />
+  <span class="toolbar__spacer"></span>
+  <app-radio-group
+    label="Layout"
+    hideLabel
+    [options]="layoutOptions"
+    [value]="layout()"
+    (valueChange)="setLayout($event)"
+  />
+}

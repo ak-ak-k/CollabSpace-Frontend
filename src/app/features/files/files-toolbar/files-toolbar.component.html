@@ -1,22 +1,21 @@
-<div class="toolbar" role="group" aria-label="File filters">
+<div class="toolbar" role="group" aria-label="File tools">
   <app-search-input
     class="toolbar__search"
     label="Search files"
-    placeholder="Search files"
+    placeholder="Search name, type, owner or source"
     [(value)]="query"
   />
-  <div class="toolbar__selects">
-    <app-select class="toolbar__select" label="Type" [options]="typeOptions" [(value)]="type" />
-    @if (showSort()) {
-      <app-select
-        class="toolbar__select"
-        label="Sort"
-        [options]="sortOptions"
-        [value]="sortValue()"
-        (valueChange)="selectSort($event)"
-      />
-    }
-  </div>
+  <button
+    #trigger
+    appButton
+    type="button"
+    aria-haspopup="dialog"
+    [attr.aria-expanded]="filtersOpen()"
+    (click)="requestFilters()"
+  >
+    <app-icon name="sliders-horizontal" [size]="16" />
+    {{ filterLabel() }}
+  </button>
   @if (showLayout()) {
     <app-radio-group
       class="toolbar__layout"

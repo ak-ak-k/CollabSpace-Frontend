@@ -1,0 +1,28 @@
+<app-radio-group
+  label="Notifications"
+  hideLabel
+  stretch
+  [options]="options"
+  [value]="level()"
+  (valueChange)="choose($event)"
+/>
+@if (canEditChannel()) {
+  <div class="notifications__actions">
+    <button appButton type="button" size="sm" (click)="membership.editChannel(conversationId())">
+      <app-icon name="pencil" [size]="14" />
+      Edit channel
+    </button>
+    @if (canArchiveChannel()) {
+      <button
+        appButton
+        type="button"
+        variant="ghost"
+        size="sm"
+        (click)="membership.archiveChannel(conversationId())"
+      >
+        <app-icon name="archive" [size]="14" />
+        Archive channel
+      </button>
+    }
+  </div>
+}

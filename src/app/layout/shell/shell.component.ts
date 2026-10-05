@@ -1,10 +1,7 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, effect, ElementRef, inject, untracked, viewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { Router, RouterOutlet } from '@angular/router';
-import { conversationRoute } from '../../core/models/conversation';
-import { firstNameOf } from '../../core/models/user';
-import { Message } from '../../core/models/message';
+import { RouterOutlet } from '@angular/router';
 import { BreakpointService } from '../../core/services/breakpoint.service';
 import { DialogService } from '../../core/services/dialog.service';
 import { SearchService } from '../../core/services/search.service';
@@ -12,8 +9,8 @@ import { ToastService } from '../../core/services/toast.service';
 import { ChatState } from '../../core/state/chat.state';
 import { InviteState } from '../../core/state/invite.state';
 import { NetworkState } from '../../core/state/network.state';
+import { NotificationEngine } from '../../core/state/notification-engine';
 import { PreferencesState } from '../../core/state/preferences.state';
-import { WorkspaceState } from '../../core/state/workspace.state';
 import { SearchPaletteComponent } from '../../features/search/search-palette/search-palette.component';
 import { OfflineBannerComponent } from '../../shared/components/offline-banner/offline-banner.component';
 import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
@@ -22,6 +19,7 @@ import { DrawerMenuComponent } from '../drawer-menu/drawer-menu.component';
 import { MobileHeaderComponent } from '../mobile-header/mobile-header.component';
 import { RailComponent } from '../rail/rail.component';
 import { WorkspaceBannerComponent } from '../workspace-banner/workspace-banner.component';
+import { IncomingAlerts } from './incoming-alerts';
 import { isPaletteShortcut, isQuickSearchKey, isTypingTarget } from './shortcuts';
 
 const TITLE_SEPARATOR = ' · ';
@@ -37,6 +35,7 @@ const TITLE_SEPARATOR = ' · ';
     WorkspaceBannerComponent,
     SearchPaletteComponent,
   ],
+  providers: [IncomingAlerts],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
   host: {
@@ -52,12 +51,11 @@ export class ShellComponent {
   private readonly announcer = inject(LiveAnnouncer);
   private readonly title = inject(Title);
   private readonly route = inject(CurrentRoute);
-  private readonly router = inject(Router);
-  private readonly workspace = inject(WorkspaceState);
 
   protected readonly breakpoint = inject(BreakpointService);
   protected readonly network = inject(NetworkState);
   protected readonly search = inject(SearchService);
+  protected readonly announcement = inject(NotificationEngine).announcement;
 
   private readonly main = viewChild.required<ElementRef<HTMLElement>>('main');
   private wasOnline = this.network.online();
@@ -66,13 +64,8 @@ export class ShellComponent {
 
   constructor() {
     inject(PreferencesState);
+    inject(IncomingAlerts);
     effect(() => this.reactToNetwork(this.network.online()));
-    effect(() => {
-      const message = this.chat.incomingMessage();
-      if (message) {
-        untracked(() => this.showIncoming(message));
-      }
-    });
     effect(() => {
       this.route.path();
       untracked(() => this.announcePage());
@@ -124,23 +117,6 @@ export class ShellComponent {
 
   private warnOffline(): void {
     this.toasts.show('You’re offline', { icon: 'wifi-off' });
-  }
-
-  private showIncoming(message: Message): void {
-    const conversation = this.chat.conversation(message.conversationId);
-    const hidden =
-      !conversation ||
-      this.chat.mutedIds().has(conversation.id) ||
-      !this.chat.inCurrentWorkspace(conversation.id);
-    if (hidden) {
-      return;
-    }
-    const author = firstNameOf(this.workspace.user(message.authorId)?.name ?? 'Someone');
-    this.toasts.show(`${author}: ${message.text}`, {
-      icon: 'message-square',
-      actionLabel: 'Open',
-      onAction: () => void this.router.navigateByUrl(conversationRoute(conversation)),
-    });
   }
 
   private announcePage(): void {

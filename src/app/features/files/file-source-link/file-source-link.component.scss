@@ -1,0 +1,45 @@
+@use 'breakpoints';
+
+@mixin touch-height {
+  @include breakpoints.tablet-and-down {
+    min-height: var(--size-touch-target);
+  }
+
+  @include breakpoints.touch-device {
+    min-height: var(--size-touch-target);
+  }
+}
+
+:host {
+  display: block;
+  min-width: var(--space-0);
+}
+
+.source {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  max-width: 100%;
+  min-width: var(--space-0);
+  vertical-align: middle;
+}
+
+.source--link {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: var(--underline-offset);
+
+  &:hover {
+    text-decoration-thickness: var(--underline-thickness-hover);
+  }
+
+  @include touch-height;
+}
+
+.source--plain {
+  color: var(--text-muted);
+}
+
+.source__label {
+  min-width: var(--space-0);
+}

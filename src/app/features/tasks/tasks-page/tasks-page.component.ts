@@ -9,30 +9,26 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { TASK_COLUMNS } from '../../../core/models/task';
+import { TaskStatus } from '../../../core/models/task';
 import { BreakpointService } from '../../../core/services/breakpoint.service';
 import { DialogService } from '../../../core/services/dialog.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { TaskState } from '../../../core/state/task.state';
-import { WorkspaceState } from '../../../core/state/workspace.state';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { SkeletonComponent } from '../../../shared/ui/skeleton/skeleton.component';
 import { TaskActions } from '../task-actions.service';
-import { BoardColumn, TaskBoardComponent } from '../task-board/task-board.component';
+import { TaskBoardComponent } from '../task-board/task-board.component';
 import { TaskDrawerComponent, TaskDrawerData } from '../task-drawer/task-drawer.component';
+import { TaskFiltersDialog } from '../task-filters-dialog.service';
+import { TaskListComponent } from '../task-list/task-list.component';
 import { TaskMobileBoardComponent } from '../task-mobile-board/task-mobile-board.component';
+import { TasksFilterChipsComponent } from '../tasks-filter-chips/tasks-filter-chips.component';
+import { TasksPageStore } from '../tasks-page.store';
 import { TasksToolbarComponent } from '../tasks-toolbar/tasks-toolbar.component';
-import {
-  assigneeIdsOf,
-  matchesFilters,
-  personOf,
-  priorityFilterOf,
-  sprintKicker,
-  TaskPerson,
-  taskCardView,
-} from '../tasks-view';
+
+const DRAWER_WIDTH = 'var(--task-drawer-width)';
 
 @Component({
   selector: 'app-tasks-page',
@@ -42,57 +38,32 @@ import {
     IconComponent,
     SkeletonComponent,
     TaskBoardComponent,
+    TaskListComponent,
     TaskMobileBoardComponent,
+    TasksFilterChipsComponent,
     TasksToolbarComponent,
   ],
+  providers: [TasksPageStore],
   templateUrl: './tasks-page.component.html',
   styleUrl: './tasks-page.component.scss',
 })
 export class TasksPageComponent {
   private readonly tasks = inject(TaskState);
-  private readonly workspace = inject(WorkspaceState);
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
+  private readonly filtersDialog = inject(TaskFiltersDialog);
+  protected readonly store = inject(TasksPageStore);
   protected readonly actions = inject(TaskActions);
   protected readonly breakpoint = inject(BreakpointService);
 
   readonly task = input<string | undefined>(undefined);
 
-  protected readonly kicker = sprintKicker();
-  protected readonly query = signal('');
-  protected readonly assigneeIds = signal<readonly string[]>([]);
-  protected readonly priority = signal<string>('all');
-  protected readonly status = this.tasks.status;
-
-  protected readonly people = computed<readonly TaskPerson[]>(() =>
-    assigneeIdsOf(this.tasks.tasks())
-      .map((id) => personOf(this.workspace.user(id)))
-      .filter((person): person is TaskPerson => person !== null),
+  protected readonly filtersOpen = signal(false);
+  protected readonly isEmpty = computed(
+    () => this.store.status() === 'empty' || this.store.visibleCount() === 0,
   );
-  private readonly visibleTasks = computed(() => {
-    const filters = {
-      query: this.query(),
-      assigneeIds: this.assigneeIds(),
-      priority: priorityFilterOf(this.priority()),
-    };
-    return this.tasks.tasks().filter((task) => matchesFilters(task, filters));
-  });
-  protected readonly columns = computed<readonly BoardColumn[]>(() =>
-    TASK_COLUMNS.map((column) => ({
-      status: column.status,
-      label: column.label,
-      cards: this.visibleTasks()
-        .filter((task) => task.status === column.status)
-        .map((task) => taskCardView(task, this.workspace.user(task.assigneeId))),
-    })),
-  );
-  protected readonly visibleCount = computed(() => this.visibleTasks().length);
-  protected readonly totalCount = computed(() => this.tasks.tasks().length);
-  protected readonly filtered = computed(
-    () => this.query().trim() !== '' || this.assigneeIds().length > 0 || this.priority() !== 'all',
-  );
-  protected readonly noMatch = computed(
-    () => this.status() === 'ready' && this.filtered() && this.visibleCount() === 0,
+  protected readonly isFirstRun = computed(
+    () => this.store.status() === 'empty' || !this.store.filtered(),
   );
 
   private drawer: DialogRef<void> | null = null;
@@ -101,16 +72,28 @@ export class TasksPageComponent {
   constructor() {
     effect(() => {
       const taskId = this.task() ?? null;
-      const ready = this.status() !== 'loading';
+      const ready = this.tasks.status() !== 'loading';
       untracked(() => this.syncDrawer(taskId, ready));
     });
     inject(DestroyRef).onDestroy(() => this.dismissDrawer());
   }
 
-  protected clearFilters(): void {
-    this.query.set('');
-    this.assigneeIds.set([]);
-    this.priority.set('all');
+  protected newTask(status?: TaskStatus): void {
+    this.actions.newTask({ status, teamId: this.store.createTeamId() });
+  }
+
+  protected openFilters(anchor: HTMLElement): void {
+    this.filtersOpen.set(true);
+    this.filtersDialog
+      .open(anchor, {
+        filters: this.store.filters,
+        teamId: this.store.teamId,
+        teamOptions: this.store.teamOptions,
+        resultCount: this.store.visibleCount,
+        selectTeam: (teamId) => this.actions.showTeam(teamId),
+        clearAll: () => this.store.clearAll(),
+      })
+      .closed.subscribe(() => this.filtersOpen.set(false));
   }
 
   protected reload(): void {
@@ -146,6 +129,7 @@ export class TasksPageComponent {
       side: 'right',
       size: 'lg',
     });
+    drawer.updateSize(DRAWER_WIDTH);
     this.drawer = drawer;
     drawer.closed.subscribe(() => {
       if (this.drawer === drawer) {

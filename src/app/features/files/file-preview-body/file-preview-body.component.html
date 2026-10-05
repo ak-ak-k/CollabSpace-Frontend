@@ -1,0 +1,44 @@
+@switch (kind()) {
+  @case ('image') {
+    <div class="preview-image">
+      @if (file().previewUrl; as url) {
+        <img class="preview-image__picture" [src]="url" [alt]="file().name" />
+      } @else {
+        <div
+          class="preview-image__placeholder"
+          role="img"
+          [attr.aria-label]="'Image preview of ' + file().name"
+        >
+          <app-icon name="image" [size]="48" />
+        </div>
+      }
+    </div>
+  }
+  @case ('page') {
+    <div class="page" role="img" [attr.aria-label]="'First page of ' + file().name">
+      <span class="page__title"></span>
+      @for (width of lineWidths; track $index) {
+        <span class="page__line" [style.width.%]="width"></span>
+      }
+      <span class="page__count">Page 1 of {{ pageCount() }}</span>
+    </div>
+  }
+  @case ('text') {
+    <pre class="excerpt">{{ excerpt() }}</pre>
+  }
+  @default {
+    <div class="unavailable">
+      <span class="unavailable__tile">
+        <app-icon [name]="icon()" [size]="28" />
+      </span>
+      <strong class="unavailable__title">Preview unavailable</strong>
+      <span class="unavailable__text">
+        {{ file().typeLabel }} files can’t be previewed here. Download it to open it.
+      </span>
+      <button appButton type="button" (click)="download.emit()">
+        <app-icon name="download" [size]="16" />
+        Download
+      </button>
+    </div>
+  }
+}

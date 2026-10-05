@@ -14,21 +14,6 @@
   max-width: var(--files-search-max-width);
 }
 
-.toolbar__selects {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2) var(--space-3);
-}
-
-.toolbar__select {
-  --field-label-gap: var(--space-0);
-
-  flex-direction: row;
-  align-items: center;
-  gap: var(--space-2);
-}
-
 .toolbar__layout {
   margin-left: auto;
 }

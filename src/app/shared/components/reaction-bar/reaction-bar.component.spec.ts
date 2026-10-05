@@ -42,4 +42,20 @@ describe('ReactionBarComponent', () => {
     expect(toggled).toEqual(['🎉']);
     expect(added).toBe(true);
   });
+
+  it('lists who reacted on right-click or long-press instead of toggling', async () => {
+    const fixture = await render(REACTIONS, false);
+    const host = fixture.nativeElement as HTMLElement;
+    const shown: string[] = [];
+    const toggled: string[] = [];
+    fixture.componentInstance.reactorsShown.subscribe((who) => shown.push(who));
+    fixture.componentInstance.toggle.subscribe((emoji) => toggled.push(emoji));
+
+    const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+    host.querySelector('.reaction-bar__chip')?.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(shown).toEqual(['You, Rahul reacted with 👍']);
+    expect(toggled).toEqual([]);
+  });
 });

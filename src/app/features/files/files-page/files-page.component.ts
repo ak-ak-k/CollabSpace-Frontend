@@ -1,53 +1,48 @@
 import {
   Component,
   computed,
-  ElementRef,
+  effect,
   inject,
   input,
   linkedSignal,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { FileView } from '../../../core/models/file-item';
 import { BreakpointService } from '../../../core/services/breakpoint.service';
-import { FileState } from '../../../core/state/file.state';
-import { WorkspaceState } from '../../../core/state/workspace.state';
-import { ButtonComponent } from '../../../shared/ui/button/button.component';
+import { NetworkState } from '../../../core/state/network.state';
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { PaginationComponent } from '../../../shared/ui/pagination/pagination.component';
 import { SkeletonComponent } from '../../../shared/ui/skeleton/skeleton.component';
-import { TabItem, TabsComponent } from '../../../shared/ui/tabs/tabs.component';
+import { TabsComponent } from '../../../shared/ui/tabs/tabs.component';
 import { FileActions } from '../file-actions.service';
-import {
-  ALL_FILE_TYPES,
-  DEFAULT_FILE_FOLDER,
-  DEFAULT_FILE_SORT,
-  FILE_FOLDERS,
-  FILES_PER_PAGE,
-  FileSort,
-  FileSortKey,
-  folderMeta,
-  folderOf,
-  nextSort,
-} from '../files-options';
+import { FileCatalog } from '../file-catalog.service';
+import { FileFiltersDialog } from '../file-filters-dialog.service';
+import { FilePreviewController } from '../file-preview/file-preview-controller';
+import { FileUploads } from '../file-uploads.service';
+import { FilesDropZoneDirective } from '../files-drop-zone.directive';
+import { FilesFilterChipsComponent } from '../files-filter-chips/files-filter-chips.component';
 import { FilesGridComponent } from '../files-grid/files-grid.component';
+import { FilesHeaderComponent } from '../files-header/files-header.component';
 import { FilesListComponent } from '../files-list/files-list.component';
+import { DEFAULT_FILE_FOLDER, FILES_PER_PAGE, folderMeta, folderOf } from '../files-options';
 import { FilesSidebarComponent } from '../files-sidebar/files-sidebar.component';
 import { FilesTableComponent } from '../files-table/files-table.component';
 import { FilesToolbarComponent } from '../files-toolbar/files-toolbar.component';
+import { FilesUploadPanelComponent } from '../files-upload-panel/files-upload-panel.component';
 import {
   countByFolder,
+  EmptyAction,
   emptyCopyFor,
   FileActionKind,
   FileActionRequest,
   FileRow,
-  filterRows,
-  hasActiveFilters,
   pageOf,
-  sortRows,
-  toFileRow,
 } from '../files-view';
+import { folderTabs, queryParamValue } from './files-page-options';
+import { FilesQuery } from './files-query';
 
 type FilesBody = 'table' | 'grid' | 'list';
 
@@ -56,13 +51,15 @@ const FIRST_PAGE = 1;
 @Component({
   selector: 'app-files-page',
   imports: [
-    ButtonComponent,
     EmptyStateComponent,
+    FilesFilterChipsComponent,
     FilesGridComponent,
+    FilesHeaderComponent,
     FilesListComponent,
     FilesSidebarComponent,
     FilesTableComponent,
     FilesToolbarComponent,
+    FilesUploadPanelComponent,
     IconComponent,
     PaginationComponent,
     SkeletonComponent,
@@ -70,62 +67,59 @@ const FIRST_PAGE = 1;
   ],
   templateUrl: './files-page.component.html',
   styleUrl: './files-page.component.scss',
+  hostDirectives: [FilesDropZoneDirective],
 })
 export class FilesPageComponent {
-  private readonly fileState = inject(FileState);
-  private readonly workspace = inject(WorkspaceState);
+  private readonly dropZone = inject(FilesDropZoneDirective);
+  private readonly catalog = inject(FileCatalog);
   private readonly breakpoint = inject(BreakpointService);
   private readonly actions = inject(FileActions);
+  private readonly filtersDialog = inject(FileFiltersDialog);
+  protected readonly uploads = inject(FileUploads);
 
   readonly folder = input<FileView, string | undefined>(DEFAULT_FILE_FOLDER, {
     transform: folderOf,
   });
+  readonly file = input<string, string | null | undefined>('', { transform: queryParamValue });
+  readonly team = input<string, string | null | undefined>('', { transform: queryParamValue });
+  readonly conv = input<string, string | null | undefined>('', { transform: queryParamValue });
 
-  protected readonly query = signal('');
-  protected readonly type = signal<string>(ALL_FILE_TYPES);
+  protected readonly view = new FilesQuery({
+    folder: this.folder,
+    teamId: this.team,
+    conversationId: this.conv,
+  });
   protected readonly layout = signal('list');
-  protected readonly sort = signal<FileSort>(DEFAULT_FILE_SORT);
+  protected readonly filtersOpen = signal(false);
+  protected readonly dragging = this.dropZone.dragging;
   protected readonly page = linkedSignal({
-    source: () => [this.folder(), this.query(), this.type(), this.sort()] as const,
+    source: () =>
+      [
+        this.folder(),
+        this.view.search(),
+        this.view.filters(),
+        this.view.sort(),
+        this.view.scope(),
+      ] as const,
     computation: () => FIRST_PAGE,
   });
 
   protected readonly pageSize = FILES_PER_PAGE;
-  protected readonly status = this.fileState.status;
+  protected readonly status = this.catalog.status;
   protected readonly isDesktop = this.breakpoint.isDesktop;
   protected readonly isMobile = this.breakpoint.isMobile;
+  protected readonly offline = inject(NetworkState).offline;
   protected readonly meta = computed(() => folderMeta(this.folder()));
-
-  private readonly allRows = computed(() => {
-    const currentUserId = this.workspace.currentUser()?.id ?? '';
-    const usersById = this.workspace.usersById();
-    return this.fileState.files().map((file) => toFileRow(file, usersById, currentUserId));
-  });
-  private readonly filters = computed(() => ({
-    folder: this.folder(),
-    query: this.query(),
-    type: this.type(),
-  }));
-
-  protected readonly rows = computed(() =>
-    sortRows(filterRows(this.allRows(), this.filters()), this.sort()),
+  protected readonly pageRows = computed(() =>
+    pageOf(this.view.rows(), this.page(), FILES_PER_PAGE),
   );
-  protected readonly pageRows = computed(() => pageOf(this.rows(), this.page(), FILES_PER_PAGE));
   protected readonly counts = computed(() =>
-    this.status() === 'ready' ? countByFolder(this.allRows()) : null,
+    this.status() === 'ready' ? countByFolder(this.catalog.rows()) : null,
   );
   protected readonly usedBytes = computed(() =>
-    this.fileState.files().reduce((total, file) => total + file.bytes, 0),
+    this.catalog.files().reduce((total, file) => total + file.bytes, 0),
   );
-  protected readonly tabs = computed<readonly TabItem[]>(() => {
-    const counts = this.counts();
-    return FILE_FOLDERS.map((folder) => ({
-      id: folder.id,
-      label: folder.label,
-      count: counts?.[folder.id],
-      link: ['/files', folder.id],
-    }));
-  });
+  protected readonly tabs = computed(() => folderTabs(this.counts()));
   protected readonly body = computed<FilesBody>(() => {
     if (this.isMobile()) {
       return 'list';
@@ -133,45 +127,71 @@ export class FilesPageComponent {
     return this.layout() === 'grid' ? 'grid' : 'table';
   });
   protected readonly emptyCopy = computed(() =>
-    emptyCopyFor(this.folder(), this.status() === 'ready' && hasActiveFilters(this.filters())),
+    emptyCopyFor(this.folder(), this.status() === 'ready' && this.view.filtered()),
   );
 
-  private readonly heading = viewChild.required<ElementRef<HTMLElement>>('heading');
-  private readonly picker = viewChild.required<ElementRef<HTMLInputElement>>('picker');
+  private readonly header = viewChild.required(FilesHeaderComponent);
+  private readonly preview = new FilePreviewController({
+    removeRequested: (fileId) => this.removeAfterPreview(fileId),
+    focusLost: () => this.header().focusHeading(),
+  });
 
   private readonly handlers: Record<FileActionKind, (file: FileRow) => void> = {
-    star: (file) => this.actions.toggleStar(file),
+    preview: (file) => this.actions.preview(file.id),
     download: (file) => this.actions.download(file),
-    share: (file) => void this.actions.share(file),
+    star: (file) => this.actions.toggleStar(file),
+    'copy-link': (file) => void this.actions.copyLink(file),
+    source: (file) => this.actions.openSource(file),
+    rename: (file) => void this.actions.rename(file),
     remove: (file) => void this.remove(file),
   };
 
-  protected sortBy(key: FileSortKey): void {
-    this.sort.update((sort) => nextSort(sort, key));
+  constructor() {
+    this.dropZone.filesDropped.subscribe((files) => this.upload(files));
+    effect(() => {
+      const fileId = this.file();
+      const settled = this.status() === 'ready' || this.status() === 'empty';
+      untracked(() => this.preview.sync(fileId, settled));
+    });
   }
 
   protected run(request: FileActionRequest): void {
     this.handlers[request.kind](request.file);
   }
 
-  protected pickFiles(): void {
-    this.picker().nativeElement.click();
+  protected upload(files: readonly File[]): void {
+    this.uploads.start(files, this.team() || null);
   }
 
-  protected uploadPicked(): void {
-    const input = this.picker().nativeElement;
-    const names = Array.from(input.files ?? [], (file) => file.name);
-    input.value = '';
-    void this.actions.upload(names);
+  protected runEmptyAction(action: EmptyAction): void {
+    if (action === 'upload') {
+      this.header().pick();
+    } else if (action === 'clear') {
+      this.view.clearAll();
+    }
+  }
+
+  protected openFilters(anchor: HTMLElement): void {
+    this.filtersOpen.set(true);
+    this.filtersDialog
+      .open(anchor, this.view.dialogData())
+      .closed.subscribe(() => this.filtersOpen.set(false));
   }
 
   protected reload(): void {
-    void this.fileState.reload();
+    void this.catalog.reload();
   }
 
   private async remove(file: FileRow): Promise<void> {
     if (await this.actions.remove(file)) {
-      this.heading().nativeElement.focus();
+      this.header().focusHeading();
+    }
+  }
+
+  private removeAfterPreview(fileId: string): void {
+    const file = this.catalog.row(fileId);
+    if (file) {
+      void this.remove(file);
     }
   }
 }

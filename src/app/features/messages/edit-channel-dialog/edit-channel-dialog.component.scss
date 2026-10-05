@@ -1,0 +1,18 @@
+:host {
+  display: block;
+}
+
+.edit-channel__team {
+  margin: var(--space-0);
+  color: var(--text-secondary);
+  font-size: var(--font-size-13);
+}
+
+.edit-channel__team-name {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-heavy);
+}
+
+.edit-channel__privacy {
+  max-width: var(--channel-privacy-max-width);
+}

@@ -14,6 +14,7 @@ export interface AppNotification {
   readonly createdAt: number;
   readonly read: boolean;
   readonly route: string | null;
+  readonly icon?: IconName;
 }
 
 export interface NotificationCategoryOption {
@@ -27,6 +28,6 @@ export const NOTIFICATION_CATEGORIES: readonly NotificationCategoryOption[] = [
   { id: 'mention', label: 'Mentions', icon: 'at-sign' },
   { id: 'message', label: 'Messages', icon: 'message-square' },
   { id: 'task', label: 'Tasks', icon: 'square-kanban' },
-  { id: 'team', label: 'Team activity', icon: 'users' },
+  { id: 'team', label: 'Teams & workspace', icon: 'users' },
   { id: 'system', label: 'System', icon: 'shield-check' },
 ];

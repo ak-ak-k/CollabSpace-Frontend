@@ -1,0 +1,45 @@
+<dl class="details">
+  @for (detail of details(); track detail.term) {
+    <dt class="details__term">{{ detail.term }}</dt>
+    <dd class="details__value">{{ detail.value }}</dd>
+  }
+</dl>
+
+<section class="shared" [attr.aria-labelledby]="sharedHeadingId">
+  <h3 class="shared__heading" [id]="sharedHeadingId">Shared in</h3>
+  @if (references().length === 0) {
+    <p class="shared__empty">Only in Files.</p>
+  } @else {
+    <ul class="shared__list">
+      @for (reference of references(); track reference.label) {
+        <li>
+          @if (reference.link; as link) {
+            <a class="shared__link" [routerLink]="link.path" [queryParams]="link.queryParams">
+              <app-icon [name]="reference.icon" [size]="14" />
+              <span class="truncate">{{ reference.label }}</span>
+            </a>
+          }
+        </li>
+      }
+    </ul>
+  }
+</section>
+
+<div class="actions">
+  @if (file().canManage) {
+    <button appButton type="button" (click)="rename.emit()">
+      <app-icon name="pencil" [size]="14" />
+      Rename
+    </button>
+  }
+  <button appButton type="button" variant="ghost" (click)="copyLink.emit()">
+    <app-icon name="link" [size]="14" />
+    Copy link
+  </button>
+  @if (file().canManage) {
+    <button appButton type="button" variant="ghost" class="actions__danger" (click)="remove.emit()">
+      <app-icon name="trash-2" [size]="14" />
+      Delete
+    </button>
+  }
+</div>

@@ -52,3 +52,15 @@
   color: var(--text-secondary);
   font-size: var(--font-size-12);
 }
+
+.mention-list__tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--size-avatar-24);
+  height: var(--size-avatar-24);
+  background: var(--avatar-inverted-background);
+  color: var(--avatar-inverted-foreground);
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-heavy);
+}

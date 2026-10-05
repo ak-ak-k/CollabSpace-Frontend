@@ -3,8 +3,8 @@
     <app-conversation-details
       [view]="conversation"
       [extras]="extras()"
+      [access]="access()"
       (jump)="jumpTo($event)"
-      (addPeople)="addPeople()"
     />
   }
 </app-drawer>

@@ -1,12 +1,12 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, computed, inject, input, linkedSignal } from '@angular/core';
 import {
+  isTaskPriority,
   Task,
   TASK_COLUMNS,
+  TASK_LABELS,
   TASK_PRIORITIES,
   TASK_PRIORITY_LABELS,
-  TaskPriority,
-  TaskStatus,
 } from '../../../core/models/task';
 import { ToastService } from '../../../core/services/toast.service';
 import { TaskState } from '../../../core/state/task.state';
@@ -17,7 +17,7 @@ import { InputComponent } from '../../../shared/ui/input/input.component';
 import { SelectComponent, SelectOption } from '../../../shared/ui/select/select.component';
 import { TextareaComponent } from '../../../shared/ui/textarea/textarea.component';
 import { TaskActions } from '../task-actions.service';
-import { TASK_LABELS } from '../tasks-view';
+import { assigneeOptionsFor, teamOptionsOf } from '../task-options';
 
 const STATUS_OPTIONS: readonly SelectOption[] = TASK_COLUMNS.map((column) => ({
   value: column.status,
@@ -51,12 +51,12 @@ export class TaskEditorComponent {
   protected readonly titleDraft = linkedSignal(() => this.task().title);
   protected readonly descriptionDraft = linkedSignal(() => this.task().description);
   protected readonly dueValue = computed(() => toDateInputValue(this.task().dueAt));
-  protected readonly assigneeOptions = computed<readonly SelectOption[]>(() =>
-    this.workspace.members().map((user) => ({
-      value: user.id,
-      label: user.id === this.workspace.currentUser()?.id ? `${user.name} (you)` : user.name,
-    })),
-  );
+  protected readonly assigneeOptions = computed(() => {
+    const teamId = this.task().teamId;
+    const team = teamId ? this.workspace.team(teamId) : null;
+    return assigneeOptionsFor(this.workspace.members(), team, this.workspace.currentUser()?.id);
+  });
+  protected readonly teamOptions = computed(() => teamOptionsOf(this.workspace.teams()));
 
   protected saveTitle(): void {
     const title = this.titleDraft().trim();
@@ -82,19 +82,22 @@ export class TaskEditorComponent {
   protected changeStatus(value: string): void {
     const column = TASK_COLUMNS.find((candidate) => candidate.status === value);
     if (column && column.status !== this.task().status) {
-      void this.actions.move(this.task().id, column.status satisfies TaskStatus);
+      void this.actions.move(this.task().id, column.status);
     }
   }
 
   protected changePriority(value: string): void {
-    const priority = TASK_PRIORITIES.find((candidate) => candidate === value);
-    if (priority) {
-      void this.tasks.update(this.task().id, { priority: priority satisfies TaskPriority });
+    if (isTaskPriority(value) && value !== this.task().priority) {
+      void this.tasks.update(this.task().id, { priority: value });
     }
   }
 
   protected changeAssignee(value: string): void {
     void this.tasks.update(this.task().id, { assigneeId: value || null });
+  }
+
+  protected changeTeam(value: string): void {
+    void this.tasks.update(this.task().id, { teamId: value || null });
   }
 
   protected changeDue(value: string): void {

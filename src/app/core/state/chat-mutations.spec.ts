@@ -22,6 +22,7 @@ const message = (
   attachments: [],
   reactions: [],
   replyToId: null,
+  threadRootId: null,
   pinned: false,
   deliveryState,
 });
@@ -49,12 +50,24 @@ describe('chat mutations', () => {
     expect(removed['dm-u1'].map((item) => item.id)).toEqual(['2']);
   });
 
-  it('only moves delivery forward and never touches queued messages', () => {
-    const threads = { 'dm-u1': [message('1', 'u0', 'queued'), message('2', 'u0', 'read')] };
+  it('only moves delivery forward and never touches unsettled messages', () => {
+    const threads = {
+      'dm-u1': [
+        message('1', 'u0', 'queued'),
+        message('2', 'u0', 'read'),
+        message('3', 'u0', 'failed'),
+        message('4', 'u0', 'sent'),
+      ],
+    };
 
     const advanced = advanceDelivery(threads, 'dm-u1', 'u0', 'delivered');
 
-    expect(advanced['dm-u1'].map((item) => item.deliveryState)).toEqual(['queued', 'read']);
+    expect(advanced['dm-u1'].map((item) => item.deliveryState)).toEqual([
+      'queued',
+      'read',
+      'failed',
+      'delivered',
+    ]);
     expect(releaseQueued(advanced)['dm-u1'][0].deliveryState).toBe('sent');
   });
 

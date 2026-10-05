@@ -28,6 +28,13 @@
   gap: var(--space-3);
 }
 
+.card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+
 .card__identity {
   flex: 1;
   min-width: 0;

@@ -20,16 +20,10 @@
   min-height: 0;
   padding: var(--space-4);
   overflow-y: auto;
-}
 
-.mobile__card {
-  display: block;
-  width: 100%;
-  padding: var(--space-0);
-  border: var(--space-0);
-  background: none;
-  text-align: left;
-  cursor: pointer;
+  &:focus {
+    outline: none;
+  }
 }
 
 .mobile__empty {

@@ -1,0 +1,30 @@
+<app-modal heading="Rename file" size="sm">
+  <form class="rename" novalidate [id]="formId" (submit)="submit($event)">
+    <label class="rename__label" [for]="inputId">File name</label>
+    <div class="rename__field">
+      <input
+        #control
+        class="rename__input"
+        type="text"
+        autocomplete="off"
+        [class.rename__input--invalid]="showError()"
+        [id]="inputId"
+        [value]="base()"
+        [attr.aria-invalid]="showError() ? 'true' : null"
+        [attr.aria-describedby]="describedBy()"
+        (input)="base.set(control.value)"
+      />
+      @if (extension) {
+        <span class="rename__extension" [id]="extensionId">{{ extension }}</span>
+      }
+    </div>
+    @if (showError()) {
+      <app-field-error [id]="errorId" [message]="error()" />
+    }
+  </form>
+
+  <button modalActions appButton type="button" (click)="cancel()">Cancel</button>
+  <button modalActions appButton type="submit" variant="inverted" [attr.form]="formId">
+    Rename
+  </button>
+</app-modal>

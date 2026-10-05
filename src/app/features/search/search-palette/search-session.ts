@@ -52,6 +52,10 @@ export class SearchSession {
     this.schedule();
   }
 
+  retry(): void {
+    this.schedule();
+  }
+
   private schedule(): void {
     this.cancelPending();
     this.failed.set(false);

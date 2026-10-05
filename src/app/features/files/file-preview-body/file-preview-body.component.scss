@@ -1,0 +1,95 @@
+:host {
+  display: grid;
+  place-items: center;
+  min-width: var(--space-0);
+  min-height: var(--files-preview-stage-min-height);
+  padding: var(--space-6);
+  background: var(--surface);
+}
+
+.preview-image {
+  width: 100%;
+  max-width: var(--files-preview-image-max-width);
+}
+
+.preview-image__picture {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.preview-image__placeholder {
+  display: grid;
+  place-items: center;
+  aspect-ratio: var(--files-preview-image-aspect-ratio);
+  background: var(--color-neutral-300);
+  color: var(--text-primary);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: min(var(--files-preview-page-width), 100%);
+  aspect-ratio: var(--files-preview-page-aspect-ratio);
+  padding: var(--space-6);
+  background: var(--background);
+  box-shadow: var(--shadow-md);
+}
+
+.page__title {
+  width: var(--files-preview-page-title-width);
+  height: var(--files-preview-page-title-height);
+  background: var(--text-primary);
+}
+
+.page__line {
+  height: var(--files-preview-page-line-height);
+  background: var(--color-neutral-300);
+}
+
+.page__count {
+  margin-top: auto;
+  color: var(--text-muted);
+  font-size: var(--font-size-12);
+}
+
+.excerpt {
+  width: 100%;
+  max-width: var(--files-preview-image-max-width);
+  margin: var(--space-0);
+  padding: var(--space-4);
+  overflow: auto;
+  border: var(--rule-hairline);
+  background: var(--background);
+  font-family: var(--files-font-mono);
+  font-size: var(--font-size-13);
+  line-height: var(--line-height-message);
+  white-space: pre-wrap;
+}
+
+.unavailable {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  max-width: var(--files-preview-message-max-width);
+}
+
+.unavailable__tile {
+  display: grid;
+  place-items: center;
+  width: var(--files-preview-tile-size);
+  height: var(--files-preview-tile-size);
+  background: var(--text-primary);
+  color: var(--background);
+}
+
+.unavailable__title {
+  font-size: var(--font-size-17);
+}
+
+.unavailable__text {
+  color: var(--text-muted);
+  font-size: var(--font-size-14);
+}

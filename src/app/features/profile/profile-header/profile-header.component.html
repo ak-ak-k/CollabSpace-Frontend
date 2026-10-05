@@ -3,20 +3,22 @@
 <header class="header">
   <div class="header__avatar">
     <app-avatar [name]="me.name" [seed]="seed()" [size]="avatarSize()" />
-    <span class="header__status" [class]="'header__status--' + me.status" aria-hidden="true"></span>
-    <button
-      appIconButton
-      type="button"
-      class="header__photo"
-      label="Change profile photo"
-      (click)="changePhoto.emit()"
-    >
-      <app-icon name="upload" [size]="16" />
-    </button>
+    <app-status-dot class="header__status" [status]="me.status" />
+    @if (self()) {
+      <button
+        appIconButton
+        type="button"
+        class="header__photo"
+        label="Change profile photo"
+        (click)="changePhoto.emit()"
+      >
+        <app-icon name="upload" [size]="16" />
+      </button>
+    }
   </div>
 
   <div class="header__identity">
-    <span class="header__eyebrow">Your profile</span>
+    <span class="header__eyebrow">{{ self() ? 'Your profile' : 'Profile' }}</span>
     <h1 class="header__name">{{ me.name }}</h1>
     <p class="header__meta">{{ me.title }} · {{ me.department }}</p>
     <div class="header__tags">
@@ -25,14 +27,23 @@
         <app-status-dot [status]="me.status" size="sm" />
         {{ statusLabel() }}
       </app-tag>
-      @if (statusMessage()) {
+      @if (self() && statusMessage()) {
         <app-tag>{{ statusMessage() }}</app-tag>
       }
     </div>
   </div>
 
   <div class="header__actions">
-    @if (editing()) {
+    @if (!self()) {
+      <a appButton routerLink="/people">
+        <app-icon name="arrow-left" [size]="16" />
+        People
+      </a>
+      <button appButton type="button" variant="inverted" (click)="message.emit()">
+        <app-icon name="message-square" [size]="16" />
+        Message {{ firstName() }}
+      </button>
+    } @else if (editing()) {
       <button appButton type="button" (click)="cancel.emit()">Cancel</button>
       <button appButton type="button" variant="primary" [busy]="saving()" (click)="save.emit()">
         <app-icon name="check" [size]="16" />

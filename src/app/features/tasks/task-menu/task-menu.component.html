@@ -1,0 +1,38 @@
+@if (appearance() === 'sheet') {
+  <button
+    appIconButton
+    type="button"
+    size="lg"
+    aria-haspopup="menu"
+    [label]="card().menuLabel"
+    (click)="openSheet($event)"
+  >
+    <app-icon name="ellipsis-vertical" [size]="20" />
+  </button>
+} @else {
+  <button
+    appIconButton
+    type="button"
+    class="menu__trigger"
+    [label]="card().menuLabel"
+    [cdkMenuTriggerFor]="menu"
+    [cdkMenuPosition]="positions"
+    (click)="$event.stopPropagation()"
+    (keydown)="$event.stopPropagation()"
+  >
+    <app-icon name="ellipsis" [size]="16" />
+  </button>
+
+  <ng-template #menu>
+    <div [appDropdownPanel]="card().menuLabel">
+      <app-dropdown [label]="card().menuLabel">
+        @for (item of items(); track item.key) {
+          <button appDropdownItem (triggered)="run(item)">
+            <app-icon [name]="item.icon" [size]="16" />
+            {{ item.label }}
+          </button>
+        }
+      </app-dropdown>
+    </div>
+  </ng-template>
+}

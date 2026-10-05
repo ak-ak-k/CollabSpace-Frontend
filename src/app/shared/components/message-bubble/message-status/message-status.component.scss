@@ -1,0 +1,63 @@
+@use 'touch';
+
+:host {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+}
+
+.message-status__line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-secondary);
+}
+
+.message-status__line--read {
+  color: var(--delivery-read);
+}
+
+.message-status__alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--danger);
+}
+
+.message-status__retry,
+.message-status__discard {
+  position: relative;
+  min-height: var(--message-status-button-height);
+  background: none;
+  font: inherit;
+  cursor: pointer;
+
+  @include touch.on-touch {
+    min-height: var(--size-touch-target);
+  }
+}
+
+.message-status__retry {
+  padding: var(--space-0) var(--space-2-5);
+  border: var(--border-width-hairline) solid currentColor;
+  color: inherit;
+
+  &:hover {
+    background: var(--danger-surface);
+    color: var(--on-danger-surface);
+  }
+}
+
+.message-status__discard {
+  padding: var(--space-0) var(--space-1-5);
+  border: var(--space-0);
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: var(--message-link-underline-offset);
+
+  &:hover {
+    background: var(--hover);
+  }
+}

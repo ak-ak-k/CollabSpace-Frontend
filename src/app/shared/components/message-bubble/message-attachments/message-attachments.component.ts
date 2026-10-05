@@ -1,4 +1,5 @@
 import { Component, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AttachmentView } from '../../../../core/models/thread';
 import { IconButtonComponent } from '../../../ui/icon-button/icon-button.component';
 import { IconComponent } from '../../../ui/icon/icon.component';
@@ -9,13 +10,14 @@ const DOWNLOAD_ICON_SIZE = 16;
 
 @Component({
   selector: 'app-message-attachments',
-  imports: [IconComponent, IconButtonComponent],
+  imports: [IconComponent, IconButtonComponent, RouterLink],
   templateUrl: './message-attachments.component.html',
   styleUrl: './message-attachments.component.scss',
 })
 export class MessageAttachmentsComponent {
   readonly attachments = input.required<readonly AttachmentView[]>();
   readonly download = output<string>();
+  readonly opened = output<AttachmentView>();
 
   protected readonly imageIconSize = IMAGE_ICON_SIZE;
   protected readonly fileIconSize = FILE_ICON_SIZE;

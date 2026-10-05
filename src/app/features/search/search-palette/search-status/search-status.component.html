@@ -1,15 +1,11 @@
+<p class="visually-hidden" aria-live="polite">{{ liveCount() }}</p>
+
 @switch (status()) {
   @case ('searching') {
-    <p class="status__searching">
+    <p class="status__searching" role="status">
       <app-spinner class="status__spinner" />
       <span>Searching for “{{ term() }}”…</span>
     </p>
-  }
-  @case ('refreshing') {
-    <span class="visually-hidden">Searching</span>
-  }
-  @case ('results') {
-    <span class="visually-hidden">{{ resultCount() }}</span>
   }
   @case ('empty') {
     <div class="status__block">
@@ -21,12 +17,10 @@
     </div>
   }
   @case ('failed') {
-    <div class="status__block">
-      <span class="status__tile"><app-icon name="triangle-alert" [size]="20" /></span>
-      <strong class="status__title">Couldn’t load results</strong>
-      <span class="status__hint">
-        We couldn’t load this right now. Check your connection and try again.
-      </span>
+    <div class="status__block status__block--alert" role="alert">
+      <strong class="status__title">Search unavailable</strong>
+      <span class="status__hint">We couldn’t load results.</span>
+      <button appButton type="button" variant="secondary" (click)="retry.emit()">Retry</button>
     </div>
   }
 }

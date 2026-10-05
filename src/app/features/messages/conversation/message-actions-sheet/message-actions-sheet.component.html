@@ -3,15 +3,15 @@
     <button
       type="button"
       class="sheet__emoji-button"
-      [attr.aria-label]="'React with ' + item"
+      [attr.aria-label]="labelOf(item)"
       (click)="react(item)"
     >
       <span aria-hidden="true">{{ item }}</span>
     </button>
   }
 </div>
-<ul>
-  @for (action of actions(); track action.kind) {
+<ul class="sheet__actions">
+  @for (action of actions; track action.kind) {
     <li>
       <button
         type="button"

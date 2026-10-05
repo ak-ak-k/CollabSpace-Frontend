@@ -65,7 +65,7 @@
         <app-team-table
           [teams]="teams()"
           (manage)="actions.manage($event)"
-          (invite)="actions.invite($event)"
+          (invite)="actions.addMembers($event)"
         />
       } @else {
         <ul class="directory__grid">
@@ -75,7 +75,7 @@
                 [team]="team"
                 (join)="join(team.id)"
                 (manage)="actions.manage(team.id)"
-                (invite)="actions.invite(team.id)"
+                (invite)="actions.addMembers(team.id)"
               />
             </li>
           }

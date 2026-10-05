@@ -4,7 +4,7 @@ import { WorkspaceCatalog, WorkspaceData } from '../data/workspace.data';
 import { CURRENT_USER_ID } from '../mocks/users.mock';
 import { CURRENT_WORKSPACE_ID } from '../mocks/workspaces.mock';
 import { ActivityEvent } from '../models/activity';
-import { Channel, NewChannel } from '../models/channel';
+import { Channel, ChannelChanges, NewChannel } from '../models/channel';
 import { Conversation } from '../models/conversation';
 import { NewTeam, Team } from '../models/team';
 import { PresenceStatus, User } from '../models/user';
@@ -78,7 +78,9 @@ export class WorkspaceState {
     summariesOf(this.workspaces(), this.rosters(), this.currentWorkspaceId(), CURRENT_USER_ID),
   );
 
-  readonly teams = computed(() => this.allTeams().filter((team) => this.contains(team)));
+  readonly teams = computed(() =>
+    this.allTeams().filter((team) => this.contains(team) && !team.archived),
+  );
   readonly teamIds = computed(() => new Set(this.teams().map((team) => team.id)));
   readonly channels = computed(() =>
     this.allChannels().filter((channel) => this.teamIds().has(channel.teamId)),
@@ -124,6 +126,10 @@ export class WorkspaceState {
     return this.teams().find((team) => team.id === teamId) ?? null;
   }
 
+  anyTeam(teamId: string): Team | null {
+    return this.allTeams().find((team) => team.id === teamId && this.contains(team)) ?? null;
+  }
+
   switchWorkspace(workspaceId: string): void {
     this.currentWorkspaceId.set(workspaceId);
   }
@@ -158,6 +164,17 @@ export class WorkspaceState {
     this.preferenceMap.update((map) => ({ ...map, [workspaceId]: preferences }));
   }
 
+  putTeam(updated: Team): void {
+    this.allTeams.update((teams) => teams.map((team) => (team.id === updated.id ? updated : team)));
+  }
+
+  putChannels(updated: readonly Channel[]): void {
+    const byId = new Map(updated.map((channel) => [channel.id, channel]));
+    this.allChannels.update((channels) =>
+      channels.map((channel) => byId.get(channel.id) ?? channel),
+    );
+  }
+
   async createChannel(newChannel: NewChannel): Promise<Channel> {
     const { team, channel } = await this.teamsData.createChannel(newChannel);
     this.allTeams.update((teams) =>
@@ -165,6 +182,14 @@ export class WorkspaceState {
     );
     this.allChannels.update((channels) => [...channels, channel]);
     return channel;
+  }
+
+  async updateChannel(channelId: string, changes: ChannelChanges): Promise<Channel> {
+    const updated = await this.teamsData.updateChannel(channelId, changes);
+    this.allChannels.update((channels) =>
+      channels.map((channel) => (channel.id === channelId ? updated : channel)),
+    );
+    return updated;
   }
 
   async createTeam(newTeam: NewTeam): Promise<CreatedTeam> {

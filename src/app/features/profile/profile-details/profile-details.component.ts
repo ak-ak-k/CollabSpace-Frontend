@@ -13,7 +13,7 @@ import { ProfileDetail, ProfileDraft, TIME_ZONE_OPTIONS } from '../profile-view'
 export class ProfileDetailsComponent {
   readonly details = input<readonly ProfileDetail[]>([]);
   readonly editing = input(false, { transform: booleanAttribute });
-  readonly form = input.required<FieldTree<ProfileDraft>>();
+  readonly form = input<FieldTree<ProfileDraft>>();
 
   protected readonly timeZoneOptions = TIME_ZONE_OPTIONS;
 }

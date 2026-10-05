@@ -7,6 +7,7 @@
     [attr.aria-label]="reaction.description"
     [title]="reaction.description"
     (click)="toggle.emit(reaction.emoji)"
+    (contextmenu)="showReactors($event, reaction)"
   >
     <span class="reaction-bar__emoji" aria-hidden="true">{{ reaction.emoji }}</span>
     <span class="reaction-bar__count">{{ reaction.count }}</span>
@@ -14,11 +15,12 @@
 }
 @if (showAdd()) {
   <button
+    #addButton
     type="button"
     class="reaction-bar__add"
     aria-label="Add reaction"
     title="Add reaction"
-    (click)="add.emit()"
+    (click)="add.emit(addButton)"
   >
     <app-icon name="smile-plus" [size]="addIconSize" />
   </button>

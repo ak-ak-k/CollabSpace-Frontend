@@ -1,56 +1,53 @@
-import {
-  booleanAttribute,
-  Component,
-  ElementRef,
-  input,
-  model,
-  output,
-  viewChild,
-} from '@angular/core';
-import { QUICK_EMOJI } from '../../../../core/models/thread';
+import { ConnectedPosition } from '@angular/cdk/overlay';
+import { booleanAttribute, Component, input, output } from '@angular/core';
+import { DROPDOWN_IMPORTS } from '../../../ui/dropdown/dropdown-imports';
 import { IconButtonComponent } from '../../../ui/icon-button/icon-button.component';
+import { IconName } from '../../../ui/icon/icon-registry';
 import { IconComponent } from '../../../ui/icon/icon.component';
+import { MessageMenuItem, MessageMenuKind } from '../message-menu';
 
 const TOOL_ICON_SIZE = 16;
+const MENU_OFFSET = 4;
+
+const MENU_BELOW_END: ConnectedPosition = {
+  originX: 'end',
+  originY: 'bottom',
+  overlayX: 'end',
+  overlayY: 'top',
+  offsetY: MENU_OFFSET,
+};
+
+const MENU_ABOVE_END: ConnectedPosition = {
+  originX: 'end',
+  originY: 'top',
+  overlayX: 'end',
+  overlayY: 'bottom',
+  offsetY: -MENU_OFFSET,
+};
 
 @Component({
   selector: 'app-message-toolbar',
-  imports: [IconComponent, IconButtonComponent],
+  imports: [IconComponent, IconButtonComponent, ...DROPDOWN_IMPORTS],
   templateUrl: './message-toolbar.component.html',
   styleUrl: './message-toolbar.component.scss',
 })
 export class MessageToolbarComponent {
-  readonly hasText = input(false, { transform: booleanAttribute });
-  readonly pinned = input(false, { transform: booleanAttribute });
-  readonly mine = input(false, { transform: booleanAttribute });
-  readonly pickerOpen = model(false);
+  readonly items = input<readonly MessageMenuItem[]>([]);
+  readonly inThread = input(false, { transform: booleanAttribute });
+  readonly pickerOpen = input(false, { transform: booleanAttribute });
+  readonly saveLabel = input('Save for later');
+  readonly saveIcon = input<IconName>('bookmark');
 
-  readonly reactionPicked = output<string>();
-  readonly reply = output<void>();
-  readonly copy = output<void>();
-  readonly pin = output<void>();
-  readonly edit = output<void>();
-  readonly deleteRequested = output<void>();
+  readonly reactionRequested = output<HTMLElement>();
+  readonly command = output<MessageMenuKind>();
+  readonly menuOpenChange = output<boolean>();
 
-  private readonly addButton = viewChild.required('addButton', { read: ElementRef });
-
-  protected readonly quickEmoji = QUICK_EMOJI;
   protected readonly iconSize = TOOL_ICON_SIZE;
+  protected readonly menuPositions = [MENU_BELOW_END, MENU_ABOVE_END];
 
-  protected togglePicker(): void {
-    this.pickerOpen.update((open) => !open);
-  }
-
-  protected closePicker(): void {
-    if (!this.pickerOpen()) {
-      return;
+  protected requestReaction(event: MouseEvent): void {
+    if (event.currentTarget instanceof HTMLElement) {
+      this.reactionRequested.emit(event.currentTarget);
     }
-    this.pickerOpen.set(false);
-    this.addButton().nativeElement.focus();
-  }
-
-  protected pick(emoji: string): void {
-    this.reactionPicked.emit(emoji);
-    this.closePicker();
   }
 }

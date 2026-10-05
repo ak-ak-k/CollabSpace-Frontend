@@ -2,6 +2,7 @@ import { Component, computed, effect, inject, input, untracked } from '@angular/
 import { Router } from '@angular/router';
 import { BreakpointService } from '../../../core/services/breakpoint.service';
 import { FileState } from '../../../core/state/file.state';
+import { TaskState } from '../../../core/state/task.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import {
   BreadcrumbComponent,
@@ -17,16 +18,25 @@ import { TeamFilesComponent } from '../team-files/team-files.component';
 import { TeamHeaderComponent } from '../team-header/team-header.component';
 import { TeamMembersComponent } from '../team-members/team-members.component';
 import { TeamOverviewComponent } from '../team-overview/team-overview.component';
+import { TeamTasksComponent } from '../team-tasks/team-tasks.component';
 import { injectTeamDetail } from './team-detail-data';
 
-type TeamTab = 'overview' | 'members' | 'channels' | 'files' | 'activity';
+type TeamTab = 'overview' | 'members' | 'channels' | 'tasks' | 'files' | 'activity';
 
-const TEAM_TABS: readonly TeamTab[] = ['overview', 'members', 'channels', 'files', 'activity'];
+const TEAM_TABS: readonly TeamTab[] = [
+  'overview',
+  'members',
+  'channels',
+  'tasks',
+  'files',
+  'activity',
+];
 
 const TAB_LABELS: Record<TeamTab, string> = {
   overview: 'Overview',
   members: 'Members',
   channels: 'Channels',
+  tasks: 'Tasks',
   files: 'Files',
   activity: 'Activity',
 };
@@ -45,6 +55,7 @@ const tabOf = (value: string | undefined): TeamTab | null =>
     TeamOverviewComponent,
     TeamMembersComponent,
     TeamChannelsComponent,
+    TeamTasksComponent,
     TeamFilesComponent,
     TeamActivityComponent,
   ],
@@ -55,6 +66,7 @@ export class TeamDetailComponent {
   private readonly workspace = inject(WorkspaceState);
   private readonly router = inject(Router);
   protected readonly fileState = inject(FileState);
+  protected readonly taskState = inject(TaskState);
   protected readonly actions = inject(TeamActions);
   protected readonly breakpoint = inject(BreakpointService);
 
@@ -63,6 +75,7 @@ export class TeamDetailComponent {
 
   protected readonly detail = injectTeamDetail(() => this.teamId());
   protected readonly status = this.workspace.status;
+  protected readonly canInvite = computed(() => this.workspace.access().canInvite);
   protected readonly activeTab = computed(() => tabOf(this.tab()) ?? 'overview');
   protected readonly breadcrumb = computed<readonly BreadcrumbItem[]>(() => [
     { label: this.workspace.currentWorkspace()?.name ?? 'Workspace', link: '/workspace' },
@@ -72,7 +85,8 @@ export class TeamDetailComponent {
   protected readonly tabs = computed<readonly TabItem[]>(() => {
     const counts: Partial<Record<TeamTab, number>> = {
       members: this.detail.team()?.memberIds.length,
-      channels: this.detail.team()?.channelIds.length,
+      channels: this.detail.channels().length,
+      tasks: this.detail.tasks().length,
       files: this.detail.files().length,
     };
     return TEAM_TABS.map((tab) => ({

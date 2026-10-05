@@ -1,0 +1,37 @@
+@if (variant() === 'sheet') {
+  <button
+    appIconButton
+    type="button"
+    aria-haspopup="menu"
+    [size]="size()"
+    [label]="label()"
+    [attr.aria-expanded]="sheetOpen()"
+    (click)="openSheet()"
+  >
+    <app-icon [name]="icon()" [size]="20" />
+  </button>
+} @else {
+  <button
+    appIconButton
+    type="button"
+    [size]="size()"
+    [label]="label()"
+    [cdkMenuTriggerFor]="menu"
+    [cdkMenuPosition]="positions"
+  >
+    <app-icon [name]="icon()" [size]="18" />
+  </button>
+}
+
+<ng-template #menu>
+  <div [appDropdownPanel]="menuLabel()">
+    <app-dropdown [label]="menuLabel()">
+      @for (item of items(); track item.id) {
+        <button appDropdownItem (triggered)="run(item)">
+          <app-icon [name]="item.icon" [size]="16" />
+          <span class="truncate">{{ item.label }}</span>
+        </button>
+      }
+    </app-dropdown>
+  </div>
+</ng-template>

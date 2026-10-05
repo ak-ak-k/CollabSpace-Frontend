@@ -82,6 +82,12 @@ export const routes: Routes = [
           import('./features/workspace/workspace.routes').then((module) => module.WORKSPACE_ROUTES),
       },
       {
+        path: 'people',
+        title: 'People · CollabSpace',
+        loadChildren: () =>
+          import('./features/people/people.routes').then((module) => module.PEOPLE_ROUTES),
+      },
+      {
         path: 'messages',
         title: 'Messages · CollabSpace',
         loadChildren: () =>

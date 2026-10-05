@@ -1,0 +1,16 @@
+<div class="sheet__header">
+  <h2 class="sheet__title" [id]="titleId">Filters</h2>
+  <button appIconButton type="button" size="lg" label="Close filters" (click)="close()">
+    <app-icon name="x" [size]="20" />
+  </button>
+</div>
+
+<app-select label="Team" size="lg" [options]="teamOptions()" [(value)]="teamId" />
+<app-select label="Department" size="lg" [options]="departmentOptions()" [(value)]="department" />
+
+<div class="sheet__actions">
+  <button appButton type="button" size="xl" block (click)="clear()">Clear</button>
+  <button appButton type="button" size="xl" variant="inverted" block (click)="close()">
+    {{ showLabel() }}
+  </button>
+</div>

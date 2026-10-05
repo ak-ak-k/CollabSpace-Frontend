@@ -1,0 +1,23 @@
+@if (items().length === 0) {
+  <p class="activity__empty">No recent activity in {{ workspaceName() }}.</p>
+} @else {
+  <ol class="activity">
+    @for (item of items(); track item.id) {
+      <li class="activity__item">
+        <app-icon class="activity__icon" [name]="item.icon" [size]="16" />
+        <span class="activity__body">
+          <span class="activity__sentence">
+            {{ item.verb }}
+            <a class="activity__object" [routerLink]="item.link" (click)="navigate.emit()">{{
+              item.object
+            }}</a>
+          </span>
+          @if (item.snippet) {
+            <span class="activity__snippet">“{{ item.snippet }}”</span>
+          }
+          <span class="activity__when">{{ item.when }}</span>
+        </span>
+      </li>
+    }
+  </ol>
+}

@@ -2,9 +2,28 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ComposerSubmission, MentionCandidate } from '../../../core/models/thread';
 import { MessageComposerComponent } from './message-composer.component';
 
-const MEMBERS: readonly MentionCandidate[] = [
-  { id: 'u2', name: 'Rahul Mehta', firstName: 'Rahul', title: 'Engineer', seed: 1 },
-  { id: 'u3', name: 'Ananya Singh', firstName: 'Ananya', title: 'Designer', seed: 2 },
+const person = (id: string, name: string, title: string): MentionCandidate => ({
+  id,
+  kind: 'member',
+  token: `@${name.split(' ')[0]}`,
+  name,
+  firstName: name.split(' ')[0],
+  title,
+  seed: 1,
+});
+
+const MENTIONS: readonly MentionCandidate[] = [
+  person('u2', 'Rahul Mehta', 'Engineer'),
+  person('u3', 'Ananya Singh', 'Designer'),
+  {
+    id: 'c-frontend',
+    kind: 'channel',
+    token: '#frontend',
+    name: '#frontend',
+    firstName: 'frontend',
+    title: 'Frontend',
+    seed: 0,
+  },
 ];
 
 type Fixture = ComponentFixture<MessageComposerComponent>;
@@ -17,7 +36,7 @@ class ResizeObserverStub {
 const render = async () => {
   const fixture = TestBed.createComponent(MessageComposerComponent);
   fixture.componentRef.setInput('conversationTitle', 'Design team');
-  fixture.componentRef.setInput('members', MEMBERS);
+  fixture.componentRef.setInput('mentions', MENTIONS);
   await fixture.whenStable();
   const host = fixture.nativeElement as HTMLElement;
   const textarea = host.querySelector('textarea') as HTMLTextAreaElement;
@@ -128,5 +147,36 @@ describe('MessageComposerComponent', () => {
 
     expect(textarea.value).toBe('Hello @');
     expect(host.querySelectorAll('[role="option"]')).toHaveLength(2);
+  });
+
+  it('suggests channels under a Channels heading after #', async () => {
+    const { fixture, host, textarea } = await render();
+    await type(fixture, textarea, 'See #fr');
+
+    expect(host.querySelector('.mention-list__header')?.textContent).toBe('Channels');
+
+    press(textarea, 'Tab');
+    await fixture.whenStable();
+
+    expect(textarea.value).toBe('See #frontend ');
+  });
+
+  it('shows the formatting toolbar from the Formatting toggle and wraps the selection on Ctrl+B', async () => {
+    const { fixture, host, textarea } = await render();
+    const toggle = host.querySelector('button[aria-label="Formatting"]') as HTMLButtonElement;
+
+    toggle.click();
+    await fixture.whenStable();
+    expect(toggle.getAttribute('aria-pressed')).toBe('true');
+    expect(host.querySelector('[role="toolbar"][aria-label="Formatting"]')).not.toBeNull();
+
+    await type(fixture, textarea, 'ship it');
+    textarea.setSelectionRange(5, 7);
+    const event = press(textarea, 'b', { ctrlKey: true });
+    await fixture.whenStable();
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(textarea.value).toBe('ship **it**');
+    expect([textarea.selectionStart, textarea.selectionEnd]).toEqual([7, 9]);
   });
 });

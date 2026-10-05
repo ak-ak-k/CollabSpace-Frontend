@@ -28,6 +28,10 @@ export class ConversationItemComponent {
 
   protected readonly avatarSize = computed(() => AVATAR_SIZES[this.density()]);
   protected readonly isDirect = computed(() => this.conversation().type === 'dm');
+  protected readonly isGroup = computed(() => this.conversation().type === 'group');
+  protected readonly avatarText = computed(() =>
+    this.conversation().type === 'channel' ? '#' : '',
+  );
   protected readonly isComfortable = computed(() => this.density() === 'comfortable');
   protected readonly hasUnread = computed(() => this.conversation().unreadCount > 0);
   protected readonly isTyping = computed(() => this.conversation().typingText !== '');
@@ -41,11 +45,13 @@ export class ConversationItemComponent {
   protected readonly accessibleLabel = computed(() => this.describe(this.conversation()));
 
   private describe(conversation: ConversationPreview): string {
+    const team = conversation.teamName ? `, ${conversation.teamName} team` : '';
+    const favourite = conversation.starred ? ', favourite' : '';
     const unread = this.hasUnread() ? `, ${conversation.unreadCount} unread` : '';
     const activity = this.isTyping()
       ? `, ${conversation.typingText}`
       : `, last message: ${conversation.preview}`;
     const when = this.when() ? `, ${this.when()}` : '';
-    return conversation.title + unread + activity + when;
+    return conversation.title + team + favourite + unread + activity + when;
   }
 }

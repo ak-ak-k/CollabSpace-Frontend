@@ -1,24 +1,35 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import {
+  booleanAttribute,
+  Component,
+  computed,
+  ElementRef,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { TaskStatus } from '../../../core/models/task';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { TabItem, TabsComponent } from '../../../shared/ui/tabs/tabs.component';
-import { BoardColumn } from '../task-board/task-board.component';
-import { TaskCardComponent } from '../task-card/task-card.component';
+import { TaskMobileCardComponent } from '../task-mobile-card/task-mobile-card.component';
+import { BoardColumn } from '../tasks-page.store';
 
 const DEFAULT_COLUMN: TaskStatus = 'progress';
 
 @Component({
   selector: 'app-task-mobile-board',
-  imports: [ButtonComponent, IconComponent, TabsComponent, TaskCardComponent],
+  imports: [ButtonComponent, IconComponent, TabsComponent, TaskMobileCardComponent],
   templateUrl: './task-mobile-board.component.html',
   styleUrl: './task-mobile-board.component.scss',
 })
 export class TaskMobileBoardComponent {
   readonly columns = input.required<readonly BoardColumn[]>();
+  readonly canCreate = input(true, { transform: booleanAttribute });
 
-  readonly open = output<string>();
   readonly add = output<TaskStatus>();
+
+  private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
 
   protected readonly activeStatus = signal<TaskStatus>(DEFAULT_COLUMN);
   protected readonly tabs = computed<readonly TabItem[]>(() =>
@@ -37,5 +48,9 @@ export class TaskMobileBoardComponent {
     if (match) {
       this.activeStatus.set(match.status);
     }
+  }
+
+  protected focusPanel(): void {
+    this.panel()?.nativeElement.focus();
   }
 }

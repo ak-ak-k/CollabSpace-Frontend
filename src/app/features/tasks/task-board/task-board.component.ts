@@ -7,6 +7,7 @@ import {
 } from '@angular/cdk/drag-drop';
 import {
   afterRenderEffect,
+  booleanAttribute,
   Component,
   ElementRef,
   inject,
@@ -18,13 +19,7 @@ import { TaskStatus } from '../../../core/models/task';
 import { IconButtonComponent } from '../../../shared/ui/icon-button/icon-button.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { TaskCardComponent } from '../task-card/task-card.component';
-import { TaskCardView } from '../tasks-view';
-
-export interface BoardColumn {
-  readonly status: TaskStatus;
-  readonly label: string;
-  readonly cards: readonly TaskCardView[];
-}
+import { BoardColumn } from '../tasks-page.store';
 
 export interface TaskDrop {
   readonly taskId: string;
@@ -59,6 +54,7 @@ export class TaskBoardComponent {
 
   readonly columns = input.required<readonly BoardColumn[]>();
   readonly selectedId = input<string | null>(null);
+  readonly canCreate = input(true, { transform: booleanAttribute });
 
   readonly open = output<string>();
   readonly dropped = output<TaskDrop>();
@@ -77,6 +73,10 @@ export class TaskBoardComponent {
         this.focusAfterRender.set(null);
       }
     });
+  }
+
+  protected focusCard(taskId: string): void {
+    this.focusAfterRender.set(taskId);
   }
 
   protected onKeydown(event: KeyboardEvent, taskId: string): void {

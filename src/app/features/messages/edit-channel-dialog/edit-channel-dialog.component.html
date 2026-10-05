@@ -1,0 +1,42 @@
+<form class="edit-channel" [formRoot]="channelForm">
+  <app-modal
+    heading="Edit channel"
+    description="Changes are visible to everyone in the channel."
+    size="md"
+  >
+    <app-channel-name-field
+      label="Channel name"
+      placeholder="design-reviews"
+      hint="Lowercase, with hyphens instead of spaces."
+      [maxlength]="nameMaxLength"
+      [formField]="channelForm.name"
+    />
+    <p class="edit-channel__team">
+      In the <strong class="edit-channel__team-name">{{ teamName() }}</strong> team
+    </p>
+    <app-textarea
+      label="Description"
+      optional
+      [rows]="2"
+      placeholder="What is this channel about?"
+      [maxlength]="descriptionMaxLength"
+      [formField]="channelForm.description"
+    />
+    <app-radio-group
+      class="edit-channel__privacy"
+      label="Privacy"
+      stretch
+      [options]="privacyOptions"
+      [hint]="privacyHelp()"
+      [formField]="channelForm.privacy"
+    />
+
+    <ng-container modalActions>
+      <button appButton type="button" (click)="cancel()">Cancel</button>
+      <button appButton type="submit" variant="primary" [busy]="channelForm().submitting()">
+        <app-icon name="hash" [size]="16" />
+        Save changes
+      </button>
+    </ng-container>
+  </app-modal>
+</form>

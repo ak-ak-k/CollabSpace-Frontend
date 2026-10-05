@@ -67,4 +67,11 @@ describe('SearchService', () => {
 
     expect(service.recentSearches()).not.toContain('NS-142');
   });
+
+  it('clears every recent search and remembers that', () => {
+    service.clearRecent();
+
+    expect(service.recentSearches()).toEqual([]);
+    expect(localStorage.getItem(RECENT_SEARCHES_STORAGE_KEY)).toBe('[]');
+  });
 });

@@ -1,6 +1,10 @@
 import { computed, Signal, signal } from '@angular/core';
 import { MentionCandidate } from '../../../core/models/thread';
-import { filterMentionCandidates, findMentionMatch, MentionMatch } from './composer-text';
+import { suggestMentions } from '../../../core/state/chat-mentions';
+import { findMentionMatch, MentionMatch } from './composer-text';
+
+const PEOPLE_HEADING = 'People';
+const CHANNELS_HEADING = 'Channels';
 
 export class ComposerMentionState {
   private readonly dismissed = signal(false);
@@ -8,6 +12,7 @@ export class ComposerMentionState {
 
   readonly match: Signal<MentionMatch | null>;
   readonly candidates: Signal<readonly MentionCandidate[]>;
+  readonly heading: Signal<string>;
   readonly open: Signal<boolean>;
   readonly activeIndex: Signal<number>;
   readonly active: Signal<MentionCandidate | undefined>;
@@ -15,13 +20,16 @@ export class ComposerMentionState {
   constructor(
     draft: Signal<string>,
     caret: Signal<number>,
-    members: Signal<readonly MentionCandidate[]>,
+    mentions: Signal<readonly MentionCandidate[]>,
   ) {
     this.match = computed(() => (this.dismissed() ? null : findMentionMatch(draft(), caret())));
     this.candidates = computed(() => {
       const match = this.match();
-      return match ? filterMentionCandidates(members(), match.query) : [];
+      return match ? suggestMentions(mentions(), match.trigger, match.query) : [];
     });
+    this.heading = computed(() =>
+      this.match()?.trigger === '#' ? CHANNELS_HEADING : PEOPLE_HEADING,
+    );
     this.open = computed(() => this.candidates().length > 0);
     this.activeIndex = computed(() =>
       Math.min(this.requestedIndex(), Math.max(this.candidates().length - 1, 0)),

@@ -1,0 +1,45 @@
+<p class="message-text">
+  @for (segment of segments(); track $index) {
+    @switch (segment.style) {
+      @case ('mention') {
+        <span class="message-text__mention">{{ segment.text }}</span>
+      }
+      @case ('bold') {
+        <strong class="message-text__bold">{{ segment.text }}</strong>
+      }
+      @case ('italic') {
+        <em>{{ segment.text }}</em>
+      }
+      @case ('code') {
+        <code class="message-text__code">{{ segment.text }}</code>
+      }
+      @case ('link') {
+        <a
+          class="message-text__link"
+          target="_blank"
+          rel="noopener noreferrer"
+          [href]="segment.href"
+          (click)="$event.stopPropagation()"
+          >{{ segment.text }}</a
+        >
+      }
+      @default {
+        <span>{{ segment.text }}</span>
+      }
+    }
+  }
+  @if (edited()) {
+    <span class="message-text__edited"> (edited)</span>
+  }
+  @if (status(); as status) {
+    <span
+      class="message-text__status"
+      [class.message-text__status--read]="status.read"
+      role="img"
+      [attr.aria-label]="status.accessibleLabel"
+      [attr.title]="status.label"
+    >
+      <app-icon [name]="status.icon" [size]="statusIconSize" />
+    </span>
+  }
+</p>

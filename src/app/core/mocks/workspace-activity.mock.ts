@@ -38,7 +38,7 @@ const ACTIVITY_SEEDS: readonly ActivitySeed[] = [
     '#api-v2 in Platform',
     MINUTES_PER_DAY + 200,
     'channel',
-    '/teams/t-platform/c/c-api',
+    '/teams/t-platform/channels/c-api',
   ],
   [
     'wa6',
@@ -58,7 +58,7 @@ const ACTIVITY_SEEDS: readonly ActivitySeed[] = [
     '#research in Design',
     3 * MINUTES_PER_DAY,
     'channel',
-    '/teams/t-design/c/c-research',
+    '/teams/t-design/channels/c-research',
   ],
   [
     'wa8',

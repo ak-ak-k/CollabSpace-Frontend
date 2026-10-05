@@ -8,12 +8,20 @@ import { IconComponent } from '../../../ui/icon/icon.component';
 
 const IMAGE_MIME_PREFIX = 'image/';
 
-export const attachmentFromFile = (file: File): Attachment => ({
-  kind: file.type.startsWith(IMAGE_MIME_PREFIX) ? 'image' : 'file',
-  type: fileTypeOf(file.name),
-  name: file.name,
-  size: formatFileSize(file.size),
-});
+export type PreviewUrlFactory = (file: File) => string | null;
+
+export const attachmentFromFile = (file: File, previewUrlOf: PreviewUrlFactory): Attachment => {
+  const image = file.type.startsWith(IMAGE_MIME_PREFIX);
+  const src = image ? previewUrlOf(file) : null;
+  return {
+    kind: image ? 'image' : 'file',
+    type: fileTypeOf(file.name),
+    name: file.name,
+    size: formatFileSize(file.size),
+    bytes: file.size,
+    ...(src ? { src } : {}),
+  };
+};
 
 @Component({
   selector: 'app-attachment-chips',

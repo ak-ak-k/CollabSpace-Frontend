@@ -11,8 +11,8 @@ describe('NotificationState', () => {
     const notifications = TestBed.inject(NotificationState);
     await settle();
 
-    expect(notifications.unreadCount()).toBe(5);
-    expect(notifications.unreadMentionCount()).toBe(2);
+    expect(notifications.unreadCount()).toBe(7);
+    expect(notifications.unreadMentionCount()).toBe(3);
     expect(notifications.unreadCountFor('task')).toBe(1);
   });
 
@@ -23,7 +23,30 @@ describe('NotificationState', () => {
     await notifications.markAllRead('mention');
 
     expect(notifications.unreadMentionCount()).toBe(0);
-    expect(notifications.unreadCount()).toBe(3);
+    expect(notifications.unreadCount()).toBe(4);
+  });
+
+  it('adds new notifications newest first', async () => {
+    const notifications = TestBed.inject(NotificationState);
+    await settle();
+
+    await notifications.add([
+      {
+        id: 'due-NS-141',
+        workspaceId: 'w1',
+        category: 'task',
+        actorId: null,
+        text: 'NS-141 is due today',
+        snippet: 'Settings: roles and permissions UI',
+        createdAt: Date.now(),
+        read: false,
+        route: '/tasks?task=NS-141',
+        icon: 'calendar',
+      },
+    ]);
+
+    expect(notifications.notifications()[0].id).toBe('due-NS-141');
+    expect(notifications.unreadCountFor('task')).toBe(2);
   });
 
   it('dismisses and restores a notification in date order', async () => {

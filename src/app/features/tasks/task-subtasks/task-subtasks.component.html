@@ -1,0 +1,60 @@
+<section class="section" [attr.aria-labelledby]="headingId">
+  <div class="section__head">
+    <h3 class="section__title" [id]="headingId">Subtasks</h3>
+    <span class="section__meta">{{ progressLabel() }}</span>
+  </div>
+  @if (progress().total > 0) {
+    <div
+      class="progress"
+      role="progressbar"
+      aria-label="Subtasks completed"
+      aria-valuemin="0"
+      [attr.aria-valuemax]="progress().total"
+      [attr.aria-valuenow]="progress().done"
+    >
+      <div class="progress__bar" [style.width.%]="percent()"></div>
+    </div>
+  }
+  <ul class="subtasks">
+    @for (subtask of task().subtasks; track subtask.id) {
+      <li class="subtask">
+        <app-checkbox
+          class="subtask__check"
+          [checked]="subtask.done"
+          (checkedChange)="toggle(subtask)"
+        >
+          <span class="visually-hidden">
+            {{ (subtask.done ? 'Mark not done: ' : 'Mark done: ') + subtask.title }}
+          </span>
+        </app-checkbox>
+        <input
+          #titleField
+          class="subtask__title"
+          [class.subtask__title--done]="subtask.done"
+          [value]="subtask.title"
+          [attr.aria-label]="'Subtask: ' + subtask.title"
+          (keydown.enter)="titleField.blur()"
+          (blur)="rename(subtask, titleField)"
+        />
+        <button
+          appIconButton
+          type="button"
+          [label]="'Delete subtask ' + subtask.title"
+          (click)="remove(subtask)"
+        >
+          <app-icon name="x" [size]="14" />
+        </button>
+      </li>
+    }
+  </ul>
+  <form class="add" (submit)="add($event)">
+    <app-input
+      class="add__field"
+      label="Add a subtask"
+      hideLabel
+      placeholder="Add a subtask"
+      [(value)]="draft"
+    />
+    <button appButton type="submit" [disabled]="!draft().trim()">Add</button>
+  </form>
+</section>

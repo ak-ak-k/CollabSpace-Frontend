@@ -23,18 +23,22 @@
   gap: var(--space-2);
 }
 
-.task-card__id {
+.task-card__id,
+.task-card__team {
   color: var(--text-muted);
   font-size: var(--font-size-12);
+}
+
+.task-card__id {
   font-weight: var(--font-weight-semibold);
+}
+
+.task-card__team {
+  max-width: var(--task-team-max-width);
 }
 
 .task-card__spacer {
   flex: 1;
-}
-
-.task-card__grip {
-  color: var(--text-muted);
 }
 
 .task-card__title {
@@ -60,6 +64,7 @@
 }
 
 .task-card__meta {
+  flex-wrap: wrap;
   gap: var(--space-3);
   color: var(--text-muted);
   font-size: var(--font-size-12);

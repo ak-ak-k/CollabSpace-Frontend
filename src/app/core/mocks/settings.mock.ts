@@ -2,11 +2,13 @@ import { DeviceSession, Integration, Preferences, RolePermission } from '../mode
 
 export const MOCK_PREFERENCES: Preferences = {
   notifications: {
-    mentions: { desktop: true, mobile: true, email: true },
-    dms: { desktop: true, mobile: true, email: false },
-    tasks: { desktop: true, mobile: false, email: true },
-    team: { desktop: false, mobile: false, email: false },
-    system: { desktop: true, mobile: true, email: true },
+    mentions: { inapp: true, push: true, email: true },
+    dms: { inapp: true, push: true, email: false },
+    threads: { inapp: true, push: false, email: false },
+    tasks: { inapp: true, push: false, email: true },
+    due: { inapp: true, push: true, email: false },
+    team: { inapp: true, push: false, email: false },
+    system: { inapp: true, push: true, email: true },
   },
   sounds: true,
   doNotDisturb: false,

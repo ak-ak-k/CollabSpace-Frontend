@@ -1,31 +1,60 @@
-import { inject, Service } from '@angular/core';
+import { inject, InjectionToken, Service } from '@angular/core';
 import { ChatData } from '../data/chat.data';
 import { CURRENT_USER_ID } from '../mocks/users.mock';
-import { Message } from '../models/message';
-import { ComposerSubmission } from '../models/thread';
+import { DeliveryState, Message, MessageDraft } from '../models/message';
 import {
   appendMessage,
   editMessage,
   insertMessage,
   reactToMessage,
   removeMessage,
+  setDeliveryState,
   togglePinned,
 } from './chat-mutations';
+import { threadOf } from './chat-selectors';
 import { ChatState } from './chat.state';
 import { NetworkState } from './network.state';
+
+export const SEND_ACKNOWLEDGE_DELAY = new InjectionToken<number>('SEND_ACKNOWLEDGE_DELAY', {
+  factory: () => 650,
+});
 
 @Service()
 export class ChatMessagesState {
   private readonly chat = inject(ChatState);
   private readonly data = inject(ChatData);
   private readonly network = inject(NetworkState);
+  private readonly acknowledgeDelay = inject(SEND_ACKNOWLEDGE_DELAY);
 
-  async send(conversationId: string, submission: ComposerSubmission): Promise<Message> {
-    const deliveryState = this.network.online() ? 'sent' : 'queued';
-    const message = await this.data.sendMessage(conversationId, submission, deliveryState);
+  thread(conversationId: string, rootId: string): readonly Message[] {
+    return threadOf(this.chat.messages()[conversationId] ?? [], rootId);
+  }
+
+  async send(conversationId: string, draft: MessageDraft): Promise<Message> {
+    const online = this.network.online();
+    const message = await this.data.sendMessage(
+      conversationId,
+      draft,
+      online ? 'sending' : 'queued',
+    );
     this.chat.messages.update((threads) => appendMessage(threads, message));
-    this.chat.newMessagesMarkerId.set(null);
+    if (!message.threadRootId) {
+      this.chat.newMessagesMarkerId.set(null);
+    }
+    if (online) {
+      this.acknowledgeLater(conversationId, message.id);
+    }
     return message;
+  }
+
+  async retry(conversationId: string, messageId: string): Promise<boolean> {
+    if (!this.network.online()) {
+      return false;
+    }
+    this.setState(conversationId, messageId, 'sending');
+    await this.data.setDeliveryState(conversationId, messageId, 'sending');
+    this.acknowledgeLater(conversationId, messageId);
+    return true;
   }
 
   async edit(conversationId: string, messageId: string, text: string): Promise<void> {
@@ -46,7 +75,9 @@ export class ChatMessagesState {
   }
 
   async togglePin(conversationId: string, messageId: string): Promise<boolean> {
-    this.chat.messages.update((threads) => togglePinned(threads, conversationId, messageId));
+    this.chat.messages.update((threads) =>
+      togglePinned(threads, conversationId, messageId, CURRENT_USER_ID),
+    );
     await this.persist(conversationId, messageId);
     return this.find(conversationId, messageId)?.pinned ?? false;
   }
@@ -56,6 +87,25 @@ export class ChatMessagesState {
       reactToMessage(threads, conversationId, messageId, emoji, CURRENT_USER_ID),
     );
     await this.persist(conversationId, messageId);
+  }
+
+  private acknowledgeLater(conversationId: string, messageId: string): void {
+    setTimeout(() => void this.acknowledge(conversationId, messageId), this.acknowledgeDelay);
+  }
+
+  private async acknowledge(conversationId: string, messageId: string): Promise<void> {
+    if (this.find(conversationId, messageId)?.deliveryState !== 'sending') {
+      return;
+    }
+    const state: DeliveryState = this.network.online() ? 'sent' : 'failed';
+    this.setState(conversationId, messageId, state);
+    await this.data.setDeliveryState(conversationId, messageId, state);
+  }
+
+  private setState(conversationId: string, messageId: string, state: DeliveryState): void {
+    this.chat.messages.update((threads) =>
+      setDeliveryState(threads, conversationId, messageId, state),
+    );
   }
 
   private find(conversationId: string, messageId: string): Message | null {

@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { booleanAttribute, Component, input, output } from '@angular/core';
 import { Team } from '../../../core/models/team';
 import { AvatarComponent } from '../../../shared/ui/avatar/avatar.component';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
@@ -14,9 +14,10 @@ import { CountPipe } from '../../../shared/pipes/count.pipe';
 })
 export class TeamHeaderComponent {
   readonly team = input.required<Team>();
+  readonly canManage = input(false, { transform: booleanAttribute });
 
-  readonly invite = output<void>();
-  readonly manage = output<void>();
+  readonly addMembers = output<void>();
+  readonly openSettings = output<void>();
   readonly join = output<void>();
   readonly leave = output<void>();
 }

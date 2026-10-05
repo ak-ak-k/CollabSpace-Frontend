@@ -1,5 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import {
+  NOTIFICATION_CHANNEL_LABELS,
   NOTIFICATION_CHANNELS,
   NotificationChannel,
   NotificationTopic,
@@ -19,18 +20,22 @@ interface TopicCopy {
 }
 
 const TOPICS: readonly TopicCopy[] = [
-  { topic: 'mentions', label: 'Mentions', description: '@you and @here in channels' },
-  { topic: 'dms', label: 'Direct messages', description: 'New DMs and group messages' },
-  { topic: 'tasks', label: 'Tasks', description: 'Assignments, due dates and comments' },
-  { topic: 'team', label: 'Team activity', description: 'New channels, members and files' },
-  { topic: 'system', label: 'System', description: 'Security alerts and maintenance' },
+  { topic: 'mentions', label: 'Mentions', description: '@you, @here and @everyone' },
+  { topic: 'dms', label: 'Direct messages', description: 'New messages in DMs and groups' },
+  { topic: 'threads', label: 'Thread replies', description: 'Replies in threads you’re part of' },
+  {
+    topic: 'tasks',
+    label: 'Task assignments & mentions',
+    description: 'Assigned to you, or mentioned in a comment',
+  },
+  { topic: 'due', label: 'Due reminders', description: 'Your tasks due soon or overdue' },
+  {
+    topic: 'team',
+    label: 'Teams & workspace',
+    description: 'Added to a team or private channel, role changes',
+  },
+  { topic: 'system', label: 'Security & system', description: 'New sign-ins and account security' },
 ];
-
-const CHANNEL_LABELS: Record<NotificationChannel, string> = {
-  desktop: 'Desktop',
-  mobile: 'Mobile',
-  email: 'Email',
-};
 
 @Component({
   selector: 'app-settings-notifications',
@@ -46,7 +51,7 @@ export class SettingsNotificationsComponent {
 
   protected readonly topics = TOPICS;
   protected readonly channels = NOTIFICATION_CHANNELS;
-  protected readonly channelLabels = CHANNEL_LABELS;
+  protected readonly channelLabels = NOTIFICATION_CHANNEL_LABELS;
   protected readonly preferences = this.state.preferences;
   protected readonly doNotDisturb = computed(() => this.workspace.currentUser()?.status === 'dnd');
 

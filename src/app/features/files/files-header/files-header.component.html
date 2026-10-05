@@ -1,0 +1,32 @@
+<div class="header__text">
+  <h1 class="header__title" tabindex="-1" #title>{{ heading() }}</h1>
+  <p class="header__description">{{ description() }}</p>
+</div>
+
+<div class="header__upload">
+  <button
+    appButton
+    type="button"
+    variant="primary"
+    size="lg"
+    [disabled]="offline()"
+    [attr.aria-describedby]="hint() ? hintId : null"
+    (click)="pick()"
+  >
+    <app-icon name="upload" [size]="16" />
+    Upload
+  </button>
+  @if (hint()) {
+    <span class="header__hint" [id]="hintId">{{ hint() }}</span>
+  }
+</div>
+
+<input
+  #picker
+  type="file"
+  multiple
+  hidden
+  tabindex="-1"
+  aria-label="Choose files to upload"
+  (change)="emitPicked()"
+/>

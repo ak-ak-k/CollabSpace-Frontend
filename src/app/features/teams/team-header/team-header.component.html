@@ -12,14 +12,16 @@
     </div>
   </div>
   <div class="header__actions">
-    <button appButton type="button" variant="primary" (click)="invite.emit()">
+    <button appButton type="button" variant="primary" (click)="addMembers.emit()">
       <app-icon name="user-plus" [size]="16" />
-      Invite
+      Add members
     </button>
-    <button appButton type="button" (click)="manage.emit()">
-      <app-icon name="settings" [size]="16" />
-      Manage
-    </button>
+    @if (canManage()) {
+      <button appButton type="button" (click)="openSettings.emit()">
+        <app-icon name="settings" [size]="16" />
+        Team settings
+      </button>
+    }
     @if (item.joined) {
       <button appButton type="button" (click)="leave.emit()">Leave team</button>
     } @else {

@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { MessageView } from '../../../core/models/thread';
+import { MessageMenuItem } from '../../../shared/components/message-bubble/message-menu';
+import { BreakpointService } from '../../../core/services/breakpoint.service';
 import { DialogService } from '../../../core/services/dialog.service';
-import { WorkspaceActions } from '../../workspace/workspace-actions.service';
 import {
   DetailsDrawerComponent,
   DetailsDrawerData,
@@ -13,11 +13,27 @@ import {
   MessageActionsSheetData,
   MessageActionsSheetResult,
 } from './message-actions-sheet/message-actions-sheet.component';
+import { ConversationSessionState } from './conversation-session.state';
 
 @Injectable()
 export class ConversationOverlays {
   private readonly dialogs = inject(DialogService);
-  private readonly workspaceActions = inject(WorkspaceActions);
+  private readonly breakpoint = inject(BreakpointService);
+  private readonly session = inject(ConversationSessionState);
+
+  showDetails(conversationId: string, toggle: boolean, jumpTo: (messageId: string) => void): void {
+    if (!this.breakpoint.isDesktop()) {
+      this.openDetails(conversationId).subscribe((result) => {
+        if (result) {
+          jumpTo(result.jumpTo);
+        }
+      });
+    } else if (toggle) {
+      this.session.toggleDockedDetails();
+    } else {
+      this.session.dockedDetailsOpen.set(true);
+    }
+  }
 
   openDetails(conversationId: string): Observable<DetailsDrawerResult | undefined> {
     return this.dialogs.openDrawer<DetailsDrawerResult, DetailsDrawerData>(DetailsDrawerComponent, {
@@ -28,14 +44,12 @@ export class ConversationOverlays {
     }).closed;
   }
 
-  openMessageActions(message: MessageView): Observable<MessageActionsSheetResult | undefined> {
+  openMessageActions(
+    items: readonly MessageMenuItem[],
+  ): Observable<MessageActionsSheetResult | undefined> {
     return this.dialogs.openDrawer<MessageActionsSheetResult, MessageActionsSheetData>(
       MessageActionsSheetComponent,
-      { data: { message }, side: 'bottom', ariaLabel: 'Message actions' },
+      { data: { items }, side: 'bottom', ariaLabel: 'Message actions' },
     ).closed;
-  }
-
-  invite(teamId: string | undefined): void {
-    this.workspaceActions.openInvite(teamId ?? null);
   }
 }

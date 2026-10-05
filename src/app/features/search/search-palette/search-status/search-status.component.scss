@@ -23,6 +23,10 @@
   padding: var(--space-8) var(--space-4);
 }
 
+.status__block--alert {
+  align-items: flex-start;
+}
+
 .status__tile {
   display: grid;
   place-items: center;

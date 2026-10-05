@@ -1,25 +1,29 @@
-import { booleanAttribute, Component, computed, input, output } from '@angular/core';
-import { AvatarComponent } from '../../../shared/ui/avatar/avatar.component';
+import { NgTemplateOutlet } from '@angular/common';
+import { booleanAttribute, Component, computed, inject, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { IconButtonComponent } from '../../../shared/ui/icon-button/icon-button.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { createUniqueId } from '../../../shared/ui/input/field/unique-id';
-import { StatusDotComponent } from '../../../shared/ui/status-dot/status-dot.component';
-import { TagComponent } from '../../../shared/ui/tag/tag.component';
+import { ConversationAccess } from '../conversation/conversation-access';
 import { ConversationExtras } from '../conversation/conversation-context';
 import { ConversationView } from '../conversation/conversation-view';
-import { CountPipe } from '../../../shared/pipes/count.pipe';
+import { MembershipActions } from '../membership-actions.service';
+import { DetailsIdentityComponent } from './details-identity/details-identity.component';
+import { DetailsMembersComponent } from './details-members/details-members.component';
+import { DetailsNotificationsComponent } from './details-notifications/details-notifications.component';
 
 @Component({
   selector: 'app-conversation-details',
   imports: [
-    CountPipe,
-    AvatarComponent,
+    NgTemplateOutlet,
+    RouterLink,
     ButtonComponent,
     IconButtonComponent,
     IconComponent,
-    StatusDotComponent,
-    TagComponent,
+    DetailsIdentityComponent,
+    DetailsMembersComponent,
+    DetailsNotificationsComponent,
   ],
   templateUrl: './conversation-details.component.html',
   styleUrl: './conversation-details.component.scss',
@@ -28,13 +32,15 @@ import { CountPipe } from '../../../shared/pipes/count.pipe';
   },
 })
 export class ConversationDetailsComponent {
+  private readonly membership = inject(MembershipActions);
+
   readonly view = input.required<ConversationView>();
   readonly extras = input.required<ConversationExtras>();
+  readonly access = input.required<ConversationAccess>();
   readonly docked = input(false, { transform: booleanAttribute });
 
   readonly closed = output<void>();
   readonly jump = output<string>();
-  readonly addPeople = output<void>();
 
   protected readonly ids = {
     members: createUniqueId('details-members'),
@@ -45,5 +51,9 @@ export class ConversationDetailsComponent {
   protected readonly membersHeading = computed(() =>
     this.isDirect() ? 'In this conversation' : `Members · ${this.view().memberCount}`,
   );
-  protected readonly mailto = computed(() => `mailto:${this.view().profile?.email ?? ''}`);
+  protected readonly filesQuery = computed(() => ({ conv: this.view().id }));
+
+  protected addPeople(): void {
+    void this.membership.addPeople(this.view().id);
+  }
 }

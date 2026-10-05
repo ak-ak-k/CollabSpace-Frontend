@@ -1,11 +1,18 @@
-import { FILE_TYPE_LABELS, FileView } from '../../core/models/file-item';
+import {
+  FILE_TYPE_LABELS,
+  FILE_TYPES,
+  FileSourceKind,
+  FileType,
+  FileView,
+} from '../../core/models/file-item';
 import { IconName } from '../../shared/ui/icon/icon-registry';
 import { RadioOption } from '../../shared/ui/radio/radio-group.component';
-import { SelectOption } from '../../shared/ui/select/select.component';
 import { SortDirection } from '../../shared/ui/table/sort-header.component';
 
 export type FileLayout = 'list' | 'grid';
 export type FileSortKey = 'name' | 'size' | 'modified';
+export type FileSourceFilter = 'any' | FileSourceKind;
+export type FileModifiedFilter = 'any' | '7' | '30';
 
 export interface FileSort {
   readonly key: FileSortKey;
@@ -15,44 +22,50 @@ export interface FileSort {
 export interface FileFolder {
   readonly id: FileView;
   readonly label: string;
+  readonly short: string;
   readonly icon: IconName;
   readonly description: string;
 }
 
-export interface FileSortOption extends SelectOption {
-  readonly sort: FileSort;
+export interface FileTypeOption {
+  readonly value: FileType;
+  readonly label: string;
 }
 
-export const ALL_FILE_TYPES = 'all';
 export const FILES_PER_PAGE = 8;
 export const DEFAULT_FILE_FOLDER: FileView = 'recent';
 export const DEFAULT_FILE_SORT: FileSort = { key: 'modified', direction: 'desc' };
+export const OFFLINE_UPLOAD_MESSAGE = 'You’re offline. Upload when you’re back online.';
 
 export const FILE_FOLDERS: readonly FileFolder[] = [
   {
     id: 'recent',
     label: 'Recent files',
+    short: 'Recent',
     icon: 'clock',
-    description: 'Everything shared with you and by you, newest first.',
+    description: 'Everything you can access, newest first.',
   },
   {
     id: 'shared',
-    label: 'Shared with me',
+    label: 'Shared in conversations & tasks',
+    short: 'Shared',
     icon: 'share-2',
-    description: 'Files your teammates shared in channels and DMs.',
+    description: 'Files teammates attached to messages and tasks.',
   },
-  { id: 'mine', label: 'My files', icon: 'folder', description: 'Files you uploaded.' },
+  {
+    id: 'mine',
+    label: 'My files',
+    short: 'Mine',
+    icon: 'folder',
+    description: 'Files you uploaded or attached.',
+  },
   {
     id: 'starred',
     label: 'Starred',
+    short: 'Starred',
     icon: 'star',
-    description: 'Files you starred for quick access.',
+    description: 'Files you starred — only you see your stars.',
   },
-];
-
-export const FILE_TYPE_OPTIONS: readonly SelectOption[] = [
-  { value: ALL_FILE_TYPES, label: 'All types' },
-  ...Object.entries(FILE_TYPE_LABELS).map(([value, label]) => ({ value, label })),
 ];
 
 export const FILE_LAYOUT_OPTIONS: readonly RadioOption[] = [
@@ -60,19 +73,28 @@ export const FILE_LAYOUT_OPTIONS: readonly RadioOption[] = [
   { value: 'grid', label: 'Grid', icon: 'layout-grid' },
 ];
 
-const sortOption = (key: FileSortKey, direction: SortDirection, label: string): FileSortOption => ({
-  value: `${key}-${direction}`,
-  label,
-  sort: { key, direction },
-});
+export const FILE_TYPE_OPTIONS: readonly FileTypeOption[] = FILE_TYPES.map((value) => ({
+  value,
+  label: FILE_TYPE_LABELS[value],
+}));
 
-export const FILE_SORT_OPTIONS: readonly FileSortOption[] = [
-  sortOption('modified', 'desc', 'Newest first'),
-  sortOption('modified', 'asc', 'Oldest first'),
-  sortOption('name', 'asc', 'Name (A–Z)'),
-  sortOption('name', 'desc', 'Name (Z–A)'),
-  sortOption('size', 'desc', 'Largest first'),
-  sortOption('size', 'asc', 'Smallest first'),
+export const FILE_SOURCE_LABELS: Record<FileSourceKind, string> = {
+  upload: 'Uploads',
+  message: 'Conversations',
+  task: 'Tasks',
+};
+
+export const FILE_SOURCE_OPTIONS: readonly RadioOption[] = [
+  { value: 'any', label: 'Any' },
+  { value: 'upload', label: FILE_SOURCE_LABELS.upload },
+  { value: 'message', label: FILE_SOURCE_LABELS.message },
+  { value: 'task', label: FILE_SOURCE_LABELS.task },
+];
+
+export const FILE_MODIFIED_OPTIONS: readonly RadioOption[] = [
+  { value: 'any', label: 'Any time' },
+  { value: '7', label: 'Last 7 days' },
+  { value: '30', label: 'Last 30 days' },
 ];
 
 export const folderOf = (value: string | undefined): FileView =>
@@ -80,11 +102,6 @@ export const folderOf = (value: string | undefined): FileView =>
 
 export const folderMeta = (id: FileView): FileFolder =>
   FILE_FOLDERS.find((folder) => folder.id === id) ?? FILE_FOLDERS[0];
-
-export const sortValueOf = (sort: FileSort): string => `${sort.key}-${sort.direction}`;
-
-export const sortFromValue = (value: string): FileSort =>
-  FILE_SORT_OPTIONS.find((option) => option.value === value)?.sort ?? DEFAULT_FILE_SORT;
 
 export const nextSort = (current: FileSort, key: FileSortKey): FileSort => {
   if (current.key === key) {
@@ -101,3 +118,9 @@ const SORT_DESCRIPTIONS: Record<FileSortKey, Record<SortDirection, string>> = {
 
 export const sortDescription = (sort: FileSort): string =>
   SORT_DESCRIPTIONS[sort.key][sort.direction];
+
+export const isSourceFilter = (value: string): value is FileSourceFilter =>
+  FILE_SOURCE_OPTIONS.some((option) => option.value === value);
+
+export const isModifiedFilter = (value: string): value is FileModifiedFilter =>
+  FILE_MODIFIED_OPTIONS.some((option) => option.value === value);

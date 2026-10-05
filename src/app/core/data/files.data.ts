@@ -1,49 +1,36 @@
 import { inject, Service } from '@angular/core';
 import { MOCK_FILES } from '../mocks/files.mock';
-import { CURRENT_USER_ID } from '../mocks/users.mock';
-import { FileItem, fileTypeOf } from '../models/file-item';
+import { FileItem } from '../models/file-item';
 import { MockRequest } from './mock-request';
 
-const UPLOADED_FILE_BYTES = 1_200_000;
-const UPLOADED_FILE_SIZE_LABEL = '1.2 MB';
-const PRIVATE_LOCATION = 'Only you';
+export type NewFile = Omit<FileItem, 'id'>;
+
+export type FileChanges = Partial<Pick<FileItem, 'name' | 'modifiedAt' | 'starred' | 'taskIds'>>;
+
+const NEW_FILE_PREFIX = 'f-new-';
 
 @Service()
 export class FilesData {
   private readonly request = inject(MockRequest);
 
   private files = [...MOCK_FILES];
-  private uploadedFiles = 0;
+  private createdFiles = 0;
 
   getFiles(): Promise<readonly FileItem[]> {
     return this.request.read(() => this.files, []);
   }
 
-  uploadFile(name: string, workspaceId: string): Promise<FileItem> {
+  addFile(draft: NewFile): Promise<FileItem> {
     return this.request.write(() => {
-      const file: FileItem = {
-        id: `f-new-${++this.uploadedFiles}`,
-        workspaceId,
-        name,
-        type: fileTypeOf(name),
-        sizeLabel: UPLOADED_FILE_SIZE_LABEL,
-        bytes: UPLOADED_FILE_BYTES,
-        ownerId: CURRENT_USER_ID,
-        modifiedAt: Date.now(),
-        location: PRIVATE_LOCATION,
-        shared: false,
-        starred: false,
-      };
+      const file: FileItem = { ...draft, id: `${NEW_FILE_PREFIX}${++this.createdFiles}` };
       this.files = [file, ...this.files];
       return file;
     });
   }
 
-  toggleStar(id: string): Promise<void> {
+  updateFile(id: string, changes: FileChanges): Promise<void> {
     return this.request.write(() => {
-      this.files = this.files.map((file) =>
-        file.id === id ? { ...file, starred: !file.starred } : file,
-      );
+      this.files = this.files.map((file) => (file.id === id ? { ...file, ...changes } : file));
     });
   }
 
@@ -55,7 +42,7 @@ export class FilesData {
 
   restoreFile(file: FileItem): Promise<void> {
     return this.request.write(() => {
-      this.files = [file, ...this.files];
+      this.files = [file, ...this.files.filter((current) => current.id !== file.id)];
     });
   }
 }

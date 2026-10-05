@@ -21,6 +21,12 @@
   font-weight: var(--font-weight-regular);
 }
 
+.matrix__note {
+  @include settings-section.helper-text;
+
+  text-wrap: pretty;
+}
+
 .notification-switches {
   @include settings-section.list;
 }

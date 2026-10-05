@@ -1,39 +1,57 @@
+import { emojiName } from '../models/emoji-names';
 import { FILE_TYPE_ICONS, FILE_TYPE_LABELS } from '../models/file-item';
-import { Attachment, Message, Reaction } from '../models/message';
+import { Attachment, DeliveryState, Message, Reaction } from '../models/message';
 import {
   AttachmentView,
   MessageView,
   ReactionView,
   ReplyPreview,
-  TextSegment,
   ThreadRow,
+  ThreadSummary,
 } from '../models/thread';
 import { firstNameOf, User, userColorSeed } from '../models/user';
 import { formatDayLabel, formatTime, isSameDay } from '../../shared/pipes/time-format';
+import { formatSegments, mentionsUser } from './chat-format';
+import { threadOf, threadSummariesOf, timelineOf } from './chat-selectors';
+import { replyCountLabel, threadPanelRows, threadPreviewOf } from './chat-thread-view';
 
 export interface ThreadOptions {
   readonly currentUserId: string;
   readonly usersById: ReadonlyMap<string, User>;
   readonly searchTerm: string;
   readonly newMarkerId: string | null;
+  readonly rootId: string | null;
+  readonly savedIds: ReadonlySet<string>;
+  readonly threadUnreadCounts: Readonly<Record<string, number>>;
+  readonly fileIdFor?: (name: string) => string | null;
+}
+
+interface RowContext {
+  readonly byId: ReadonlyMap<string, Message>;
+  readonly summaries: ReadonlyMap<string, ThreadSummary>;
+  readonly options: ThreadOptions;
 }
 
 const GROUPING_WINDOW = 5 * 60_000;
-const HIGHLIGHT_PATTERN = /(@[A-Z][a-z]+|#[a-z][a-z0-9-]*|NS-\d+)/g;
 
-export const segmentsOf = (text: string): TextSegment[] =>
-  text
-    .split(HIGHLIGHT_PATTERN)
-    .filter(Boolean)
-    .map((part) => ({ text: part, highlighted: /^(@|#|NS-)/.test(part) }));
+const DELIVERY_SPOKEN: Record<DeliveryState, string> = {
+  queued: 'queued',
+  sending: 'sending',
+  sent: 'sent',
+  delivered: 'delivered',
+  read: 'read',
+  failed: 'not sent',
+};
 
-const attachmentView = (attachment: Attachment): AttachmentView => ({
+const attachmentView = (attachment: Attachment, options: ThreadOptions): AttachmentView => ({
   kind: attachment.kind,
   name: attachment.name,
   size: attachment.size,
   dimensions: attachment.dimensions ?? '',
   icon: FILE_TYPE_ICONS[attachment.type],
   label: FILE_TYPE_LABELS[attachment.type],
+  src: attachment.src ?? '',
+  fileId: options.fileIdFor?.(attachment.name) ?? null,
 });
 
 const nameOf = (userId: string, options: ThreadOptions): string =>
@@ -45,7 +63,7 @@ const reactionView = (reaction: Reaction, options: ThreadOptions): ReactionView 
   emoji: reaction.emoji,
   count: reaction.userIds.length,
   mine: reaction.userIds.includes(options.currentUserId),
-  description: `${reaction.userIds.map((userId) => nameOf(userId, options)).join(', ')} reacted with ${reaction.emoji}`,
+  description: `${reaction.userIds.map((userId) => nameOf(userId, options)).join(', ')} reacted with ${emojiName(reaction.emoji)}`,
 });
 
 const replyPreview = (
@@ -72,23 +90,54 @@ const isContinuation = (message: Message, previous: Message | null, searching: b
   message.sentAt - previous.sentAt < GROUPING_WINDOW &&
   message.replyToId === null;
 
-const accessibleLabel = (message: Message, authorName: string, mine: boolean): string => {
+const repliesLabel = (summary: ThreadSummary | null): string =>
+  summary ? `, ${replyCountLabel(summary.replyCount)}` : '';
+
+interface LabelFlags {
+  readonly mine: boolean;
+  readonly saved: boolean;
+  readonly mentionsMe: boolean;
+  readonly thread: ThreadSummary | null;
+}
+
+const accessibleLabel = (message: Message, authorName: string, flags: LabelFlags): string => {
   const pinned = message.pinned ? ', pinned' : '';
+  const saved = flags.saved ? ', saved' : '';
+  const mention = flags.mentionsMe ? ', mentions you' : '';
   const body = message.text || 'attachment';
-  const delivery = mine ? `, ${message.deliveryState}` : '';
-  return `${authorName}, ${formatTime(message.sentAt)}${pinned}: ${body}${delivery}`;
+  const delivery = flags.mine ? `, ${DELIVERY_SPOKEN[message.deliveryState]}` : '';
+  const replies = repliesLabel(flags.thread);
+  return `${authorName}, ${formatTime(message.sentAt)}${pinned}${saved}${mention}: ${body}${replies}${delivery}`;
+};
+
+const showsDeliveryLine = (message: Message, mine: boolean, isLastOwn: boolean): boolean =>
+  mine &&
+  (isLastOwn ||
+    message.deliveryState === 'queued' ||
+    message.deliveryState === 'sending' ||
+    message.text === '');
+
+const mentionsReader = (message: Message, options: ThreadOptions): boolean => {
+  const reader = options.usersById.get(options.currentUserId);
+  return (
+    message.authorId !== options.currentUserId &&
+    mentionsUser(message.text, firstNameOf(reader?.name ?? ''))
+  );
 };
 
 const messageView = (
   message: Message,
   previous: Message | null,
   isLastOwn: boolean,
-  byId: ReadonlyMap<string, Message>,
-  options: ThreadOptions,
+  { byId, summaries, options }: RowContext,
 ): MessageView => {
   const author = options.usersById.get(message.authorId);
   const authorName = author?.name ?? 'Someone';
   const mine = message.authorId === options.currentUserId;
+  const saved = options.savedIds.has(message.id);
+  const summary = summaries.get(message.id);
+  const thread = summary ? threadPreviewOf(summary, options.usersById) : null;
+  const mentionsMe = mentionsReader(message, options);
   return {
     id: message.id,
     authorId: message.authorId,
@@ -100,26 +149,40 @@ const messageView = (
     sentAt: message.sentAt,
     time: formatTime(message.sentAt),
     text: message.text,
-    segments: segmentsOf(message.text),
-    attachments: message.attachments.map(attachmentView),
+    segments: formatSegments(message.text),
+    attachments: message.attachments.map((attachment) => attachmentView(attachment, options)),
     reactions: message.reactions.map((reaction) => reactionView(reaction, options)),
     replyTo: replyPreview(message, byId, options),
+    isReply: message.threadRootId !== null,
+    thread,
+    saved,
+    mentionsMe,
     pinned: message.pinned,
     edited: message.editedAt !== undefined,
     deliveryState: message.deliveryState,
-    showsDeliveryLine:
-      mine && (isLastOwn || message.deliveryState === 'queued' || message.text === ''),
-    accessibleLabel: accessibleLabel(message, authorName, mine),
+    showsDeliveryLine: showsDeliveryLine(message, mine, isLastOwn),
+    accessibleLabel: accessibleLabel(message, authorName, { mine, saved, mentionsMe, thread }),
   };
 };
 
 const matchesSearch = (message: Message, term: string): boolean =>
   term === '' || message.text.toLowerCase().includes(term);
 
-export const buildThread = (messages: readonly Message[], options: ThreadOptions): ThreadRow[] => {
+const visibleMessages = (
+  messages: readonly Message[],
+  rootId: string | null,
+): readonly Message[] => (rootId ? threadOf(messages, rootId) : timelineOf(messages));
+
+const buildRows = (messages: readonly Message[], options: ThreadOptions): ThreadRow[] => {
   const term = options.searchTerm.trim().toLowerCase();
-  const byId = new Map(messages.map((message) => [message.id, message]));
-  const visible = messages.filter((message) => matchesSearch(message, term));
+  const context: RowContext = {
+    byId: new Map(messages.map((message) => [message.id, message])),
+    summaries: options.rootId ? new Map() : threadSummariesOf(messages, options.threadUnreadCounts),
+    options: { ...options, searchTerm: term },
+  };
+  const visible = visibleMessages(messages, options.rootId).filter((message) =>
+    matchesSearch(message, term),
+  );
   const lastOwnId = [...visible]
     .reverse()
     .find((message) => message.authorId === options.currentUserId)?.id;
@@ -137,12 +200,14 @@ export const buildThread = (messages: readonly Message[], options: ThreadOptions
     rows.push({
       kind: 'message',
       key: message.id,
-      message: messageView(message, previous, message.id === lastOwnId, byId, {
-        ...options,
-        searchTerm: term,
-      }),
+      message: messageView(message, previous, message.id === lastOwnId, context),
     });
     previous = message;
   }
   return rows;
+};
+
+export const buildThread = (messages: readonly Message[], options: ThreadOptions): ThreadRow[] => {
+  const rows = buildRows(messages, options);
+  return options.rootId ? threadPanelRows(rows, options.rootId) : rows;
 };

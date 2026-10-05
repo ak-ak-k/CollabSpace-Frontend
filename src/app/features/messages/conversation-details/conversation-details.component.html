@@ -8,83 +8,28 @@
 }
 
 <div class="details__body">
-  <div class="details__identity">
-    @if (view().partner; as partner) {
-      <app-avatar
-        [name]="partner.name"
-        [seed]="partner.seed"
-        [size]="72"
-        [status]="partner.status"
-      />
-      <div class="details__person">
-        <span class="details__name">{{ partner.name }}</span>
-        <span class="details__muted">{{ partner.title }}</span>
-      </div>
-      @if (view().profile; as profile) {
-        <dl class="details__facts">
-          <dt>Status</dt>
-          <dd class="details__status">
-            <app-status-dot [status]="partner.status" size="sm" />
-            {{ partner.presence }}
-          </dd>
-          <dt>Local time</dt>
-          <dd>{{ profile.localTime }}</dd>
-          <dt>Email</dt>
-          <dd class="details__email">
-            <a [href]="mailto()">{{ profile.email }}</a>
-          </dd>
-          <dt>Location</dt>
-          <dd>{{ profile.location }}</dd>
-        </dl>
-      }
-    } @else {
-      <span class="details__name">{{ view().title }}</span>
-      <p class="details__about">{{ view().about }}</p>
-      <div class="details__tags">
-        @if (view().isPrivate) {
-          <app-tag><app-icon name="lock" [size]="12" />Private</app-tag>
-        }
-        <app-tag>{{ view().memberCount | count: 'member' }}</app-tag>
-        @if (view().teamName) {
-          <app-tag>{{ view().teamName }} team</app-tag>
-        }
-      </div>
-    }
-  </div>
+  <app-details-identity [view]="view()" [canRename]="access().canRename" />
+
+  <section class="details__section" aria-label="Notification settings">
+    <h3 class="details__section-title details__section-title--spaced">Notifications</h3>
+    <app-details-notifications
+      [conversationId]="view().id"
+      [canEditChannel]="access().canEditChannel"
+      [canArchiveChannel]="access().canArchiveChannel"
+    />
+  </section>
 
   <section class="details__section" [attr.aria-labelledby]="ids.members">
     <div class="details__section-header">
       <h3 class="details__section-title" [id]="ids.members">{{ membersHeading() }}</h3>
       @if (!isDirect()) {
-        <button appButton type="button" variant="ghost" size="sm" (click)="addPeople.emit()">
+        <button appButton type="button" variant="ghost" size="sm" (click)="addPeople()">
           <app-icon name="user-plus" [size]="14" />
-          Add
+          Add people
         </button>
       }
     </div>
-    <ul>
-      @for (member of view().members; track member.id) {
-        <li class="details__member">
-          <app-avatar
-            [name]="member.name"
-            [seed]="member.seed"
-            [size]="32"
-            [status]="member.status"
-          />
-          <span class="details__member-text">
-            <span class="details__member-name"
-              >{{ member.name }}
-              @if (member.isMe) {
-                (you)
-              }
-            </span>
-            <span class="details__muted details__line"
-              >{{ member.title }} · {{ member.presence }}</span
-            >
-          </span>
-        </li>
-      }
-    </ul>
+    <app-details-members [view]="view()" [canRemove]="access().canRemoveMembers" />
   </section>
 
   <section class="details__section" [attr.aria-labelledby]="ids.pinned">
@@ -111,19 +56,39 @@
     </h3>
     <ul>
       @for (file of extras().files; track file.key) {
-        <li class="details__file">
-          <span class="details__file-tile" aria-hidden="true"
-            ><app-icon [name]="file.icon" [size]="16"
-          /></span>
-          <span class="details__member-text">
-            <span class="details__file-name">{{ file.name }}</span>
-            <span class="details__muted details__file-meta">{{ file.meta }}</span>
-          </span>
+        <li>
+          @if (file.fileId; as fileId) {
+            <a
+              class="details__file details__file--link"
+              routerLink="/files/recent"
+              [queryParams]="{ file: fileId }"
+            >
+              <ng-container *ngTemplateOutlet="fileRow; context: { $implicit: file }" />
+            </a>
+          } @else {
+            <div class="details__file">
+              <ng-container *ngTemplateOutlet="fileRow; context: { $implicit: file }" />
+            </div>
+          }
         </li>
       }
     </ul>
     @if (extras().fileCount === 0) {
       <p class="details__empty">No shared files yet.</p>
+    } @else {
+      <a class="details__all-files" routerLink="/files/shared" [queryParams]="filesQuery()">
+        View all in Files
+      </a>
     }
   </section>
 </div>
+
+<ng-template #fileRow let-file>
+  <span class="details__file-tile" aria-hidden="true"
+    ><app-icon [name]="file.icon" [size]="16"
+  /></span>
+  <span class="details__file-text">
+    <span class="details__file-name">{{ file.name }}</span>
+    <span class="details__muted details__file-meta">{{ file.meta }}</span>
+  </span>
+</ng-template>

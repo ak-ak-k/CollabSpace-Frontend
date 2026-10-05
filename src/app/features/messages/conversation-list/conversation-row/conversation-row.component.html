@@ -1,0 +1,29 @@
+<app-conversation-item
+  density="comfortable"
+  [conversation]="conversation()"
+  [selected]="selected()"
+/>
+
+<button
+  appIconButton
+  type="button"
+  class="row__more"
+  [label]="triggerLabel()"
+  [cdkMenuTriggerFor]="menu"
+  [cdkMenuPosition]="positions"
+>
+  <app-icon name="ellipsis" [size]="16" />
+</button>
+
+<ng-template #menu>
+  <div [appDropdownPanel]="menuLabel()">
+    <app-dropdown [label]="menuLabel()" width="md">
+      @for (item of items(); track item.kind) {
+        <button appDropdownItem (triggered)="run(item)">
+          <app-icon [name]="item.icon" [size]="16" />
+          {{ item.label }}
+        </button>
+      }
+    </app-dropdown>
+  </div>
+</ng-template>

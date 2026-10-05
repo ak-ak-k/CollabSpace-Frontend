@@ -38,6 +38,16 @@ export const ICON_NODES_C_TO_E = {
     ['circle', { cx: '12', cy: '12', r: '10' }],
     ['path', { d: 'm9 12 2 2 4-4' }],
   ],
+  'circle-dashed': [
+    ['path', { d: 'M10.1 2.182a10 10 0 0 1 3.8 0' }],
+    ['path', { d: 'M13.9 21.818a10 10 0 0 1-3.8 0' }],
+    ['path', { d: 'M17.609 3.721a10 10 0 0 1 2.69 2.7' }],
+    ['path', { d: 'M2.182 13.9a10 10 0 0 1 0-3.8' }],
+    ['path', { d: 'M20.279 17.609a10 10 0 0 1-2.7 2.69' }],
+    ['path', { d: 'M21.818 10.1a10 10 0 0 1 0 3.8' }],
+    ['path', { d: 'M3.721 6.391a10 10 0 0 1 2.7-2.69' }],
+    ['path', { d: 'M6.391 20.279a10 10 0 0 1-2.69-2.7' }],
+  ],
   'circle-dot': [
     ['circle', { cx: '12', cy: '12', r: '10' }],
     ['circle', { cx: '12', cy: '12', r: '1' }],
@@ -61,8 +71,19 @@ export const ICON_NODES_C_TO_E = {
     ['path', { d: 'M5.782 5.782A7 7 0 0 0 9 19h8.5a4.5 4.5 0 0 0 1.307-.193' }],
     ['path', { d: 'M21.532 16.5A4.5 4.5 0 0 0 17.5 10h-1.79A7.008 7.008 0 0 0 10 5.07' }],
   ],
+  code: [
+    ['polyline', { points: '16 18 22 12 16 6' }],
+    ['polyline', { points: '8 6 2 12 8 18' }],
+  ],
   command: [
     ['path', { d: 'M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3' }],
+  ],
+  contact: [
+    ['path', { d: 'M16 2v2' }],
+    ['path', { d: 'M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2' }],
+    ['path', { d: 'M8 2v2' }],
+    ['circle', { cx: '12', cy: '11', r: '3' }],
+    ['rect', { x: '3', y: '4', width: '18', height: '18', rx: '2' }],
   ],
   copy: [
     ['rect', { width: '14', height: '14', x: '8', y: '8', rx: '2', ry: '2' }],
@@ -71,6 +92,10 @@ export const ICON_NODES_C_TO_E = {
   'corner-down-left': [
     ['polyline', { points: '9 10 4 15 9 20' }],
     ['path', { d: 'M20 4v7a4 4 0 0 1-4 4H4' }],
+  ],
+  'corner-down-right': [
+    ['polyline', { points: '15 10 20 15 15 20' }],
+    ['path', { d: 'M4 4v7a4 4 0 0 0 4 4h12' }],
   ],
   crown: [
     [

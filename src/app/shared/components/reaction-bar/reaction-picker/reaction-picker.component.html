@@ -1,0 +1,21 @@
+@for (emoji of emojis(); track emoji) {
+  <button
+    type="button"
+    role="menuitem"
+    class="reaction-picker__item"
+    [attr.aria-label]="labelOf(emoji)"
+    (click)="picked.emit(emoji)"
+  >
+    <span aria-hidden="true">{{ emoji }}</span>
+  </button>
+}
+<button
+  type="button"
+  role="menuitem"
+  class="reaction-picker__item"
+  [attr.aria-label]="toggleLabel()"
+  [attr.aria-expanded]="expanded()"
+  (click)="toggleExpanded()"
+>
+  <app-icon [name]="toggleIcon()" [size]="16" />
+</button>

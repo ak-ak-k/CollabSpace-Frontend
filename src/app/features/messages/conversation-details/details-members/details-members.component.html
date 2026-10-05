@@ -1,0 +1,21 @@
+<ul>
+  @for (member of view().members; track member.id) {
+    <li class="members__item">
+      <app-avatar [name]="member.name" [seed]="member.seed" [size]="32" [status]="member.status" />
+      <span class="members__text">
+        <span class="members__name"
+          >{{ member.name }}
+          @if (member.isMe) {
+            (you)
+          }
+        </span>
+        <span class="members__line truncate">{{ member.title }} · {{ member.presence }}</span>
+      </span>
+      @if (canRemove() && !member.isMe) {
+        <button appIconButton type="button" [label]="removeLabel(member)" (click)="remove(member)">
+          <app-icon name="user-minus" [size]="15" />
+        </button>
+      }
+    </li>
+  }
+</ul>

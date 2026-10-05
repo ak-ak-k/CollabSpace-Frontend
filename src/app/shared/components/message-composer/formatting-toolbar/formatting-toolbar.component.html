@@ -1,0 +1,12 @@
+@for (tool of tools; track tool.mark) {
+  <button
+    appIconButton
+    type="button"
+    [label]="tool.label"
+    (mousedown)="$event.preventDefault()"
+    (click)="format.emit(tool.mark)"
+  >
+    <app-icon [name]="tool.icon" [size]="iconSize" />
+  </button>
+}
+<span class="formatting-toolbar__hint">**bold** · _italic_ · `code`</span>

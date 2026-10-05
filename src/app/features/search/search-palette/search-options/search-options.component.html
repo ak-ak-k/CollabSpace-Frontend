@@ -37,6 +37,9 @@
           [class.option--result]="option.type === 'result'"
           [id]="option.id"
           [attr.aria-selected]="option.index === activeIndex()"
+          [attr.aria-keyshortcuts]="
+            option.type === 'result' && option.result.kind === 'person' ? 'Shift+Enter' : null
+          "
           (click)="activated.emit(option)"
           (mousemove)="hover(option.index)"
         >
@@ -76,6 +79,7 @@
               }
               <span class="option__text">
                 <span class="option__title truncate">
+                  <span class="visually-hidden">{{ typeLabels[option.result.kind] }}: </span>
                   <span>{{ option.result.title.before }}</span>
                   @if (option.result.title.match) {
                     <mark class="option__mark">{{ option.result.title.match }}</mark>
@@ -86,6 +90,9 @@
                   {{ option.result.subtitle }}
                 </span>
               </span>
+              @if (option.result.kind === 'person') {
+                <span class="option__message-slot" aria-hidden="true"></span>
+              }
               @if (option.index === activeIndex()) {
                 <app-icon class="option__muted" name="corner-down-left" [size]="14" />
               }
@@ -98,6 +105,17 @@
 </div>
 
 @for (section of sections(); track section.key) {
+  @if (section.kind === 'recent') {
+    <button
+      type="button"
+      class="options__expand"
+      aria-label="Clear recent searches"
+      [style.grid-row-start]="section.row"
+      (click)="cleared.emit()"
+    >
+      Clear
+    </button>
+  }
   @if (section.expandKey; as groupKey) {
     <button
       type="button"
@@ -122,6 +140,20 @@
         (click)="removed.emit(option.query)"
       >
         <app-icon name="x" [size]="14" />
+      </button>
+    }
+    @if (option.type === 'result' && option.result.kind === 'person') {
+      <button
+        type="button"
+        tabindex="-1"
+        class="options__message"
+        [class.options__message--active]="option.index === activeIndex()"
+        [attr.aria-label]="'Message ' + option.result.name + ' (Shift+Enter)'"
+        [style.grid-row-start]="option.row"
+        (click)="messaged.emit(option.result.id)"
+      >
+        <app-icon name="message-square" [size]="14" />
+        Message
       </button>
     }
   }

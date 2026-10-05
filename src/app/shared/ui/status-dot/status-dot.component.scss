@@ -1,11 +1,12 @@
 :host {
   --status-dot-size: var(--size-status-dot-md);
+  --status-dot-hole: var(--status-dot-cutout, var(--status-dot-ring, var(--background)));
 
   display: inline-block;
   flex: none;
   width: var(--status-dot-size);
   height: var(--status-dot-size);
-  background: var(--status-dot-color);
+  background: var(--status-dot-fill);
   box-shadow: 0 0 0 var(--status-dot-ring-width, var(--space-0)) var(--status-dot-ring, transparent);
 }
 
@@ -18,17 +19,30 @@
 }
 
 :host(.status-dot--online) {
-  --status-dot-color: var(--status-online);
+  --status-dot-fill: var(--status-online);
 }
 
 :host(.status-dot--away) {
-  --status-dot-color: var(--status-away);
+  --status-dot-fill: linear-gradient(
+    var(--status-shape-away-angle),
+    var(--status-away) 0 var(--status-shape-away-split),
+    var(--status-dot-hole) var(--status-shape-away-split)
+  );
 }
 
 :host(.status-dot--dnd) {
-  --status-dot-color: var(--status-dnd);
+  --status-dot-fill:
+    linear-gradient(
+      transparent 0 var(--status-shape-bar-start),
+      var(--status-dot-hole) var(--status-shape-bar-start) var(--status-shape-bar-end),
+      transparent var(--status-shape-bar-end)
+    ),
+    var(--status-dnd);
 }
 
 :host(.status-dot--offline) {
-  --status-dot-color: var(--status-offline);
+  --status-dot-fill:
+    linear-gradient(var(--status-dot-hole), var(--status-dot-hole)) center /
+      var(--status-shape-hole-size) var(--status-shape-hole-size) no-repeat,
+    var(--status-offline);
 }

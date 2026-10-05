@@ -17,6 +17,7 @@ const SHOW_OPTIONS: readonly RadioOption[] = [
 export class NotificationsHeaderComponent {
   readonly summary = input.required<string>();
   readonly canMarkAllRead = input(false);
+  readonly markAllLabel = input('Mark all as read');
   readonly show = model('all');
   readonly markAllRead = output<void>();
 

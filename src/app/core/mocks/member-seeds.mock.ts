@@ -1,4 +1,4 @@
-import { PresenceStatus, WorkspaceRole } from '../models/user';
+import { PresenceStatus, User, WorkspaceRole } from '../models/user';
 
 export type TimeZoneSeed = readonly [timeZone: string, label: string];
 
@@ -21,6 +21,23 @@ export const AE: TimeZoneSeed = ['Asia/Dubai', 'GST · UTC+4'];
 export const UK: TimeZoneSeed = ['Europe/London', 'BST · UTC+1'];
 export const CE: TimeZoneSeed = ['Europe/Berlin', 'CEST · UTC+2'];
 export const PT: TimeZoneSeed = ['Europe/Lisbon', 'WEST · UTC+1'];
+
+const DEPARTMENT_BIOS: Readonly<Record<string, string>> = {
+  Engineering:
+    'Builds and maintains parts of Atlas. Happy to pair on bugs, reviews and release prep.',
+  Design: 'Designs flows and components across Atlas, from research to final specs.',
+  Product: 'Works on roadmap, discovery and prioritisation with design and engineering.',
+  Marketing: 'Runs campaigns, content and launches for Atlas.',
+  Sales: 'Works with new customers from the first call to a signed contract.',
+  'Customer Success': 'Helps customers get set up, stay successful and get answers fast.',
+  Finance: 'Looks after budgets, invoicing and spend approvals.',
+  People: 'Hiring, onboarding and everything that helps people do their best work here.',
+  Operations: 'Keeps tools, devices, offices and day-to-day operations running smoothly.',
+  Legal: 'Contracts, privacy and compliance support.',
+};
+
+export const withDepartmentBio = (user: User): User =>
+  user.bio ? user : { ...user, bio: DEPARTMENT_BIOS[user.department] ?? '' };
 
 export const PRODUCT_TEAM_SEEDS: readonly MemberSeed[] = [
   [

@@ -1,7 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { LoadStatus } from '../../core/models/load-status';
 import { firstNameOf } from '../../core/models/user';
-import { DialogService } from '../../core/services/dialog.service';
 import { SearchService } from '../../core/services/search.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ChatState } from '../../core/state/chat.state';
@@ -9,7 +8,7 @@ import { FileState } from '../../core/state/file.state';
 import { NotificationState } from '../../core/state/notification.state';
 import { TaskState } from '../../core/state/task.state';
 import { WorkspaceState } from '../../core/state/workspace.state';
-import { TaskDialogComponent } from '../tasks/task-dialog/task-dialog.component';
+import { TaskActions } from '../tasks/task-actions.service';
 import { WorkspaceActions } from '../workspace/workspace-actions.service';
 import {
   byDueDate,
@@ -62,7 +61,7 @@ export class DashboardComponent {
   private readonly notifications = inject(NotificationState);
   private readonly files = inject(FileState);
   private readonly search = inject(SearchService);
-  private readonly dialogs = inject(DialogService);
+  private readonly taskActions = inject(TaskActions);
   private readonly workspaceActions = inject(WorkspaceActions);
   private readonly toasts = inject(ToastService);
 
@@ -124,7 +123,7 @@ export class DashboardComponent {
   }
 
   protected newTask(): void {
-    this.dialogs.open(TaskDialogComponent, { size: 'lg' });
+    this.taskActions.newTask();
   }
 
   protected invitePeople(): void {

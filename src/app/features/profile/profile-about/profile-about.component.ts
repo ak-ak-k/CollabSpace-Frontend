@@ -13,7 +13,7 @@ import { BIO_MAX_LENGTH, ProfileDraft } from '../profile-view';
 export class ProfileAboutComponent {
   readonly bio = input('');
   readonly editing = input(false, { transform: booleanAttribute });
-  readonly form = input.required<FieldTree<ProfileDraft>>();
+  readonly form = input<FieldTree<ProfileDraft>>();
 
   protected readonly bioMaxLength = BIO_MAX_LENGTH;
 

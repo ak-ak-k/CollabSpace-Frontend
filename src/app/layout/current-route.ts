@@ -5,7 +5,7 @@ import { filter, map } from 'rxjs';
 import { MORE_SECTION_ROUTES, SETTINGS_SECTION_ROUTE } from './navigation';
 
 const CONVERSATION_ROUTE = /^\/messages\/[^/]+/;
-const CHANNEL_ROUTE = /^\/teams\/[^/]+\/c\/[^/]+/;
+const CHANNEL_ROUTE = /^\/teams\/[^/]+\/channels\/[^/]+/;
 
 const pathOf = (url: string): string => url.split(/[?#]/)[0];
 

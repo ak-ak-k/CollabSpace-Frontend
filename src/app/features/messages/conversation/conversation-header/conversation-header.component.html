@@ -50,6 +50,18 @@
     }
   }
 
+  @if (showPinChip()) {
+    <button
+      type="button"
+      class="header__pins"
+      [attr.aria-label]="pinChipLabel()"
+      (click)="pinnedRequested.emit()"
+    >
+      <app-icon name="pin" [size]="13" />
+      {{ pinnedCount() }}
+    </button>
+  }
+
   <div class="header__actions">
     @if (!compact()) {
       <button

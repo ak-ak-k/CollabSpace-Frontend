@@ -1,0 +1,115 @@
+@use 'touch';
+
+:host {
+  display: block;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-3) var(--space-0) var(--space-0);
+  padding: var(--space-0);
+  list-style: none;
+}
+
+.list {
+  table-layout: fixed;
+}
+
+.list__status {
+  width: var(--task-list-col-status);
+}
+
+.list__priority {
+  width: var(--task-list-col-priority);
+}
+
+.list__assignee {
+  width: var(--task-list-col-assignee);
+}
+
+.list__team {
+  width: var(--task-list-col-team);
+}
+
+.list__due {
+  width: var(--task-list-col-due);
+}
+
+.list__row {
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover);
+  }
+}
+
+.list__task {
+  padding-block: var(--space-3);
+}
+
+.list__link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  min-width: 0;
+  color: var(--text-primary);
+  text-decoration: none;
+
+  @include touch.on-touch {
+    justify-content: center;
+    min-height: var(--size-touch-target);
+  }
+}
+
+.list__id {
+  color: var(--text-muted);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
+}
+
+.list__title {
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+}
+
+.list__title--done {
+  text-decoration: line-through;
+}
+
+.list__link:hover .list__title {
+  text-decoration: underline;
+}
+
+.list__cell {
+  font-size: var(--font-size-13);
+}
+
+.list__person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  min-width: 0;
+}
+
+.list__muted {
+  color: var(--text-muted);
+}
+
+.list__due-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-muted);
+}
+
+.list__due-text--overdue {
+  color: var(--danger);
+  font-weight: var(--font-weight-heavy);
+}
+
+.list__due-text--soon {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}

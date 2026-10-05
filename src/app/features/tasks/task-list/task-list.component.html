@@ -1,0 +1,74 @@
+@if (compact()) {
+  <ul class="cards" [attr.aria-label]="caption()">
+    @for (row of rows(); track row.id) {
+      <li><app-task-mobile-card variant="list" [card]="row" /></li>
+    }
+  </ul>
+} @else {
+  <app-table label="Tasks">
+    <table class="list">
+      <caption class="visually-hidden">
+        {{
+          caption()
+        }}
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Task</th>
+          <th scope="col" class="list__status">Status</th>
+          <th scope="col" class="list__priority">Priority</th>
+          <th scope="col" class="list__assignee">Assignee</th>
+          @if (showTeam()) {
+            <th scope="col" class="list__team">Team</th>
+          }
+          <th scope="col" class="list__due">Due</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows(); track row.id) {
+          <tr class="list__row" (click)="open.emit(row.id)">
+            <td class="list__task">
+              <a
+                class="list__link"
+                [routerLink]="[]"
+                [queryParams]="{ task: row.id }"
+                queryParamsHandling="merge"
+                (click)="$event.stopPropagation()"
+              >
+                <span class="list__id">{{ row.idLine }}</span>
+                <span class="list__title truncate" [class.list__title--done]="row.done">
+                  {{ row.title }}
+                </span>
+              </a>
+            </td>
+            <td>
+              <app-tag>{{ row.statusLabel }}</app-tag>
+            </td>
+            <td>
+              <app-tag [tone]="row.priorityTone">{{ row.priorityLabel }}</app-tag>
+            </td>
+            <td class="list__cell">
+              @if (row.assignee; as person) {
+                <span class="list__person">
+                  <app-avatar [name]="person.name" [seed]="person.seed" [size]="24" />
+                  <span class="truncate">{{ person.name }}</span>
+                </span>
+              } @else {
+                <span class="list__muted">{{ row.assigneeName }}</span>
+              }
+            </td>
+            @if (showTeam()) {
+              <td class="list__cell list__muted truncate">{{ row.teamName ?? '—' }}</td>
+            }
+            <td class="list__cell">
+              <span class="list__due-text" [class]="'list__due-text--' + row.dueState">
+                <app-icon [name]="row.dueIcon" [size]="13" />
+                {{ row.dueText }}
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </app-table>
+}

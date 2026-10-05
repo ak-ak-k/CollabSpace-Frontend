@@ -22,7 +22,7 @@
 .list__title-row {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
 
 .list__title {
@@ -39,4 +39,50 @@
 
 .list__state {
   padding-inline: var(--space-4);
+}
+
+.list__saved {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--saved-row-height);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: var(--rule-strong);
+  color: var(--text-primary);
+  text-decoration: none;
+  outline-offset: calc(var(--border-width-rule) * -1);
+
+  &:hover {
+    background: var(--hover);
+  }
+
+  &[aria-current='page'] {
+    background: var(--selected);
+  }
+}
+
+.list__saved-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--size-avatar-44);
+}
+
+.list__saved-label {
+  flex: 1;
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-semibold);
+}
+
+.list__saved-count {
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+}
+
+.list__section {
+  margin: var(--space-0);
+  padding: var(--space-3) var(--space-4) var(--space-1);
+  border-bottom: var(--rule-hairline);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-heavy);
 }

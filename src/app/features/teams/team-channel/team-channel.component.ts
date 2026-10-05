@@ -17,6 +17,12 @@ export class TeamChannelComponent {
 
   readonly teamId = input.required<string>();
   readonly channelId = input.required<string>();
+  readonly messageId = input<string | null, string | undefined>(null, {
+    transform: (value) => value ?? null,
+  });
+  readonly rootId = input<string | null, string | undefined>(null, {
+    transform: (value) => value ?? null,
+  });
 
   protected readonly teamLink = computed(() => `/teams/${this.teamId()}`);
   protected readonly status = this.workspace.status;

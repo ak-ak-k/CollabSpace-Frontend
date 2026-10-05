@@ -1,4 +1,5 @@
 import { afterNextRender, Component, ElementRef, inject, output } from '@angular/core';
+import { emojiName } from '../../../../core/models/emoji-names';
 import { EMOJI_PALETTE } from '../../../../core/models/thread';
 
 @Component({
@@ -14,6 +15,7 @@ export class EmojiPickerComponent {
   readonly pick = output<string>();
 
   protected readonly emojis = EMOJI_PALETTE;
+  protected readonly nameOf = emojiName;
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 

@@ -19,28 +19,13 @@
 }
 
 .header__status {
+  --status-dot-size: var(--profile-status-size);
+  --status-dot-ring: var(--background);
+  --status-dot-ring-width: var(--profile-status-ring);
+
   position: absolute;
   right: var(--profile-avatar-offset);
   bottom: var(--profile-avatar-offset);
-  width: var(--profile-status-size);
-  height: var(--profile-status-size);
-  box-shadow: 0 0 0 var(--profile-status-ring) var(--background);
-}
-
-.header__status--online {
-  background: var(--status-online);
-}
-
-.header__status--away {
-  background: var(--status-away);
-}
-
-.header__status--dnd {
-  background: var(--status-dnd);
-}
-
-.header__status--offline {
-  background: var(--status-offline);
 }
 
 .header__photo {

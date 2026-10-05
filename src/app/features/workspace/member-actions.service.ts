@@ -5,10 +5,11 @@ import { WorkspaceRole } from '../../core/models/user';
 import { roleWithArticle } from '../../core/models/workspace-role';
 import { DialogService } from '../../core/services/dialog.service';
 import { ToastService } from '../../core/services/toast.service';
-import { ChatState } from '../../core/state/chat.state';
 import { WorkspaceActivityState } from '../../core/state/workspace-activity.state';
 import { WorkspaceAdminState } from '../../core/state/workspace-admin.state';
 import { WorkspaceState } from '../../core/state/workspace.state';
+import { PersonActions } from '../../shared/components/person-panel/person-actions.service';
+import { PersonPanelService } from '../../shared/components/person-panel/person-panel.service';
 import {
   ChangeRoleDialogComponent,
   ChangeRoleDialogData,
@@ -18,11 +19,6 @@ import {
   MemberActionsSheetData,
 } from './member-actions-sheet/member-actions-sheet.component';
 import {
-  MemberProfileDrawerComponent,
-  MemberProfileDrawerData,
-  MemberProfileDrawerResult,
-} from './member-profile-drawer/member-profile-drawer.component';
-import {
   canChangeMember,
   MemberActionKind,
   MemberMenuItem,
@@ -30,16 +26,15 @@ import {
 } from './member-actions-view';
 import { MemberRow, MEMBERS_ROUTE } from './members-view';
 
-const PROFILE_DRAWER_WIDTH = 'var(--workspace-profile-drawer-width)';
 const PROFILE_ROUTE = '/profile';
-const MESSAGES_ROUTE = '/messages';
 
 @Service()
 export class MemberActions {
   private readonly workspace = inject(WorkspaceState);
   private readonly admin = inject(WorkspaceAdminState);
   private readonly activity = inject(WorkspaceActivityState);
-  private readonly chat = inject(ChatState);
+  private readonly people = inject(PersonActions);
+  private readonly personPanel = inject(PersonPanelService);
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
@@ -82,12 +77,8 @@ export class MemberActions {
   }
 
   openProfile(userId: string): void {
-    const drawer = this.dialogs.openDrawer<MemberProfileDrawerResult, MemberProfileDrawerData>(
-      MemberProfileDrawerComponent,
-      { data: { userId }, side: 'right', size: 'md' },
-    );
-    drawer.updateSize(PROFILE_DRAWER_WIDTH);
-    drawer.closed.subscribe((result) => result && this.run(result, userId));
+    const onChangeRole = this.canChange(userId) ? () => this.changeRole(userId) : undefined;
+    this.personPanel.open(userId, { onChangeRole });
   }
 
   changeRole(userId: string): void {
@@ -98,9 +89,8 @@ export class MemberActions {
     dialog.closed.subscribe((role) => role && void this.applyRole(userId, role));
   }
 
-  async message(userId: string): Promise<void> {
-    const conversationId = await this.chat.openDirectConversation(userId);
-    await this.router.navigate([MESSAGES_ROUTE, conversationId]);
+  message(userId: string): Promise<void> {
+    return this.people.message(userId);
   }
 
   async remove(userId: string): Promise<void> {

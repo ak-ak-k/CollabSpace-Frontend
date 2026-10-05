@@ -1,4 +1,10 @@
-import { DeliveryState, DELIVERY_RANK, Message, Reaction } from '../models/message';
+import {
+  DeliveryState,
+  DELIVERY_RANK,
+  isSettledDelivery,
+  Message,
+  Reaction,
+} from '../models/message';
 
 export type Threads = Readonly<Record<string, readonly Message[]>>;
 
@@ -53,10 +59,24 @@ export const togglePinned = (
   threads: Threads,
   conversationId: string,
   messageId: string,
+  userId: string,
 ): Threads =>
   updateMessage(threads, conversationId, messageId, (message) => ({
     ...message,
     pinned: !message.pinned,
+    pinnedBy: message.pinned ? null : userId,
+    pinnedAt: message.pinned ? null : Date.now(),
+  }));
+
+export const setDeliveryState = (
+  threads: Threads,
+  conversationId: string,
+  messageId: string,
+  state: DeliveryState,
+): Threads =>
+  updateMessage(threads, conversationId, messageId, (message) => ({
+    ...message,
+    deliveryState: state,
   }));
 
 const withoutEmpty = (reactions: readonly Reaction[]): Reaction[] =>
@@ -100,7 +120,8 @@ export const advanceDelivery = (
   replaceIn(threads, conversationId, (thread) =>
     thread.map((message) =>
       message.authorId === userId &&
-      message.deliveryState !== 'queued' &&
+      message.threadRootId === null &&
+      isSettledDelivery(message.deliveryState) &&
       DELIVERY_RANK[message.deliveryState] < DELIVERY_RANK[state]
         ? { ...message, deliveryState: state }
         : message,
@@ -125,12 +146,24 @@ export const firstUnreadId = (thread: readonly Message[], unreadCount: number): 
 export const sum = (values: readonly number[]): number =>
   values.reduce((total, value) => total + value, 0);
 
-export const toggleIn = (ids: ReadonlySet<string>, id: string): ReadonlySet<string> => {
+export const setIn = (ids: ReadonlySet<string>, id: string, on: boolean): ReadonlySet<string> => {
   const next = new Set(ids);
-  if (next.has(id)) {
-    next.delete(id);
-  } else {
+  if (on) {
     next.add(id);
+  } else {
+    next.delete(id);
   }
+  return next;
+};
+
+export const toggleIn = (ids: ReadonlySet<string>, id: string): ReadonlySet<string> =>
+  setIn(ids, id, !ids.has(id));
+
+export const withoutKey = <T>(
+  record: Readonly<Record<string, T>>,
+  key: string,
+): Readonly<Record<string, T>> => {
+  const next = { ...record };
+  delete next[key];
   return next;
 };

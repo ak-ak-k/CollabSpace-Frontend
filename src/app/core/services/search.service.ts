@@ -55,6 +55,10 @@ export class SearchService {
     this.saveRecentSearches(this.recentSearches().filter((recent) => recent !== query));
   }
 
+  clearRecent(): void {
+    this.saveRecentSearches([]);
+  }
+
   private saveRecentSearches(searches: readonly string[]): void {
     this.storedRecentSearches.set(searches);
     try {

@@ -2,7 +2,7 @@
   <button
     type="button"
     class="emoji-picker__emoji"
-    [attr.aria-label]="'Insert ' + emoji"
+    [attr.aria-label]="'Insert ' + nameOf(emoji)"
     (click)="pick.emit(emoji)"
   >
     {{ emoji }}

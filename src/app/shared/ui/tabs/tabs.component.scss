@@ -76,6 +76,16 @@
   border-bottom: var(--rule-strong);
 }
 
+:host(.tabs--wrap) .viewport {
+  overflow-x: visible;
+}
+
+:host(.tabs--wrap) .list {
+  flex-wrap: wrap;
+  row-gap: var(--space-0);
+  width: auto;
+}
+
 .tab {
   position: relative;
   display: inline-flex;

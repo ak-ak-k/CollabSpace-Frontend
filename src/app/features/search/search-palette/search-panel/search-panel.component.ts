@@ -15,12 +15,14 @@ import { NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { BreakpointService } from '../../../../core/services/breakpoint.service';
 import { SearchFilter, SearchService } from '../../../../core/services/search.service';
+import { NetworkState } from '../../../../core/state/network.state';
 import { ThemeState } from '../../../../core/state/theme.state';
 import { WorkspaceState } from '../../../../core/state/workspace.state';
 import { IconButtonComponent } from '../../../../shared/ui/icon-button/icon-button.component';
 import { IconComponent } from '../../../../shared/ui/icon/icon.component';
 import { SpinnerComponent } from '../../../../shared/ui/spinner/spinner.component';
 import { jumpCommands, messageCommands } from '../palette-commands';
+import { ACTIVE_STEPS, ActiveStep, FIRST_INDEX, hasModifier, isShiftEnter } from '../palette-keys';
 import {
   idleDrafts,
   layOutSections,
@@ -38,20 +40,6 @@ import {
 import { SearchOptionsComponent } from '../search-options/search-options.component';
 import { SearchSession } from '../search-session';
 import { SearchStatusComponent } from '../search-status/search-status.component';
-
-type ActiveStep = (current: number, last: number) => number;
-
-const FIRST_INDEX = 0;
-
-const ACTIVE_STEPS: Readonly<Partial<Record<string, ActiveStep>>> = {
-  ArrowDown: (current, last) => Math.min(last, current + 1),
-  ArrowUp: (current) => Math.max(FIRST_INDEX, current - 1),
-  Home: () => FIRST_INDEX,
-  End: (_current, last) => last,
-};
-
-const hasModifier = (event: KeyboardEvent): boolean =>
-  event.shiftKey || event.ctrlKey || event.altKey || event.metaKey;
 
 @Component({
   selector: 'app-search-panel',
@@ -81,6 +69,7 @@ export class SearchPanelComponent {
 
   protected readonly session = inject(SearchSession);
   protected readonly isMobile = inject(BreakpointService).isMobile;
+  protected readonly offline = inject(NetworkState).offline;
   protected readonly listboxId = LISTBOX_ID;
   protected readonly shortcut = paletteShortcutFor(
     this.document.defaultView?.navigator.userAgent ?? '',
@@ -162,7 +151,27 @@ export class SearchPanelComponent {
     this.focusField();
   }
 
+  protected clearRecent(): void {
+    this.search.clearRecent();
+    this.focusField();
+  }
+
+  protected retry(): void {
+    this.session.retry();
+    this.focusField();
+  }
+
+  protected messagePerson(userId: string): void {
+    this.search.addRecent(this.session.term());
+    this.close();
+    this.runner.message(userId);
+  }
+
   protected handleKey(event: KeyboardEvent): void {
+    if (isShiftEnter(event) && !event.isComposing) {
+      this.messageActivePerson(event);
+      return;
+    }
     if (event.isComposing || hasModifier(event)) {
       return;
     }
@@ -190,6 +199,14 @@ export class SearchPanelComponent {
         this.close();
         this.runner.open(option.result.target);
         break;
+    }
+  }
+
+  private messageActivePerson(event: KeyboardEvent): void {
+    const option = this.activeOption();
+    if (option?.type === 'result' && option.result.kind === 'person') {
+      event.preventDefault();
+      this.messagePerson(option.result.id);
     }
   }
 

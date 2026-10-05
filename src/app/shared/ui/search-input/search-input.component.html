@@ -1,4 +1,4 @@
-<app-icon class="search__icon" name="search" [size]="16" />
+<app-icon class="search__icon" [name]="icon()" [size]="16" />
 <input
   #control
   type="search"
@@ -9,6 +9,7 @@
   [disabled]="disabled()"
   [attr.name]="name() || null"
   [attr.aria-label]="label()"
+  [attr.aria-describedby]="describedBy() || null"
   [attr.placeholder]="placeholder() || null"
   autocomplete="off"
   (input)="value.set(control.value)"

@@ -19,7 +19,7 @@ const PEOPLE: SearchGroup = {
       status: 'away',
       title: highlight('Priya Sharma', 'pri'),
       subtitle: 'Product Designer · Away',
-      target: { path: '/messages/dm-u2' },
+      target: { path: '/profile/u2' },
     },
     {
       kind: 'person',
@@ -29,7 +29,7 @@ const PEOPLE: SearchGroup = {
       status: 'online',
       title: highlight('Rahul Mehta', 'pri'),
       subtitle: 'Senior Frontend Engineer · Online',
-      target: { path: '/messages/dm-u1' },
+      target: { path: '/profile/u1' },
     },
   ],
 };
@@ -59,9 +59,9 @@ describe('SearchOptionsComponent', () => {
     );
 
     expect(headings.map((heading) => heading?.trim())).toEqual(['Recent searches', 'Jump to']);
-    expect(options().length).toBe(13);
+    expect(options().length).toBe(14);
     expect(listbox().querySelector('button')).toBeNull();
-    expect(host.querySelectorAll('button').length).toBe(2);
+    expect(host.querySelectorAll('button').length).toBe(3);
   });
 
   it('marks the active option and never renders an empty highlight', async () => {
@@ -88,7 +88,7 @@ describe('SearchOptionsComponent', () => {
     fixture.componentRef.setInput('sections', layOutSections(idleDrafts(['NS-142'], [])));
     await fixture.whenStable();
     options()[0].click();
-    host.querySelector<HTMLButtonElement>('button')?.click();
+    host.querySelector<HTMLButtonElement>('.options__remove')?.click();
 
     fixture.componentRef.setInput('sections', layOutSections(resultDrafts([PEOPLE])));
     await fixture.whenStable();
@@ -97,5 +97,19 @@ describe('SearchOptionsComponent', () => {
     expect(activated).toHaveBeenCalledWith(expect.objectContaining({ query: 'NS-142', index: 0 }));
     expect(removed).toHaveBeenCalledWith('NS-142');
     expect(expanded).toHaveBeenCalledWith('people');
+  });
+
+  it('labels each result with its type and offers to message a person', async () => {
+    const messaged = vi.fn();
+    fixture.componentInstance.messaged.subscribe(messaged);
+    fixture.componentRef.setInput('sections', layOutSections(resultDrafts([PEOPLE])));
+    await fixture.whenStable();
+
+    const message = host.querySelector<HTMLButtonElement>('.options__message');
+    message?.click();
+
+    expect(options()[0].textContent).toContain('Person:');
+    expect(message?.getAttribute('aria-label')).toBe('Message Priya Sharma (Shift+Enter)');
+    expect(messaged).toHaveBeenCalledWith('u2');
   });
 });

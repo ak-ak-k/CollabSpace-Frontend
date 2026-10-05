@@ -1,0 +1,71 @@
+@use 'touch';
+
+:host {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-0);
+  border-bottom: var(--rule-hairline);
+}
+
+.row__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  min-width: 0;
+}
+
+.row__name {
+  min-width: 0;
+  margin: var(--space-0);
+  font-size: var(--font-size-15);
+  line-height: var(--line-height-compact);
+}
+
+.row__open {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  min-height: var(--people-name-min-height);
+  padding: var(--space-0);
+  border: var(--space-0);
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: var(--font-weight-heavy);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include touch.on-touch {
+    @include touch.minimum-hit-area;
+  }
+}
+
+.row__open-text {
+  display: block;
+}
+
+.row__line {
+  font-size: var(--font-size-13);
+}
+
+.row__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+}
+
+.row__organisation {
+  flex: 0 1 var(--people-organisation-basis);
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-13);
+}

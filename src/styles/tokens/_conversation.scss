@@ -7,4 +7,13 @@
   --conversation-details-avatar: var(--size-avatar-72);
   --member-picker-max-height: min(280px, 38vh);
   --conversation-intro-max-width: 560px;
+  --conversation-row-more-offset: var(--space-1-5);
+  --saved-row-height: 52px;
+  --saved-page-max-width: 880px;
+  --saved-page-padding: clamp(var(--space-4), 3vw, var(--space-8));
+  --saved-heading-size: clamp(22px, 2.6vw, 28px);
+  --saved-text-lines: 3;
+  --details-pinned-lines: 2;
+  --pin-chip-height: var(--space-8);
+  --join-bar-text-basis: 200px;
 }

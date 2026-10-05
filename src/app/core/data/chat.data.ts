@@ -1,62 +1,42 @@
 import { inject, Service } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { MOCK_CHANNELS } from '../mocks/channels.mock';
-import {
-  MOCK_CONVERSATIONS,
-  MOCK_REPLIES,
-  MOCK_STARRED_CONVERSATION_IDS,
-  MOCK_TYPING_USER_IDS,
-  MOCK_UNREAD_COUNTS,
-} from '../mocks/conversations.mock';
-import { buildMockMessages } from '../mocks/messages.mock';
-import { CURRENT_USER_ID, MOCK_USERS } from '../mocks/users.mock';
+import { CURRENT_USER_ID } from '../mocks/users.mock';
 import { Channel } from '../models/channel';
 import {
   ChannelConversation,
-  Conversation,
   DirectConversation,
   GroupConversation,
+  MemberConversation,
+  NotifyLevel,
 } from '../models/conversation';
-import { DeliveryState, Message, MessageDraft } from '../models/message';
+import { DELIVERY_RANK, DeliveryState, Message, MessageDraft, SavedEntry } from '../models/message';
 import { ChatEvent, ChatSnapshot, EMPTY_SNAPSHOT } from './chat-events';
-import { planReply, scheduleReply } from './chat-simulation';
+import { ChatResponder } from './chat-responder';
+import { channelConversation, ChatFlagKind, ChatStore } from './chat-store';
 import { MockRequest } from './mock-request';
-
-const channelConversation = (channel: Channel): ChannelConversation => ({
-  id: channel.id,
-  type: 'channel',
-  channelId: channel.id,
-  teamId: channel.teamId,
-  name: channel.name,
-  memberIds: channel.memberIds,
-});
 
 @Service()
 export class ChatData {
   private readonly request = inject(MockRequest);
   private readonly eventStream = new Subject<ChatEvent>();
-
-  private conversations: Conversation[] = [
-    ...MOCK_CONVERSATIONS,
-    ...MOCK_CHANNELS.map(channelConversation),
-  ];
-  private messages: Record<string, Message[]> = buildMockMessages();
-  private unreadCounts: Record<string, number> = { ...MOCK_UNREAD_COUNTS };
-  private starredIds = new Set(MOCK_STARRED_CONVERSATION_IDS);
-  private mutedIds = new Set<string>();
-  private readonly users = new Map(MOCK_USERS.map((user) => [user.id, user]));
+  private readonly store = new ChatStore();
+  private readonly responder = new ChatResponder({
+    store: this.store,
+    emit: (event) => this.eventStream.next(event),
+    createReply: (conversationId, authorId, draft) =>
+      this.buildMessage(conversationId, authorId, draft, 'sent'),
+  });
   private createdMessages = 0;
   private createdGroups = 0;
-  private replyIndex = 0;
 
   readonly events$: Observable<ChatEvent> = this.eventStream.asObservable();
 
   getConversations(): Promise<ChatSnapshot> {
-    return this.request.read(() => this.snapshot(), EMPTY_SNAPSHOT);
+    return this.request.read(() => this.store.snapshot(), EMPTY_SNAPSHOT);
   }
 
   getMessages(conversationId: string): Promise<readonly Message[]> {
-    return this.request.read(() => this.messages[conversationId] ?? [], []);
+    return this.request.read(() => this.store.thread(conversationId), []);
   }
 
   sendMessage(
@@ -66,10 +46,12 @@ export class ChatData {
   ): Promise<Message> {
     return this.request.write(() => {
       const message = this.buildMessage(conversationId, CURRENT_USER_ID, draft, deliveryState);
-      this.append(message);
-      this.unreadCounts[conversationId] = 0;
-      if (deliveryState !== 'queued') {
-        this.simulateReply(conversationId);
+      this.store.append(message);
+      if (!message.threadRootId) {
+        this.store.setUnread(conversationId, 0);
+      }
+      if (DELIVERY_RANK[deliveryState] > DELIVERY_RANK.queued) {
+        this.responder.respondTo(message);
       }
       return message;
     });
@@ -77,51 +59,69 @@ export class ChatData {
 
   saveMessage(message: Message): Promise<Message> {
     return this.request.write(() => {
-      const thread = this.messages[message.conversationId] ?? [];
-      const others = thread.filter((candidate) => candidate.id !== message.id);
-      this.messages[message.conversationId] = [...others, message].sort(
-        (first, second) => first.sentAt - second.sentAt,
-      );
+      this.store.putMessage(message);
       return message;
     });
   }
 
+  setDeliveryState(
+    conversationId: string,
+    messageId: string,
+    state: DeliveryState,
+  ): Promise<Message | null> {
+    return this.request.write(() => this.store.setDelivery(conversationId, messageId, state));
+  }
+
   deleteMessage(conversationId: string, messageId: string): Promise<void> {
-    return this.request.write(() => {
-      const thread = this.messages[conversationId] ?? [];
-      this.messages[conversationId] = thread.filter((message) => message.id !== messageId);
-    });
+    return this.request.write(() => this.store.deleteMessage(conversationId, messageId));
   }
 
   setUnread(conversationId: string, count: number): Promise<void> {
-    return this.request.write(() => {
-      this.unreadCounts[conversationId] = count;
-    });
+    return this.request.write(() => this.store.setUnread(conversationId, count));
+  }
+
+  setThreadUnread(rootId: string, count: number): Promise<void> {
+    return this.request.write(() => this.store.setThreadUnread(rootId, count));
   }
 
   setStarred(conversationId: string, starred: boolean): Promise<void> {
-    return this.request.write(() => this.setMembership(this.starredIds, conversationId, starred));
+    return this.setFlag('starred', conversationId, starred);
   }
 
-  setMuted(conversationId: string, muted: boolean): Promise<void> {
-    return this.request.write(() => this.setMembership(this.mutedIds, conversationId, muted));
+  setLeft(conversationId: string, left: boolean): Promise<void> {
+    return this.setFlag('left', conversationId, left);
+  }
+
+  setArchived(conversationId: string, archived: boolean): Promise<void> {
+    return this.setFlag('archived', conversationId, archived);
+  }
+
+  setNotifyLevel(conversationId: string, level: NotifyLevel): Promise<void> {
+    return this.request.write(() => this.store.setNotifyLevel(conversationId, level));
+  }
+
+  setSaved(messageId: string, entry: SavedEntry | null): Promise<void> {
+    return this.request.write(() => this.store.setSaved(messageId, entry));
   }
 
   ensureDirectConversation(userId: string, workspaceId: string): Promise<DirectConversation> {
     return this.request.write(() => {
-      const existing = this.conversations.find(
+      const id = `dm-${userId}`;
+      const scopedId = `${id}-${workspaceId}`;
+      const existing = [this.store.conversation(id), this.store.conversation(scopedId)].find(
         (conversation): conversation is DirectConversation =>
-          conversation.type === 'dm' &&
-          conversation.userId === userId &&
-          conversation.workspaceId === workspaceId,
+          conversation?.type === 'dm' && conversation.workspaceId === workspaceId,
       );
       if (existing) {
         return existing;
       }
-      const id = this.directIdFor(userId, workspaceId);
-      const created: DirectConversation = { id, type: 'dm', userId, workspaceId };
-      this.conversations = [...this.conversations, created];
-      this.messages[id] = [];
+      const created: DirectConversation = {
+        id: this.store.conversation(id) ? scopedId : id,
+        type: 'dm',
+        userId,
+        workspaceId,
+      };
+      this.store.putConversation(created);
       return created;
     });
   }
@@ -138,50 +138,44 @@ export class ChatData {
         name,
         memberIds: [CURRENT_USER_ID, ...memberIds],
         workspaceId,
+        createdBy: CURRENT_USER_ID,
       };
-      this.conversations = [...this.conversations, group];
-      this.messages[group.id] = [];
+      this.store.putConversation(group);
       return group;
     });
   }
 
-  private directIdFor(userId: string, workspaceId: string): string {
-    const id = `dm-${userId}`;
-    const taken = this.conversations.some((conversation) => conversation.id === id);
-    return taken ? `${id}-${workspaceId}` : id;
+  renameGroup(conversationId: string, name: string): Promise<GroupConversation | null> {
+    return this.request.write(() => {
+      const group = this.store.conversation(conversationId);
+      if (group?.type !== 'group') {
+        return null;
+      }
+      const renamed = { ...group, name };
+      this.store.putConversation(renamed);
+      return renamed;
+    });
+  }
+
+  setMembers(
+    conversationId: string,
+    memberIds: readonly string[],
+  ): Promise<MemberConversation | null> {
+    return this.request.write(() => this.store.setMembers(conversationId, memberIds));
   }
 
   addChannel(channel: Channel): ChannelConversation {
     const conversation = channelConversation(channel);
-    this.conversations = [...this.conversations, conversation];
-    this.messages[channel.id] = [];
+    this.store.putConversation(conversation);
     return conversation;
   }
 
-  private snapshot(): ChatSnapshot {
-    return {
-      conversations: this.conversations,
-      messages: { ...this.messages },
-      unreadCounts: { ...this.unreadCounts },
-      starredIds: [...this.starredIds],
-      mutedIds: [...this.mutedIds],
-      typingUserIds: MOCK_TYPING_USER_IDS,
-    };
+  syncChannel(channel: Channel): ChannelConversation {
+    return this.addChannel(channel);
   }
 
-  private setMembership(ids: Set<string>, conversationId: string, member: boolean): void {
-    if (member) {
-      ids.add(conversationId);
-    } else {
-      ids.delete(conversationId);
-    }
-  }
-
-  private append(message: Message): void {
-    this.messages[message.conversationId] = [
-      ...(this.messages[message.conversationId] ?? []),
-      message,
-    ];
+  private setFlag(kind: ChatFlagKind, conversationId: string, on: boolean): Promise<void> {
+    return this.request.write(() => this.store.setFlag(kind, conversationId, on));
   }
 
   private buildMessage(
@@ -199,44 +193,9 @@ export class ChatData {
       attachments: draft.attachments,
       reactions: [],
       replyToId: draft.replyToId,
+      threadRootId: draft.threadRootId ?? null,
       pinned: false,
       deliveryState,
     };
-  }
-
-  private simulateReply(conversationId: string): void {
-    const conversation = this.conversations.find((candidate) => candidate.id === conversationId);
-    if (!conversation) {
-      return;
-    }
-    const plan = planReply(
-      conversation,
-      this.users,
-      CURRENT_USER_ID,
-      MOCK_REPLIES,
-      this.replyIndex++,
-    );
-    scheduleReply(plan, {
-      delivered: () => this.emit({ type: 'delivery', conversationId, state: 'delivered' }),
-      typing: (userId) => this.emit({ type: 'typing', conversationId, userIds: [userId] }),
-      read: () => this.emit({ type: 'delivery', conversationId, state: 'read' }),
-      reply: (responderId, text) => this.deliverReply(conversationId, responderId, text),
-    });
-  }
-
-  private deliverReply(conversationId: string, responderId: string, text: string): void {
-    const message = this.buildMessage(
-      conversationId,
-      responderId,
-      { text, attachments: [], replyToId: null },
-      'sent',
-    );
-    this.append(message);
-    this.emit({ type: 'typing', conversationId, userIds: [] });
-    this.emit({ type: 'message', message });
-  }
-
-  private emit(event: ChatEvent): void {
-    this.eventStream.next(event);
   }
 }

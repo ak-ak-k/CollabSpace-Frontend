@@ -1,0 +1,46 @@
+@use '../task-section';
+
+:host {
+  display: block;
+}
+
+.section {
+  @include task-section.section;
+}
+
+.section__head {
+  @include task-section.head;
+}
+
+.section__title {
+  @include task-section.title;
+}
+
+.section__meta {
+  @include task-section.meta;
+
+  margin: var(--space-0);
+}
+
+.entries {
+  margin: var(--space-0);
+  padding: var(--space-0);
+  list-style: none;
+}
+
+.entry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  padding: var(--space-2) var(--space-0);
+  border-bottom: var(--rule-hairline);
+  font-size: var(--font-size-13);
+}
+
+.entry__who {
+  font-weight: var(--font-weight-heavy);
+}
+
+.entry__when {
+  color: var(--text-muted);
+}

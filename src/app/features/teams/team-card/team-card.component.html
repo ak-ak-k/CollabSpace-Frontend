@@ -7,7 +7,17 @@
       <h2 class="card__name">{{ item.name }}</h2>
       <span class="card__lead">{{ item.leadLabel }}</span>
     </div>
-    <app-tag>{{ item.activityLevel }}</app-tag>
+    <span class="card__tags">
+      @if (item.unreadCount > 0) {
+        <app-tag tone="outline" role="img" [attr.aria-label]="item.unreadLabel">{{
+          item.unreadCount
+        }}</app-tag>
+      }
+      @if (item.isPrivate) {
+        <app-tag><app-icon name="lock" [size]="12" />Private</app-tag>
+      }
+      <app-tag>{{ item.activityLevel }}</app-tag>
+    </span>
   </div>
   <p class="card__description">{{ item.description }}</p>
   <div class="card__people">

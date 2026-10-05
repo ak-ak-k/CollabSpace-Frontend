@@ -1,10 +1,14 @@
 <div class="messages">
   @if (showList()) {
-    <app-conversation-list class="messages__list" [selectedId]="conversationId()" />
+    <app-conversation-list
+      class="messages__list"
+      [selectedId]="conversationId()"
+      [savedOpen]="savedOpen()"
+    />
   }
   @if (showPane()) {
     <div class="messages__pane">
-      @if (conversationId()) {
+      @if (conversationId() || savedOpen()) {
         <router-outlet />
       } @else {
         <app-empty-state

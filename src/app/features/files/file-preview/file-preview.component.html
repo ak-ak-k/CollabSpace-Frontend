@@ -1,0 +1,56 @@
+<header class="preview__header">
+  <app-icon class="preview__icon" [name]="icon()" [size]="18" />
+  <h2 class="preview__title truncate" [id]="titleId">{{ title() }}</h2>
+  @if (file(); as current) {
+    <button
+      appIconButton
+      type="button"
+      [label]="'Download ' + current.name"
+      (click)="download(current)"
+    >
+      <app-icon name="download" [size]="18" />
+    </button>
+    <button
+      appIconButton
+      type="button"
+      [label]="current.starLabel"
+      [pressed]="current.starred"
+      (click)="star(current)"
+    >
+      <app-icon name="star" [size]="18" [filled]="current.starred" />
+    </button>
+  }
+  <button
+    appIconButton
+    type="button"
+    size="lg"
+    label="Close preview"
+    cdkFocusInitial
+    (click)="close()"
+  >
+    <app-icon name="x" [size]="20" />
+  </button>
+</header>
+
+@if (file(); as current) {
+  <div class="preview__main">
+    <app-file-preview-body [file]="current" (download)="download(current)" />
+    <app-file-preview-details
+      class="preview__details"
+      [file]="current"
+      [references]="references()"
+      (rename)="rename(current)"
+      (copyLink)="copyLink(current)"
+      (remove)="remove()"
+    />
+  </div>
+} @else {
+  <div class="preview__missing">
+    <span class="preview__missing-tile">
+      <app-icon name="circle-alert" [size]="28" />
+    </span>
+    <p class="preview__missing-text">
+      This file was deleted, or you don’t have access to where it was shared.
+    </p>
+  </div>
+}

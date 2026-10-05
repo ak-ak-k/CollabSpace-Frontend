@@ -8,8 +8,11 @@ import { createUniqueId } from '../../../shared/ui/input/field/unique-id';
 import { labelEnclosingDialog } from '../../../shared/ui/modal/dialog-container/dialog-label';
 import { TagComponent } from '../../../shared/ui/tag/tag.component';
 import { TaskActions } from '../task-actions.service';
+import { TaskAttachmentsComponent } from '../task-attachments/task-attachments.component';
 import { TaskCommentsComponent } from '../task-comments/task-comments.component';
 import { TaskEditorComponent } from '../task-editor/task-editor.component';
+import { TaskHistoryComponent } from '../task-history/task-history.component';
+import { TaskSubtasksComponent } from '../task-subtasks/task-subtasks.component';
 
 export interface TaskDrawerData {
   readonly taskId: string;
@@ -21,8 +24,11 @@ export interface TaskDrawerData {
     IconButtonComponent,
     IconComponent,
     TagComponent,
-    TaskEditorComponent,
+    TaskAttachmentsComponent,
     TaskCommentsComponent,
+    TaskEditorComponent,
+    TaskHistoryComponent,
+    TaskSubtasksComponent,
   ],
   templateUrl: './task-drawer.component.html',
   styleUrl: './task-drawer.component.scss',

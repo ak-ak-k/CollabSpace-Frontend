@@ -8,6 +8,9 @@ import { WorkspaceState } from './workspace.state';
 const matches = (notification: AppNotification, filter: NotificationFilter): boolean =>
   filter === 'all' || notification.category === filter;
 
+const newestFirst = (notifications: AppNotification[]): AppNotification[] =>
+  notifications.sort((first, second) => second.createdAt - first.createdAt);
+
 @Service()
 export class NotificationState {
   private readonly data = inject(NotificationsData);
@@ -79,10 +82,16 @@ export class NotificationState {
     return dismissed;
   }
 
+  async add(added: readonly AppNotification[]): Promise<void> {
+    if (added.length === 0) {
+      return;
+    }
+    this.allNotifications.update((notifications) => newestFirst([...added, ...notifications]));
+    await this.data.add(added);
+  }
+
   async restore(notification: AppNotification): Promise<void> {
-    this.allNotifications.update((notifications) =>
-      [...notifications, notification].sort((first, second) => second.createdAt - first.createdAt),
-    );
+    this.allNotifications.update((notifications) => newestFirst([...notifications, notification]));
     await this.data.restore(notification);
   }
 }
