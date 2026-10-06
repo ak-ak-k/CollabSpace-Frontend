@@ -16,7 +16,7 @@ export const canChangeMember = (
   access: WorkspaceAccess,
   role: WorkspaceRole,
   removable: boolean,
-): boolean => access.canManage && removable && !(role === 'owner' && !access.isOwner);
+): boolean => access.canManageMembers && removable && !(role === 'owner' && !access.isOwner);
 
 export const memberMenuItems = (
   member: Pick<MemberRow, 'isMe' | 'firstName'>,

@@ -54,11 +54,6 @@ export interface Integration {
   readonly connected: boolean;
 }
 
-export interface RolePermission {
-  readonly label: string;
-  readonly allowed: readonly boolean[];
-}
-
 export const NOTIFICATION_CHANNELS: readonly NotificationChannel[] = ['inapp', 'push', 'email'];
 
 export const NOTIFICATION_CHANNEL_LABELS: Record<NotificationChannel, string> = {

@@ -30,7 +30,7 @@ export class RecentActivityComponent {
 
   readonly retry = output<void>();
 
-  protected linkTo(route: string): UrlTree {
-    return this.router.parseUrl(route);
+  protected linkTo(route: string): UrlTree | null {
+    return route ? this.router.parseUrl(route) : null;
   }
 }

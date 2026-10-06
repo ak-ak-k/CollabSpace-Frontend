@@ -30,6 +30,7 @@ import { WorkspaceSettingsPanelComponent } from './workspace-settings-panel/work
 import {
   OWNER_SECTION,
   resolveWorkspaceSettingsSection,
+  visibleWorkspaceSettingsSections,
   WORKSPACE_SETTINGS_URL,
   WorkspaceSettingsSection,
   workspaceSettingsRedirectOf,
@@ -69,6 +70,9 @@ export class WorkspaceSettingsComponent {
   protected readonly returnState = returnStateOf;
   protected readonly isMobile = this.breakpoints.isMobile;
   protected readonly status = this.workspace.loadStatus;
+  protected readonly sections = computed(() =>
+    visibleWorkspaceSettingsSections((permission) => this.workspace.can(permission)),
+  );
   protected readonly current = computed(() =>
     resolveWorkspaceSettingsSection(this.section(), this.isMobile()),
   );

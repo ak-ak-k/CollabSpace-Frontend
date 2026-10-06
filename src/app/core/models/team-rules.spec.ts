@@ -1,7 +1,6 @@
 import { MOCK_TEAMS } from '../mocks/teams.mock';
 import { Channel } from './channel';
 import {
-  canManageTeam,
   channelWithMembers,
   teamRoleOf,
   withoutTeamMember,
@@ -27,12 +26,6 @@ describe('team rules', () => {
     expect(teamRoleOf(frontend, 'u4')).toBe('owner');
     expect(teamRoleOf(frontend, 'u1')).toBe('admin');
     expect(teamRoleOf(frontend, 'u2')).toBe('member');
-  });
-
-  it('lets workspace managers, the owner and admins manage a team', () => {
-    expect(canManageTeam(frontend, 'u2', false)).toBe(false);
-    expect(canManageTeam(frontend, 'u2', true)).toBe(true);
-    expect(canManageTeam(frontend, 'u1', false)).toBe(true);
   });
 
   it('adds members once and drops admin rights on removal', () => {

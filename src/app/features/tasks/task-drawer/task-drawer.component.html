@@ -17,7 +17,7 @@
     >
       <app-icon name="link" [size]="16" />
     </button>
-    @if (actions.canCreate()) {
+    @if (actions.canDelete(current)) {
       <button
         appIconButton
         type="button"

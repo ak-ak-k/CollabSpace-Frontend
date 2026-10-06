@@ -1,5 +1,6 @@
 import { inject, Service } from '@angular/core';
 import { Router } from '@angular/router';
+import { Permission } from '../../core/models/permission';
 import { NewWorkspace } from '../../core/models/workspace';
 import { DialogService } from '../../core/services/dialog.service';
 import { ToastService } from '../../core/services/toast.service';
@@ -43,14 +44,14 @@ export class WorkspaceActions {
   }
 
   openCreateTeam(): void {
-    if (this.blockGuest('teams')) {
+    if (this.blocked('teams.create', 'teams')) {
       return;
     }
     this.dialogs.open(CreateTeamDialogComponent, { size: 'md' });
   }
 
   openCreateChannel(teamId: string | null = null): void {
-    if (this.blockGuest('channels')) {
+    if (this.blocked('channels.create', 'channels')) {
       return;
     }
     const data: CreateChannelDialogData = { teamId };
@@ -81,8 +82,8 @@ export class WorkspaceActions {
     });
   }
 
-  private blockGuest(things: 'teams' | 'channels'): boolean {
-    if (this.workspace.access().canCreateTeams) {
+  private blocked(permission: Permission, things: 'teams' | 'channels'): boolean {
+    if (this.workspace.can(permission)) {
       return false;
     }
     this.toasts.show(`Guests can’t create ${things} in ${this.workspaceName()}`, {

@@ -18,9 +18,9 @@
   @for (chip of chips(); track chip.filter) {
     <a
       class="members__chip"
-      [class.members__chip--current]="chip.filter === filter()"
+      [class.members__chip--current]="chip.filter === shownFilter()"
       [routerLink]="chip.link"
-      [attr.aria-current]="chip.filter === filter() ? 'page' : null"
+      [attr.aria-current]="chip.filter === shownFilter() ? 'page' : null"
     >
       {{ chip.label }}
       @if (ready()) {
@@ -60,6 +60,9 @@
       [actionLabel]="access().canInvite ? 'Invite people' : ''"
       (action)="invite()"
     />
+  }
+  @case ('invited') {
+    <app-pending-invite-list [invites]="matchingInvites()" [query]="query()" />
   }
   @case ('none') {
     <app-empty-state

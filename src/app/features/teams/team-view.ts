@@ -1,4 +1,4 @@
-import { ACTIVITY_ICONS, ActivityEvent } from '../../core/models/activity';
+import { ActivityEvent, activityIconOf } from '../../core/models/activity';
 import { Channel } from '../../core/models/channel';
 import { FILE_TYPE_ICONS, FILE_TYPE_LABELS, FileItem } from '../../core/models/file-item';
 import { Message } from '../../core/models/message';
@@ -153,7 +153,7 @@ export const teamActivityItem = (event: ActivityEvent, usersById: UsersById): Te
     seed: userColorSeed(event.actorId),
     verb: event.verb,
     object: event.object,
-    icon: ACTIVITY_ICONS[event.kind] ?? 'activity',
+    icon: activityIconOf(event.kind),
     when: formatRelative(event.occurredAt),
     route: event.route,
   };

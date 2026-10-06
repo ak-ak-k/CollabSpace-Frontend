@@ -1,4 +1,4 @@
-import { DeviceSession, Integration, Preferences, RolePermission } from '../models/preferences';
+import { DeviceSession, Integration, Preferences } from '../models/preferences';
 
 export const MOCK_PREFERENCES: Preferences = {
   notifications: {
@@ -98,17 +98,4 @@ export const MOCK_INTEGRATIONS: readonly Integration[] = [
     description: 'Import issues into CollabSpace tasks.',
     connected: false,
   },
-];
-
-export const MOCK_ROLE_NAMES: readonly string[] = ['Owner', 'Admin', 'Member', 'Guest'];
-
-export const MOCK_ROLE_PERMISSIONS: readonly RolePermission[] = [
-  { label: 'Manage workspace settings and billing', allowed: [true, false, false, false] },
-  { label: 'Manage members and roles', allowed: [true, true, false, false] },
-  { label: 'Create teams', allowed: [true, true, true, false] },
-  { label: 'Create public channels', allowed: [true, true, true, false] },
-  { label: 'Invite members', allowed: [true, true, true, false] },
-  { label: 'Delete any message', allowed: [true, true, false, false] },
-  { label: 'Join public channels', allowed: [true, true, true, false] },
-  { label: 'Post in channels they’re added to', allowed: [true, true, true, true] },
 ];

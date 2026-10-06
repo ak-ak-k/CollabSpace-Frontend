@@ -4,7 +4,7 @@ import { INSTANT_MOCK_DATA, settle } from './state.testing';
 import { WorkspaceActivityState } from './workspace-activity.state';
 import { WorkspaceState } from './workspace.state';
 
-describe('InviteState and WorkspaceActivityState', () => {
+describe('InviteState', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({ providers: [INSTANT_MOCK_DATA] });
   });
@@ -25,18 +25,6 @@ describe('InviteState and WorkspaceActivityState', () => {
     expect(invites.status()).toBe('empty');
   });
 
-  it('keeps workspace activity per workspace', async () => {
-    const activity = TestBed.inject(WorkspaceActivityState);
-    await settle();
-
-    expect(activity.events().length).toBe(10);
-    expect(activity.events()[0]).toMatchObject({ actorId: 'u24', kind: 'join' });
-
-    TestBed.inject(WorkspaceState).switchWorkspace('w2');
-
-    expect(activity.events().map((event) => event.id)).toEqual(['wa11', 'wa12', 'wa13']);
-  });
-
   it('sends new invitations and resends existing ones', async () => {
     const invites = TestBed.inject(InviteState);
     await settle();
@@ -54,8 +42,9 @@ describe('InviteState and WorkspaceActivityState', () => {
     expect(await invites.flushQueued()).toBe(1);
   });
 
-  it('revokes an invitation and restores it on undo', async () => {
+  it('revokes an invitation, restores it on undo and logs both in the audit log', async () => {
     const invites = TestBed.inject(InviteState);
+    const activity = TestBed.inject(WorkspaceActivityState);
     await settle();
 
     const revoked = await invites.revoke('i1');
@@ -65,23 +54,14 @@ describe('InviteState and WorkspaceActivityState', () => {
     await invites.restore(revoked!);
 
     expect(invites.pendingFor('rohan.verma@northstar.io')?.id).toBe('i1');
-  });
-
-  it('records workspace activity and removes it again', async () => {
-    const activity = TestBed.inject(WorkspaceActivityState);
-    await settle();
-
-    const id = activity.record({
-      kind: 'team',
-      verb: 'created',
-      object: 'the Data team',
-      route: '/teams',
-    });
-
-    expect(activity.events()[0]).toMatchObject({ id, actorId: 'u0', verb: 'created' });
-
-    activity.remove(id);
-
-    expect(activity.events().some((event) => event.id === id)).toBe(false);
+    expect(
+      activity
+        .events({ category: 'audit' })
+        .slice(0, 2)
+        .map((event) => `${event.verb} ${event.object}`),
+    ).toEqual([
+      'restored the invitation to rohan.verma@northstar.io',
+      'revoked the invitation to rohan.verma@northstar.io',
+    ]);
   });
 });

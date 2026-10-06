@@ -165,6 +165,8 @@ export class CreateTeamDialogComponent {
       verb: 'created',
       object: `the ${name} team`,
       route: `/teams/${team.id}`,
+      teamId: team.id,
+      entity: { type: 'team', id: team.id },
     });
     this.dialogRef.close();
     await this.router.navigate(['/teams', team.id]);

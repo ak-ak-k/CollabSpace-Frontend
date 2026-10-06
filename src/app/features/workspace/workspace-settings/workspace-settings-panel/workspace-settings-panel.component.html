@@ -1,5 +1,7 @@
 @if (section().id === ownerSection) {
   <app-workspace-settings-danger />
+} @else if (section().id === auditSection) {
+  <app-workspace-settings-audit />
 } @else {
   @if (readOnlyNote()) {
     <app-workspace-settings-note kind="locked">{{ readOnlyNote() }}</app-workspace-settings-note>

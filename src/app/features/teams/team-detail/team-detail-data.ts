@@ -5,6 +5,7 @@ import { FileState } from '../../../core/state/file.state';
 import { TeamChannelsState } from '../../../core/state/team-channels.state';
 import { TaskState } from '../../../core/state/task.state';
 import { TeamMembershipState } from '../../../core/state/team-membership.state';
+import { WorkspaceActivityState } from '../../../core/state/workspace-activity.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import { teamMemberView, TeamMemberView } from '../team-member-view';
 import { teamTaskView, TeamTaskView } from '../team-task-view';
@@ -42,6 +43,7 @@ export const injectTeamDetail = (teamId: () => string): TeamDetailData => {
   const teamChannels = inject(TeamChannelsState);
   const membership = inject(TeamMembershipState);
   const taskState = inject(TaskState);
+  const activityState = inject(WorkspaceActivityState);
   const currentUserId = computed(() => workspace.currentUser()?.id ?? '');
   const team = computed(() => workspace.team(teamId()));
   const canManage = computed(() => !!team() && membership.canManageTeam(teamId()));
@@ -92,10 +94,8 @@ export const injectTeamDetail = (teamId: () => string): TeamDetailData => {
   );
 
   const activity = computed(() =>
-    workspace
-      .activity()
-      .filter((event) => event.teamId === teamId())
-      .sort((first, second) => second.occurredAt - first.occurredAt)
+    activityState
+      .events({ category: 'activity', teamId: teamId() })
       .map((event) => teamActivityItem(event, workspace.usersById())),
   );
 

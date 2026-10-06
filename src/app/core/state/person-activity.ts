@@ -1,8 +1,7 @@
 import { IconName } from '../../shared/ui/icon/icon-registry';
-import { ACTIVITY_ICONS, ActivityEvent } from '../models/activity';
+import { ActivityEvent, activityIconOf } from '../models/activity';
 import { Channel } from '../models/channel';
 import { Message } from '../models/message';
-import { WORKSPACE_ACTIVITY_ICONS, WorkspaceActivityEvent } from '../models/workspace-activity';
 
 export interface PersonActivityItem {
   readonly id: string;
@@ -15,8 +14,7 @@ export interface PersonActivityItem {
 }
 
 export interface PersonActivitySources {
-  readonly teamActivity: readonly ActivityEvent[];
-  readonly workspaceActivity: readonly WorkspaceActivityEvent[];
+  readonly events: readonly ActivityEvent[];
   readonly channels: readonly Channel[];
   readonly messages: Readonly<Record<string, readonly Message[]>>;
 }
@@ -25,23 +23,13 @@ export const PERSON_ACTIVITY_LIMIT = 5;
 
 const POSTED_VERB = 'posted in';
 
-const fromTeamEvent = (event: ActivityEvent): PersonActivityItem => ({
+const fromEvent = (event: ActivityEvent): PersonActivityItem => ({
   id: event.id,
   verb: event.verb,
   object: event.object,
   route: event.route,
   occurredAt: event.occurredAt,
-  icon: ACTIVITY_ICONS[event.kind],
-  snippet: '',
-});
-
-const fromWorkspaceEvent = (event: WorkspaceActivityEvent): PersonActivityItem => ({
-  id: event.id,
-  verb: event.verb,
-  object: event.object,
-  route: event.route,
-  occurredAt: event.occurredAt,
-  icon: WORKSPACE_ACTIVITY_ICONS[event.kind],
+  icon: activityIconOf(event.kind),
   snippet: '',
 });
 
@@ -74,10 +62,9 @@ export const personActivityOf = (
   limit = PERSON_ACTIVITY_LIMIT,
 ): readonly PersonActivityItem[] =>
   [
-    ...sources.teamActivity.filter((event) => event.actorId === userId).map(fromTeamEvent),
-    ...sources.workspaceActivity
-      .filter((event) => event.actorId === userId)
-      .map(fromWorkspaceEvent),
+    ...sources.events
+      .filter((event) => event.actorId === userId && event.category === 'activity')
+      .map(fromEvent),
     ...channelPosts(userId, sources),
   ]
     .sort((first, second) => second.occurredAt - first.occurredAt)

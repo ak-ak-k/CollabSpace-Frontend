@@ -10,8 +10,10 @@ import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { SearchInputComponent } from '../../../shared/ui/search-input/search-input.component';
 import { SkeletonComponent } from '../../../shared/ui/skeleton/skeleton.component';
 import { MemberCardsComponent } from '../member-cards/member-cards.component';
+import { invitesMatching } from '../invites-view';
 import { MembersTableComponent } from '../members-table/members-table.component';
 import {
+  allowedMemberFilter,
   MANAGE_INVITATIONS_ROUTE,
   MemberFilter,
   memberFilterChips,
@@ -22,9 +24,10 @@ import {
   visibleMembers,
   workspacePeople,
 } from '../members-view';
+import { PendingInviteListComponent } from '../pending-invite-list/pending-invite-list.component';
 import { WorkspaceActions } from '../workspace-actions.service';
 
-type MembersView = 'loading' | 'error' | 'solo' | 'none' | 'list';
+type MembersView = 'loading' | 'error' | 'solo' | 'none' | 'list' | 'invited';
 
 @Component({
   selector: 'app-workspace-members',
@@ -35,6 +38,7 @@ type MembersView = 'loading' | 'error' | 'solo' | 'none' | 'list';
     IconComponent,
     MemberCardsComponent,
     MembersTableComponent,
+    PendingInviteListComponent,
     RouterLink,
     SearchInputComponent,
     SkeletonComponent,
@@ -67,19 +71,44 @@ export class WorkspaceMembersComponent {
     () => this.workspace.currentWorkspace()?.name ?? 'this workspace',
   );
   private readonly people = computed(() =>
-    workspacePeople(this.workspace.members(), this.workspace.currentUser(), this.loadStatus()),
+    workspacePeople(
+      this.workspace.memberDirectory(),
+      this.workspace.currentUser(),
+      this.loadStatus(),
+    ),
   );
-  protected readonly chips = computed(() => memberFilterChips(this.people()));
+  protected readonly shownFilter = computed(() =>
+    allowedMemberFilter(this.filter(), this.access().canInvite),
+  );
+  private readonly peopleFilter = computed(() => {
+    const filter = this.shownFilter();
+    return filter === 'invited' ? 'all' : filter;
+  });
+  protected readonly chips = computed(() =>
+    memberFilterChips(this.people(), this.access().canInvite ? this.pendingCount() : undefined),
+  );
+  protected readonly matchingInvites = computed(() =>
+    invitesMatching(this.invites.invites(), this.query()),
+  );
   protected readonly rows = computed(() => {
     const viewerId = this.workspace.currentUser()?.id ?? '';
-    return visibleMembers(this.people(), this.filter(), this.query()).map((user) =>
+    return visibleMembers(this.people(), this.peopleFilter(), this.query()).map((user) =>
       memberRowOf(user, viewerId),
     );
   });
+  private readonly invitesStatus = computed(() =>
+    this.shownFilter() === 'invited' ? this.invites.status() : 'ready',
+  );
   protected readonly view = computed<MembersView>(() => {
-    const status = this.loadStatus();
-    if (status === 'loading' || status === 'error') {
-      return status;
+    const statuses = [this.loadStatus(), this.invitesStatus()];
+    if (statuses.includes('error')) {
+      return 'error';
+    }
+    if (statuses.includes('loading')) {
+      return 'loading';
+    }
+    if (this.shownFilter() === 'invited') {
+      return 'invited';
     }
     if (this.people().length <= 1) {
       return 'solo';
@@ -90,7 +119,7 @@ export class WorkspaceMembersComponent {
     () => this.ready() && this.access().canManage && this.pendingCount() > 0,
   );
   protected readonly noMatch = computed(() =>
-    noMatchingMembers(this.filter(), this.query(), this.workspaceName()),
+    noMatchingMembers(this.peopleFilter(), this.query(), this.workspaceName()),
   );
   protected readonly soloMessage = computed(() =>
     this.access().canInvite

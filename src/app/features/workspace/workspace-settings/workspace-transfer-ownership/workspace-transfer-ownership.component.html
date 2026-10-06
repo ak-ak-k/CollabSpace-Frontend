@@ -1,0 +1,17 @@
+<app-danger-zone
+  tone="neutral"
+  actionsAlign="end"
+  heading="Transfer ownership"
+  description="Make someone else the Owner. You’ll become an Admin."
+>
+  <app-select
+    class="transfer__field"
+    label="New owner"
+    [options]="options()"
+    [(value)]="newOwnerId"
+  />
+  <button appButton type="button" [disabled]="!newOwnerId()" (click)="transfer()">
+    <app-icon name="crown" [size]="16" />
+    Transfer
+  </button>
+</app-danger-zone>

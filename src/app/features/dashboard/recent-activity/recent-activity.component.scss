@@ -14,7 +14,7 @@
   text-decoration: none;
   outline-offset: calc(var(--border-width-rule) * -1);
 
-  &:hover {
+  &[href]:hover {
     background: var(--hover);
   }
 }

@@ -1,9 +1,11 @@
+import { User } from '../../../core/models/user';
 import {
   inviteExpiryOf,
   LOGO_TYPE_ERROR,
   logoFileErrorOf,
   parseDomains,
   readOnlyNoteOf,
+  transferCandidatesOf,
 } from './workspace-settings-view';
 
 const DAY = 86_400_000;
@@ -37,5 +39,19 @@ describe('workspace settings view', () => {
     expect(readOnlyNoteOf('guest', 'Kite Ventures')).toBe(
       'You’re a guest of Kite Ventures. Only owners and admins can change these settings — you can still view them.',
     );
+  });
+
+  it('offers every non-guest member except you as the new owner, by name', () => {
+    const members: readonly Pick<User, 'id' | 'name' | 'role'>[] = [
+      { id: 'me', name: 'Aditi', role: 'owner' },
+      { id: 'zoe', name: 'Zoe', role: 'admin' },
+      { id: 'gus', name: 'Gus', role: 'guest' },
+      { id: 'ben', name: 'Ben', role: 'member' },
+    ];
+
+    expect(transferCandidatesOf(members, 'me')).toEqual([
+      { value: 'ben', label: 'Ben · Member' },
+      { value: 'zoe', label: 'Zoe · Admin' },
+    ]);
   });
 });

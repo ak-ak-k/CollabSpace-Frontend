@@ -4,6 +4,7 @@ import { CURRENT_USER_ID } from '../mocks/users.mock';
 import { TaskComment } from '../models/task';
 import { DataModeState } from './data-mode.state';
 import { Loadable } from './loadable';
+import { commentedNote } from './task-activity-note';
 import { TaskState } from './task.state';
 
 @Service()
@@ -59,6 +60,7 @@ export class TaskCommentState {
       edited: false,
     };
     this.comments.update((comments) => [...comments, comment]);
+    this.logComment(taskId);
     this.tasks.markPendingWhileOffline(taskId);
     void this.data.saveComment(comment);
     return comment;
@@ -86,5 +88,12 @@ export class TaskCommentState {
       void this.data.deleteComment(commentId);
     }
     return removed;
+  }
+
+  private logComment(taskId: string): void {
+    const task = this.tasks.task(taskId);
+    if (task) {
+      this.tasks.log(task, commentedNote(task));
+    }
   }
 }

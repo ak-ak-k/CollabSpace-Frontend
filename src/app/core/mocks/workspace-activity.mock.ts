@@ -1,4 +1,9 @@
-import { WorkspaceActivityEvent, WorkspaceActivityKind } from '../models/workspace-activity';
+import {
+  ActivityChange,
+  ActivityEvent,
+  activityCategoryOf,
+  WorkspaceActivityKind,
+} from '../models/activity';
 import { MINUTES_PER_DAY, minutesAgo } from './mock-clock';
 
 type ActivitySeed = readonly [
@@ -10,16 +15,18 @@ type ActivitySeed = readonly [
   minutes: number,
   kind: WorkspaceActivityKind,
   route: string,
+  change?: ActivityChange,
 ];
 
 const MEMBERS_ROUTE = '/workspace/members';
 const INVITES_ROUTE = '/workspace/settings/members';
 const ADMINS_ROUTE = '/workspace/members/admins';
+const MEMBER_TO_ADMIN: ActivityChange = { from: 'Member', to: 'Admin' };
 
 const ACTIVITY_SEEDS: readonly ActivitySeed[] = [
   ['wa1', 'w1', 'u24', 'joined', 'the Design team', 70, 'join', '/teams/t-design'],
   ['wa2', 'w1', 'u4', 'invited', 'rohan.verma@northstar.io', 150, 'invite', INVITES_ROUTE],
-  ['wa3', 'w1', 'u4', 'made', 'Nandini Rao an Admin', 260, 'role', ADMINS_ROUTE],
+  ['wa3', 'w1', 'u4', 'made', 'Nandini Rao an Admin', 260, 'role', ADMINS_ROUTE, MEMBER_TO_ADMIN],
   [
     'wa4',
     'w1',
@@ -49,6 +56,7 @@ const ACTIVITY_SEEDS: readonly ActivitySeed[] = [
     2 * MINUTES_PER_DAY + 300,
     'integration',
     '/workspace/settings/integrations',
+    { from: 'Not connected', to: 'Connected' },
   ],
   [
     'wa7',
@@ -69,6 +77,7 @@ const ACTIVITY_SEEDS: readonly ActivitySeed[] = [
     4 * MINUTES_PER_DAY,
     'security',
     '/workspace/settings/security',
+    { from: 'Off', to: 'On' },
   ],
   ['wa9', 'w1', 'u39', 'joined', 'Northstar Labs', 5 * MINUTES_PER_DAY, 'join', MEMBERS_ROUTE],
   ['wa10', 'w1', 'u18', 'joined', 'Northstar Labs', 6 * MINUTES_PER_DAY, 'join', MEMBERS_ROUTE],
@@ -83,7 +92,17 @@ const ACTIVITY_SEEDS: readonly ActivitySeed[] = [
     'invite',
     INVITES_ROUTE,
   ],
-  ['wa13', 'w2', 'u5', 'made', 'Aarav Shah an Admin', 20 * MINUTES_PER_DAY, 'role', ADMINS_ROUTE],
+  [
+    'wa13',
+    'w2',
+    'u5',
+    'made',
+    'Aarav Shah an Admin',
+    20 * MINUTES_PER_DAY,
+    'role',
+    ADMINS_ROUTE,
+    MEMBER_TO_ADMIN,
+  ],
   [
     'wa14',
     'w3',
@@ -105,7 +124,8 @@ const toEvent = ([
   minutes,
   kind,
   route,
-]: ActivitySeed): WorkspaceActivityEvent => ({
+  change,
+]: ActivitySeed): ActivityEvent => ({
   id,
   workspaceId,
   actorId,
@@ -114,7 +134,10 @@ const toEvent = ([
   occurredAt: minutesAgo(minutes),
   kind,
   route,
+  category: activityCategoryOf(kind),
+  entity: null,
+  teamId: null,
+  change: change ?? null,
 });
 
-export const MOCK_WORKSPACE_ACTIVITY: readonly WorkspaceActivityEvent[] =
-  ACTIVITY_SEEDS.map(toEvent);
+export const MOCK_WORKSPACE_ACTIVITY: readonly ActivityEvent[] = ACTIVITY_SEEDS.map(toEvent);

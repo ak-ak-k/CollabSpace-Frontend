@@ -19,9 +19,15 @@
   --workspace-settings-role-column-width: 130px;
   --workspace-settings-count-column-width: 110px;
   --workspace-settings-permission-column-width: 84px;
-  --workspace-settings-permission-mark-size: var(--space-6);
+  --workspace-settings-permission-cell-size: var(--space-8);
+  --workspace-settings-transfer-field-basis: 220px;
 
   --workspace-settings-radio-size: var(--space-4);
   --workspace-settings-integration-card-min-width: 230px;
   --workspace-settings-integration-tile-size: var(--size-control-md);
+
+  --workspace-settings-audit-actor-min-width: 200px;
+  --workspace-settings-audit-when-width: 160px;
+  --workspace-settings-audit-actor-width: 150px;
+  --workspace-settings-audit-change-width: 200px;
 }

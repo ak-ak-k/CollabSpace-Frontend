@@ -2,7 +2,6 @@ import { formatDate } from '@angular/common';
 import { Component, computed, inject, LOCALE_ID, output } from '@angular/core';
 import { Workspace } from '../../core/models/workspace';
 import { ToastService } from '../../core/services/toast.service';
-import { WorkspaceActivityState } from '../../core/state/workspace-activity.state';
 import { WorkspaceAdminState } from '../../core/state/workspace-admin.state';
 import { WorkspaceState } from '../../core/state/workspace.state';
 import { IconComponent } from '../../shared/ui/icon/icon.component';
@@ -18,7 +17,6 @@ interface WorkspaceBannerView {
 }
 
 const DELETION_DAY_FORMAT = 'd MMMM';
-const DANGER_ZONE_ROUTE = '/workspace/settings/danger';
 
 @Component({
   selector: 'app-workspace-banner',
@@ -30,7 +28,6 @@ const DANGER_ZONE_ROUTE = '/workspace/settings/danger';
 export class WorkspaceBannerComponent {
   private readonly workspace = inject(WorkspaceState);
   private readonly admin = inject(WorkspaceAdminState);
-  private readonly activity = inject(WorkspaceActivityState);
   private readonly toasts = inject(ToastService);
   private readonly locale = inject(LOCALE_ID);
 
@@ -80,12 +77,6 @@ export class WorkspaceBannerComponent {
   private unarchive(): void {
     const name = this.workspace.currentWorkspace()?.name ?? 'The workspace';
     void this.admin.setArchived(false);
-    this.activity.record({
-      kind: 'archive',
-      verb: 'unarchived',
-      object: 'the workspace',
-      route: DANGER_ZONE_ROUTE,
-    });
     this.toasts.show(`${name} is active again`, { icon: 'archive-restore' });
   }
 }

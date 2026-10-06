@@ -58,7 +58,7 @@ export class WorkspaceOverviewComponent {
   protected readonly stats = computed(() =>
     overviewStats({
       people: workspacePeople(
-        this.workspace.members(),
+        this.workspace.memberDirectory(),
         this.workspace.currentUser(),
         this.workspace.loadStatus(),
       ),
@@ -70,7 +70,7 @@ export class WorkspaceOverviewComponent {
   protected readonly activity = computed(() => {
     const usersById = this.workspace.usersById();
     return this.activityState
-      .events()
+      .events({ category: 'activity' })
       .map((event) => overviewActivityItem(event, usersById, this.viewerId()));
   });
   protected readonly teams = computed(() => this.workspace.teams().map(overviewTeamRow));
@@ -82,9 +82,10 @@ export class WorkspaceOverviewComponent {
     const owner = this.workspace.user(current.ownerId);
     return workspaceDetails(current, owner, this.viewerId(), this.access().myRole);
   });
-  protected readonly locked = computed(
-    () => !this.access().canInvite && !this.access().canCreateTeams,
-  );
+  protected readonly locked = computed(() => {
+    const { canInvite, canCreateTeams, canCreateChannels } = this.access();
+    return !canInvite && !canCreateTeams && !canCreateChannels;
+  });
 
   protected retry(): void {
     void this.workspace.reload();

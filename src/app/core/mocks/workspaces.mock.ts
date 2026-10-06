@@ -1,3 +1,4 @@
+import { initialRolePermissions, RolePermissionMap } from '../models/permission';
 import { WorkspaceRole } from '../models/user';
 import {
   Workspace,
@@ -99,3 +100,10 @@ export const MOCK_WORKSPACE_PREFERENCES: WorkspacePreferenceMap = {
   w2: { ...BASE_WORKSPACE_PREFERENCES, domains: 'orbitstudio.design' },
   w3: { ...BASE_WORKSPACE_PREFERENCES, domains: 'kite.vc', requireTwoFactor: true },
 };
+
+export const MOCK_ROLE_PERMISSIONS: RolePermissionMap = Object.fromEntries(
+  Object.entries(MOCK_WORKSPACE_PREFERENCES).map(([workspaceId, preferences]) => [
+    workspaceId,
+    initialRolePermissions(preferences.whoCanInvite),
+  ]),
+);

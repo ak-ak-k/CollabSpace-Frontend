@@ -5,7 +5,6 @@ import { WorkspaceRole } from '../../core/models/user';
 import { roleWithArticle } from '../../core/models/workspace-role';
 import { DialogService } from '../../core/services/dialog.service';
 import { ToastService } from '../../core/services/toast.service';
-import { WorkspaceActivityState } from '../../core/state/workspace-activity.state';
 import { WorkspaceAdminState } from '../../core/state/workspace-admin.state';
 import { WorkspaceState } from '../../core/state/workspace.state';
 import { PersonActions } from '../../shared/components/person-panel/person-actions.service';
@@ -24,7 +23,7 @@ import {
   MemberMenuItem,
   memberMenuItems,
 } from './member-actions-view';
-import { MemberRow, MEMBERS_ROUTE } from './members-view';
+import { MemberRow } from './members-view';
 
 const PROFILE_ROUTE = '/profile';
 
@@ -32,7 +31,6 @@ const PROFILE_ROUTE = '/profile';
 export class MemberActions {
   private readonly workspace = inject(WorkspaceState);
   private readonly admin = inject(WorkspaceAdminState);
-  private readonly activity = inject(WorkspaceActivityState);
   private readonly people = inject(PersonActions);
   private readonly personPanel = inject(PersonPanelService);
   private readonly dialogs = inject(DialogService);
@@ -110,16 +108,10 @@ export class MemberActions {
     if (!role) {
       return;
     }
-    const eventId = this.activity.record({
-      kind: 'remove',
-      verb: 'removed',
-      object: member.name,
-      route: MEMBERS_ROUTE,
-    });
     this.toasts.show(`${member.name} removed from ${workspaceName}`, {
       icon: 'user-minus',
       actionLabel: 'Undo',
-      onAction: () => void this.undoRemove(workspaceId, userId, role, eventId),
+      onAction: () => void this.admin.restoreMember(userId, role, workspaceId),
     });
   }
 
@@ -129,24 +121,7 @@ export class MemberActions {
     if (!member || !changed) {
       return;
     }
-    const withArticle = roleWithArticle(role);
-    this.activity.record({
-      kind: 'role',
-      verb: 'made',
-      object: `${member.name} ${withArticle}`,
-      route: MEMBERS_ROUTE,
-    });
-    this.toasts.show(`${member.name} is now ${withArticle}`, { icon: 'shield-check' });
-  }
-
-  private async undoRemove(
-    workspaceId: string,
-    userId: string,
-    role: WorkspaceRole,
-    eventId: string,
-  ): Promise<void> {
-    this.activity.remove(eventId);
-    await this.admin.restoreMember(userId, role, workspaceId);
+    this.toasts.show(`${member.name} is now ${roleWithArticle(role)}`, { icon: 'shield-check' });
   }
 
   private workspaceName(): string {

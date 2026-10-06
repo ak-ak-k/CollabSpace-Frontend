@@ -29,7 +29,14 @@
     </header>
   }
 
-  <app-tabs label="Workspace sections" gap="lg" size="lg" [tabs]="tabs()" [active]="activeTab()" />
+  <app-tabs
+    label="Workspace sections"
+    gap="lg"
+    size="lg"
+    wrap
+    [tabs]="tabs()"
+    [active]="activeTab()"
+  />
 
   <router-outlet />
 </div>

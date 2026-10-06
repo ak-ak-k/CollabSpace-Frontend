@@ -8,9 +8,13 @@
         <span class="activity__body">
           <span class="activity__sentence">
             {{ item.verb }}
-            <a class="activity__object" [routerLink]="item.link" (click)="navigate.emit()">{{
-              item.object
-            }}</a>
+            @if (item.link) {
+              <a class="activity__object" [routerLink]="item.link" (click)="navigate.emit()">{{
+                item.object
+              }}</a>
+            } @else {
+              <span class="activity__object">{{ item.object }}</span>
+            }
           </span>
           @if (item.snippet) {
             <span class="activity__snippet">“{{ item.snippet }}”</span>

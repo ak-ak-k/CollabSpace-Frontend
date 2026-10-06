@@ -1,21 +1,16 @@
 import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { WorkspaceRole } from '../../../../core/models/user';
-import { WORKSPACE_ROLE_DETAILS, WORKSPACE_ROLES } from '../../../../core/models/workspace-role';
+import { WORKSPACE_ROLE_DETAILS } from '../../../../core/models/workspace-role';
 import { BreakpointService } from '../../../../core/services/breakpoint.service';
-import { PreferencesState } from '../../../../core/state/preferences.state';
 import { WorkspaceState } from '../../../../core/state/workspace.state';
 import { formatCount } from '../../../../shared/pipes/count.pipe';
 import { CardComponent } from '../../../../shared/ui/card/card.component';
 import { IconComponent } from '../../../../shared/ui/icon/icon.component';
 import { IconName } from '../../../../shared/ui/icon/icon-registry';
 import { TableComponent } from '../../../../shared/ui/table/table.component';
+import { RolePermissionView, rolePermissionListOf } from '../role-permissions-view';
 import { WorkspacePermissionMatrixComponent } from '../workspace-permission-matrix/workspace-permission-matrix.component';
-
-interface RolePermissionView {
-  readonly label: string;
-  readonly allowed: boolean;
-}
 
 interface RoleRow {
   readonly role: WorkspaceRole;
@@ -58,7 +53,6 @@ const ROLE_FILTERS: Record<WorkspaceRole, string> = {
 })
 export class WorkspaceSettingsRolesComponent {
   private readonly workspace = inject(WorkspaceState);
-  private readonly permissions = inject(PreferencesState).rolePermissions;
 
   protected readonly isMobile = inject(BreakpointService).isMobile;
   protected readonly rolesCaption = computed(
@@ -66,6 +60,7 @@ export class WorkspaceSettingsRolesComponent {
   );
   protected readonly rows = computed<readonly RoleRow[]>(() => {
     const members = this.workspace.members();
+    const rolePermissions = this.workspace.rolePermissions();
     return WORKSPACE_ROLE_DETAILS.map(({ role, label, description }) => {
       const count = members.filter((member) => member.role === role).length;
       return {
@@ -78,13 +73,8 @@ export class WorkspaceSettingsRolesComponent {
         countAria: `View ${formatCount(count, role)}`,
         link: `/workspace/members/${ROLE_FILTERS[role]}`,
         permissionsLabel: `What ${role}s can do`,
-        permissions: this.permissionsOf(role),
+        permissions: rolePermissionListOf(role, rolePermissions),
       };
     });
   });
-
-  private permissionsOf(role: WorkspaceRole): readonly RolePermissionView[] {
-    const index = WORKSPACE_ROLES.indexOf(role);
-    return this.permissions.map(({ label, allowed }) => ({ label, allowed: allowed[index] }));
-  }
 }

@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { booleanAttribute, Component, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
@@ -14,5 +14,6 @@ import { CountPipe } from '../../../shared/pipes/count.pipe';
 })
 export class TeamChannelsComponent {
   readonly channels = input.required<readonly ChannelRowView[]>();
+  readonly canCreate = input(false, { transform: booleanAttribute });
   readonly createChannel = output<void>();
 }

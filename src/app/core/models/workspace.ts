@@ -67,10 +67,17 @@ export interface WorkspaceSummary extends Workspace {
 
 export interface WorkspaceAccess {
   readonly myRole: WorkspaceRole;
-  readonly canManage: boolean;
   readonly isOwner: boolean;
+  readonly isGuest: boolean;
+  readonly canManage: boolean;
   readonly canInvite: boolean;
+  readonly canManageMembers: boolean;
+  readonly canManageRoles: boolean;
+  readonly canManageIntegrations: boolean;
   readonly canCreateTeams: boolean;
+  readonly canCreateChannels: boolean;
+  readonly canCreateTasks: boolean;
+  readonly canViewAudit: boolean;
 }
 
 export interface WorkspaceScoped {

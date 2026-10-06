@@ -143,6 +143,8 @@ export class CreateChannelDialogComponent {
       verb: 'created',
       object: `#${name} in ${team.name}`,
       route,
+      teamId,
+      entity: { type: 'channel', id: channel.id },
     });
     this.dialogRef.close();
     await this.router.navigateByUrl(route);

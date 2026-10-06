@@ -1,29 +1,37 @@
 import { ActivityEvent } from '../models/activity';
 import { Channel } from '../models/channel';
 import { Message } from '../models/message';
-import { WorkspaceActivityEvent } from '../models/workspace-activity';
 import { personActivityOf, PersonActivitySources } from './person-activity';
 
-const teamEvent = (id: string, actorId: string, occurredAt: number): ActivityEvent => ({
+const fileEvent = (id: string, actorId: string, occurredAt: number): ActivityEvent => ({
   id,
+  workspaceId: 'ws1',
   actorId,
   verb: 'uploaded',
   object: `${id}.fig`,
   occurredAt,
-  teamId: 't1',
   kind: 'file',
   route: '/files',
+  category: 'activity',
+  entity: null,
+  teamId: 't1',
+  change: null,
 });
 
-const workspaceEvent: WorkspaceActivityEvent = {
-  id: 'w1',
-  workspaceId: 'ws1',
-  actorId: 'u1',
+const joinEvent: ActivityEvent = {
+  ...fileEvent('w1', 'u1', 50),
   verb: 'joined',
   object: 'the Design team',
-  occurredAt: 50,
   kind: 'join',
   route: '/teams/t1',
+  teamId: null,
+};
+
+const auditEvent: ActivityEvent = {
+  ...fileEvent('audit', 'u1', 95),
+  verb: 'invited',
+  kind: 'invite',
+  category: 'audit',
 };
 
 const channel = (id: string, isPrivate: boolean): Channel => ({
@@ -52,8 +60,13 @@ const message = (id: string, authorId: string, text: string, sentAt: number): Me
 });
 
 const sources: PersonActivitySources = {
-  teamActivity: [teamEvent('a1', 'u1', 10), teamEvent('a2', 'u2', 90), teamEvent('a3', 'u1', 70)],
-  workspaceActivity: [workspaceEvent],
+  events: [
+    fileEvent('a1', 'u1', 10),
+    fileEvent('a2', 'u2', 90),
+    fileEvent('a3', 'u1', 70),
+    joinEvent,
+    auditEvent,
+  ],
   channels: [channel('general', false), channel('secret', true)],
   messages: {
     general: [message('m1', 'u1', 'First', 20), message('m2', 'u1', 'Latest', 60)],
@@ -62,7 +75,7 @@ const sources: PersonActivitySources = {
 };
 
 describe('person activity', () => {
-  it('merges team, workspace and public channel activity newest first', () => {
+  it('merges their activity events and public channel posts newest first, without audit events', () => {
     expect(personActivityOf('u1', sources).map((item) => item.id)).toEqual([
       'a3',
       'm2',

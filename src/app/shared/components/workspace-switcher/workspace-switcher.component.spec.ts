@@ -26,26 +26,36 @@ const summaryOf = (id: string, name: string, current: boolean): WorkspaceSummary
   current,
 });
 
-const accessOf = (canInvite: boolean): WorkspaceAccess => ({
-  myRole: 'owner',
-  canManage: true,
-  isOwner: true,
+const accessOf = (canInvite: boolean, isGuest = false): WorkspaceAccess => ({
+  myRole: isGuest ? 'guest' : 'owner',
+  isOwner: !isGuest,
+  isGuest,
+  canManage: !isGuest,
   canInvite,
-  canCreateTeams: true,
+  canManageMembers: !isGuest,
+  canManageRoles: !isGuest,
+  canManageIntegrations: !isGuest,
+  canCreateTeams: !isGuest,
+  canCreateChannels: !isGuest,
+  canCreateTasks: !isGuest,
+  canViewAudit: !isGuest,
 });
 
 describe('WorkspaceSwitcherComponent', () => {
   const northstar = summaryOf('w1', 'Northstar Labs', true);
   const orbit = summaryOf('w2', 'Orbit Studio', false);
 
-  const render = async (canInvite = true) => {
+  const render = async (canInvite = true, isGuest = false) => {
     const switchTo = vi.fn();
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
         {
           provide: WorkspaceState,
-          useValue: { summaries: signal([northstar, orbit]), access: signal(accessOf(canInvite)) },
+          useValue: {
+            summaries: signal([northstar, orbit]),
+            access: signal(accessOf(canInvite, isGuest)),
+          },
         },
         { provide: WorkspaceSwitch, useValue: { switchTo } },
         {
@@ -93,5 +103,15 @@ describe('WorkspaceSwitcherComponent', () => {
 
     expect(labels).not.toContain('Invite people');
     expect(labels).toContain('Create workspace');
+  });
+
+  it('hides workspace settings from guests', async () => {
+    const { element } = await render(false, true);
+    const labels = [...element.querySelectorAll('[role="menuitem"]')].map((item) =>
+      item.textContent?.trim(),
+    );
+
+    expect(labels).not.toContain('Workspace settings');
+    expect(labels).toContain('Workspace overview');
   });
 });

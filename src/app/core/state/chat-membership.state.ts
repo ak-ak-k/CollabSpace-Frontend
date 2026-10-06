@@ -1,13 +1,16 @@
 import { inject, Service, WritableSignal } from '@angular/core';
 import { ChatData } from '../data/chat.data';
 import { MemberConversation } from '../models/conversation';
+import { ActivityLogState } from './activity-log.state';
 import { setIn } from './chat-mutations';
 import { ChatState } from './chat.state';
+import { channelArchiveEntry } from './team-activity';
 
 @Service()
 export class ChatMembershipState {
   private readonly chat = inject(ChatState);
   private readonly data = inject(ChatData);
+  private readonly activity = inject(ActivityLogState);
 
   leaveChannel(conversationId: string): void {
     this.setLeft(conversationId, true);
@@ -79,6 +82,10 @@ export class ChatMembershipState {
 
   private setArchived(conversationId: string, archived: boolean): void {
     this.toggle(this.chat.archivedIds, conversationId, archived);
+    const channel = this.chat.conversation(conversationId);
+    if (channel?.type === 'channel') {
+      this.activity.record(channelArchiveEntry(channel, archived));
+    }
     void this.data.setArchived(conversationId, archived);
   }
 

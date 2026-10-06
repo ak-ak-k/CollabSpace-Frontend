@@ -1,6 +1,10 @@
 <div class="workspace-settings">
   @if (showNav()) {
-    <app-workspace-settings-nav [layout]="navLayout()" [current]="current()?.id ?? null" />
+    <app-workspace-settings-nav
+      [layout]="navLayout()"
+      [current]="current()?.id ?? null"
+      [sections]="sections()"
+    />
   }
 
   @if (current(); as section) {

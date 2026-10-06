@@ -6,25 +6,32 @@
     <thead>
       <tr>
         <th scope="col">Permission</th>
-        @for (role of roleNames; track role) {
-          <th scope="col" class="matrix__role">{{ role }}</th>
+        @for (role of roles; track role.role) {
+          <th scope="col" class="matrix__role">{{ role.label }}</th>
         }
       </tr>
     </thead>
     <tbody>
-      @for (permission of permissions; track permission.label) {
+      @for (row of rows(); track row.id) {
         <tr>
-          <th scope="row" class="matrix__permission">{{ permission.label }}</th>
-          @for (allowed of permission.allowed; track $index) {
+          <th scope="row" class="matrix__permission">{{ row.label }}</th>
+          @for (cell of row.cells; track cell.role) {
             <td class="matrix__cell">
-              <span
-                class="permission-mark"
-                [class.permission-mark--allowed]="allowed"
-                role="img"
-                [attr.aria-label]="permissionLabelOf(roleNames[$index], permission.label, allowed)"
+              <button
+                type="button"
+                role="switch"
+                class="permission-switch"
+                [class.permission-switch--allowed]="cell.allowed"
+                [class.permission-switch--locked]="cell.locked"
+                [class.permission-switch--editable]="cell.editable"
+                [attr.aria-checked]="cell.allowed"
+                [attr.aria-disabled]="cell.editable ? null : 'true'"
+                [attr.aria-label]="cell.label"
+                [appTooltip]="cell.hint"
+                (click)="toggle(cell)"
               >
-                <app-icon [name]="allowed ? 'check' : 'x'" [size]="14" />
-              </span>
+                <app-icon [name]="cell.allowed ? 'check' : 'x'" [size]="14" />
+              </button>
             </td>
           }
         </tr>

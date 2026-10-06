@@ -1,6 +1,7 @@
 import { computed, effect, inject, Service, signal, untracked } from '@angular/core';
 import { FileChanges, FilesData, NewFile } from '../data/files.data';
 import { CURRENT_USER_ID } from '../mocks/users.mock';
+import { ActivityChange } from '../models/activity';
 import {
   extensionOf,
   FileDraft,
@@ -10,7 +11,9 @@ import {
   UPLOAD_SOURCE,
 } from '../models/file-item';
 import { canSeeFile, FileAccess } from '../models/file-source';
+import { ActivityLogState } from './activity-log.state';
 import { DataModeState } from './data-mode.state';
+import { fileActivityEntry, FileActivityVerb } from './file-activity';
 import { Loadable, settledStatus } from './loadable';
 import { WorkspaceState } from './workspace.state';
 
@@ -27,6 +30,7 @@ export class FileState {
   private readonly data = inject(FilesData);
   private readonly dataMode = inject(DataModeState);
   private readonly workspace = inject(WorkspaceState);
+  private readonly activity = inject(ActivityLogState);
 
   private readonly allFiles = signal<readonly FileItem[]>([]);
 
@@ -104,6 +108,7 @@ export class FileState {
     const previous = this.file(id);
     if (previous) {
       this.change(id, { name, modifiedAt: Date.now() });
+      this.log('renamed', { ...previous, name }, { from: previous.name, to: name });
     }
     return previous;
   }
@@ -112,6 +117,7 @@ export class FileState {
     const removed = this.file(id);
     if (removed) {
       this.allFiles.update((files) => files.filter((file) => file.id !== id));
+      this.log('deleted', removed);
       void this.data.deleteFile(id);
     }
     return removed;
@@ -119,20 +125,23 @@ export class FileState {
 
   restore(file: FileItem): void {
     this.allFiles.update((files) => [file, ...files.filter((current) => current.id !== file.id)]);
+    this.log('restored', file);
     void this.data.restoreFile(file);
   }
 
-  upload(draft: string | TeamFileDraft): Promise<FileItem> {
+  async upload(draft: string | TeamFileDraft): Promise<FileItem> {
     const upload = typeof draft === 'string' ? { name: draft, ...QUICK_UPLOAD_SIZE } : draft;
     const teamId = upload.teamId ?? null;
     const teamName = teamId ? this.workspace.team(teamId)?.name : null;
-    return this.add(upload, {
+    const file = await this.add(upload, {
       source: UPLOAD_SOURCE,
       teamId,
       location: teamName ?? PRIVATE_LOCATION,
       shared: !!teamName,
       taskIds: [],
     });
+    this.log('uploaded', file);
+    return file;
   }
 
   attachToTask(taskId: string, draft: TeamFileDraft): Promise<FileItem> {
@@ -185,6 +194,10 @@ export class FileState {
     });
     this.allFiles.update((files) => [file, ...files]);
     return file;
+  }
+
+  private log(verb: FileActivityVerb, file: FileItem, change?: ActivityChange): void {
+    this.activity.record(fileActivityEntry(verb, file, change), file.workspaceId);
   }
 
   private change(id: string, changes: FileChanges): void {

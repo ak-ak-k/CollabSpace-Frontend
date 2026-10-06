@@ -1,7 +1,20 @@
-import { ActivityEvent } from '../models/activity';
+import { ActivityEvent, TeamActivityKind } from '../models/activity';
 import { minutesAgo } from './mock-clock';
 
-export const MOCK_ACTIVITY: readonly ActivityEvent[] = [
+interface TeamActivitySeed {
+  readonly id: string;
+  readonly actorId: string;
+  readonly verb: string;
+  readonly object: string;
+  readonly occurredAt: number;
+  readonly teamId: string;
+  readonly kind: TeamActivityKind;
+  readonly route: string;
+}
+
+const TEAM_ACTIVITY_WORKSPACE_ID = 'w1';
+
+const TEAM_ACTIVITY_SEEDS: readonly TeamActivitySeed[] = [
   {
     id: 'a1',
     actorId: 'u1',
@@ -103,3 +116,13 @@ export const MOCK_ACTIVITY: readonly ActivityEvent[] = [
     route: '/teams/t-platform/channels/c-api',
   },
 ];
+
+const toTeamEvent = (seed: TeamActivitySeed): ActivityEvent => ({
+  ...seed,
+  workspaceId: TEAM_ACTIVITY_WORKSPACE_ID,
+  category: 'activity',
+  entity: null,
+  change: null,
+});
+
+export const MOCK_TEAM_ACTIVITY: readonly ActivityEvent[] = TEAM_ACTIVITY_SEEDS.map(toTeamEvent);

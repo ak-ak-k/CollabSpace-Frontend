@@ -11,9 +11,10 @@ import { TabItem, TabsComponent } from '../../../shared/ui/tabs/tabs.component';
 import { TagComponent } from '../../../shared/ui/tag/tag.component';
 import { WORKSPACE_ROUTE } from '../workspace-actions.service';
 
-type WorkspaceTab = 'overview' | 'members' | 'settings';
+type WorkspaceTab = 'overview' | 'members' | 'activity' | 'settings';
 
 const MEMBERS_ROUTE = `${WORKSPACE_ROUTE}/members`;
+const ACTIVITY_ROUTE = `${WORKSPACE_ROUTE}/activity`;
 const SETTINGS_ROUTE = `${WORKSPACE_ROUTE}/settings`;
 const GENERAL_SETTINGS_ROUTE = `${SETTINGS_ROUTE}/general`;
 
@@ -24,12 +25,14 @@ const ROLE_ICONS = {
   guest: 'user',
 } as const;
 
-const tabOf = (path: string): WorkspaceTab => {
-  if (path.startsWith(MEMBERS_ROUTE)) {
-    return 'members';
-  }
-  return path.startsWith(SETTINGS_ROUTE) ? 'settings' : 'overview';
-};
+const SECTION_TABS: readonly (readonly [route: string, tab: WorkspaceTab])[] = [
+  [MEMBERS_ROUTE, 'members'],
+  [ACTIVITY_ROUTE, 'activity'],
+  [SETTINGS_ROUTE, 'settings'],
+];
+
+const tabOf = (path: string): WorkspaceTab =>
+  SECTION_TABS.find(([route]) => path.startsWith(route))?.[1] ?? 'overview';
 
 @Component({
   selector: 'app-workspace-page',
@@ -51,19 +54,21 @@ export class WorkspacePageComponent {
   protected readonly activeTab = computed(() => tabOf(this.route.path()));
   protected readonly tabs = computed<readonly TabItem[]>(() => {
     const ready = this.state.loadStatus() === 'ready' || this.state.loadStatus() === 'empty';
+    const settings: TabItem = {
+      id: 'settings',
+      label: 'Settings',
+      link: this.breakpoint.isMobile() ? SETTINGS_ROUTE : GENERAL_SETTINGS_ROUTE,
+    };
     return [
       { id: 'overview', label: 'Overview', link: WORKSPACE_ROUTE },
       {
         id: 'members',
         label: 'Members',
         link: MEMBERS_ROUTE,
-        count: ready ? this.state.members().length : undefined,
+        count: ready ? this.state.memberDirectory().length : undefined,
       },
-      {
-        id: 'settings',
-        label: 'Settings',
-        link: this.breakpoint.isMobile() ? SETTINGS_ROUTE : GENERAL_SETTINGS_ROUTE,
-      },
+      { id: 'activity', label: 'Activity', link: ACTIVITY_ROUTE },
+      ...(this.state.access().isGuest ? [] : [settings]),
     ];
   });
 }

@@ -43,3 +43,7 @@
     color: var(--text-primary);
   }
 }
+
+:host(.danger-zone--actions-end) .danger-zone {
+  align-items: flex-end;
+}

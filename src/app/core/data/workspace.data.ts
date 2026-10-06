@@ -1,12 +1,14 @@
 import { inject, Service } from '@angular/core';
-import { MOCK_WORKSPACE_ACTIVITY } from '../mocks/workspace-activity.mock';
 import {
   BASE_WORKSPACE_PREFERENCES,
+  MOCK_ROLE_PERMISSIONS,
   MOCK_WORKSPACE_PREFERENCES,
   MOCK_WORKSPACE_ROSTERS,
   MOCK_WORKSPACES,
 } from '../mocks/workspaces.mock';
+import { initialRolePermissions, RolePermissionMap, RolePermissions } from '../models/permission';
 import { WorkspaceRole } from '../models/user';
+import { withTransferredOwnership } from '../models/workspace-role';
 import {
   NewWorkspace,
   Workspace,
@@ -16,19 +18,20 @@ import {
   WorkspaceRoster,
   WorkspaceRosters,
 } from '../models/workspace';
-import { WorkspaceActivityEvent } from '../models/workspace-activity';
 import { MockRequest } from './mock-request';
 
 export interface WorkspaceCatalog {
   readonly workspaces: readonly Workspace[];
   readonly rosters: WorkspaceRosters;
   readonly preferences: WorkspacePreferenceMap;
+  readonly rolePermissions: RolePermissionMap;
 }
 
 export interface CreatedWorkspace {
   readonly workspace: Workspace;
   readonly roster: WorkspaceRoster;
   readonly preferences: WorkspacePreferences;
+  readonly rolePermissions: RolePermissions;
 }
 
 const CODE_LENGTH = 2;
@@ -50,15 +53,11 @@ export class WorkspaceData {
   private workspaces = [...MOCK_WORKSPACES];
   private rosters: WorkspaceRosters = MOCK_WORKSPACE_ROSTERS;
   private preferences: WorkspacePreferenceMap = MOCK_WORKSPACE_PREFERENCES;
-  private activity = [...MOCK_WORKSPACE_ACTIVITY];
+  private rolePermissions: RolePermissionMap = MOCK_ROLE_PERMISSIONS;
   private createdWorkspaces = 0;
 
   getCatalog(): Promise<WorkspaceCatalog> {
     return this.request.read(() => this.catalog(), this.catalog());
-  }
-
-  getActivity(): Promise<readonly WorkspaceActivityEvent[]> {
-    return this.request.read(() => this.activity, []);
   }
 
   createWorkspace(draft: NewWorkspace, ownerId: string): Promise<CreatedWorkspace> {
@@ -79,10 +78,12 @@ export class WorkspaceData {
       };
       const roster: WorkspaceRoster = { [ownerId]: 'owner' };
       const preferences = BASE_WORKSPACE_PREFERENCES;
+      const rolePermissions = initialRolePermissions(preferences.whoCanInvite);
       this.workspaces = [...this.workspaces, workspace];
       this.rosters = { ...this.rosters, [workspace.id]: roster };
       this.preferences = { ...this.preferences, [workspace.id]: preferences };
-      return { workspace, roster, preferences };
+      this.rolePermissions = { ...this.rolePermissions, [workspace.id]: rolePermissions };
+      return { workspace, roster, preferences, rolePermissions };
     });
   }
 
@@ -108,26 +109,34 @@ export class WorkspaceData {
     });
   }
 
+  updateRolePermissions(
+    workspaceId: string,
+    rolePermissions: RolePermissions,
+  ): Promise<RolePermissions> {
+    return this.request.write(() => {
+      this.rolePermissions = { ...this.rolePermissions, [workspaceId]: rolePermissions };
+      return rolePermissions;
+    });
+  }
+
   setRole(workspaceId: string, userId: string, role: WorkspaceRole): Promise<WorkspaceRoster> {
     return this.writeRoster(workspaceId, (roster) => ({ ...roster, [userId]: role }));
+  }
+
+  transferOwnership(
+    workspaceId: string,
+    newOwnerId: string,
+    previousOwnerId: string,
+  ): Promise<WorkspaceRoster> {
+    return this.writeRoster(workspaceId, (roster) =>
+      withTransferredOwnership(roster, newOwnerId, previousOwnerId),
+    );
   }
 
   removeMember(workspaceId: string, userId: string): Promise<WorkspaceRoster> {
     return this.writeRoster(workspaceId, (roster) =>
       Object.fromEntries(Object.entries(roster).filter(([memberId]) => memberId !== userId)),
     );
-  }
-
-  recordActivity(event: WorkspaceActivityEvent): Promise<void> {
-    return this.request.write(() => {
-      this.activity = [event, ...this.activity];
-    });
-  }
-
-  removeActivity(eventId: string): Promise<void> {
-    return this.request.write(() => {
-      this.activity = this.activity.filter((event) => event.id !== eventId);
-    });
   }
 
   private writeRoster(
@@ -142,7 +151,12 @@ export class WorkspaceData {
   }
 
   private catalog(): WorkspaceCatalog {
-    return { workspaces: this.workspaces, rosters: this.rosters, preferences: this.preferences };
+    return {
+      workspaces: this.workspaces,
+      rosters: this.rosters,
+      preferences: this.preferences,
+      rolePermissions: this.rolePermissions,
+    };
   }
 
   private requireWorkspace(workspaceId: string): Workspace {

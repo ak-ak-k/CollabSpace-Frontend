@@ -1,5 +1,11 @@
 import { User } from '../../core/models/user';
-import { activeLabelOf, memberFilterChips, memberFilterOf, visibleMembers } from './members-view';
+import {
+  activeLabelOf,
+  allowedMemberFilter,
+  memberFilterChips,
+  memberFilterOf,
+  visibleMembers,
+} from './members-view';
 import { memberMenuItems } from './member-actions-view';
 
 const NOW = new Date(2026, 9, 3, 15, 0).getTime();
@@ -30,6 +36,19 @@ describe('members view', () => {
     expect(memberFilterOf('guests')).toBe('guests');
     expect(memberFilterOf('nobody')).toBe('all');
     expect(memberFilterOf(undefined)).toBe('all');
+    expect(memberFilterOf('invited')).toBe('invited');
+  });
+
+  it('adds the Invited chip only for people who can invite', () => {
+    expect(memberFilterChips(people).map((chip) => chip.filter)).not.toContain('invited');
+    expect(memberFilterChips(people, 2).at(-1)).toEqual({
+      filter: 'invited',
+      label: 'Invited',
+      link: '/workspace/members/invited',
+      count: 2,
+    });
+    expect(allowedMemberFilter('invited', false)).toBe('all');
+    expect(allowedMemberFilter('invited', true)).toBe('invited');
   });
 
   it('counts each filter and sorts matches by name', () => {

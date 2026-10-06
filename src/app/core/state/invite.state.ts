@@ -3,6 +3,7 @@ import { InvitesData } from '../data/invites.data';
 import { CURRENT_USER_ID } from '../mocks/users.mock';
 import { WorkspaceRole } from '../models/user';
 import { WorkspaceInvite } from '../models/workspace-invite';
+import { ActivityLogState } from './activity-log.state';
 import { DataModeState } from './data-mode.state';
 import { Loadable, settledStatus } from './loadable';
 import { WorkspaceState } from './workspace.state';
@@ -19,6 +20,11 @@ export interface InviteOutcome {
   readonly resent: readonly WorkspaceInvite[];
 }
 
+type InviteAuditVerb =
+  'resent the invitation to' | 'revoked the invitation to' | 'restored the invitation to';
+
+const INVITED_ROUTE = '/workspace/members/invited';
+
 const sameEmail = (first: string, second: string): boolean =>
   first.toLowerCase() === second.toLowerCase();
 
@@ -27,6 +33,7 @@ export class InviteState {
   private readonly data = inject(InvitesData);
   private readonly dataMode = inject(DataModeState);
   private readonly workspace = inject(WorkspaceState);
+  private readonly activity = inject(ActivityLogState);
 
   private readonly allInvites = signal<readonly WorkspaceInvite[]>([]);
   private createdInvites = 0;
@@ -84,6 +91,7 @@ export class InviteState {
       return null;
     }
     const resent = { ...invite, invitedAt: Date.now(), invitedById: CURRENT_USER_ID };
+    this.log('resent the invitation to', invite);
     await this.save([resent]);
     return resent;
   }
@@ -94,11 +102,13 @@ export class InviteState {
       return null;
     }
     this.allInvites.update((invites) => invites.filter((candidate) => candidate.id !== inviteId));
+    this.log('revoked the invitation to', invite);
     await this.data.revokeInvite(inviteId);
     return invite;
   }
 
   restore(invite: WorkspaceInvite): Promise<void> {
+    this.log('restored the invitation to', invite);
     return this.save([invite]);
   }
 
@@ -108,6 +118,13 @@ export class InviteState {
       await this.save(queued.map((invite) => ({ ...invite, queued: false })));
     }
     return queued.length;
+  }
+
+  private log(verb: InviteAuditVerb, invite: WorkspaceInvite): void {
+    this.activity.record(
+      { kind: 'invite', verb, object: invite.email, route: INVITED_ROUTE },
+      invite.workspaceId,
+    );
   }
 
   private find(inviteId: string): WorkspaceInvite | null {

@@ -7,6 +7,7 @@ import { ChatState } from '../../core/state/chat.state';
 import { FileState } from '../../core/state/file.state';
 import { NotificationState } from '../../core/state/notification.state';
 import { TaskState } from '../../core/state/task.state';
+import { WorkspaceActivityState } from '../../core/state/workspace-activity.state';
 import { WorkspaceState } from '../../core/state/workspace.state';
 import { TaskActions } from '../tasks/task-actions.service';
 import { WorkspaceActions } from '../workspace/workspace-actions.service';
@@ -56,6 +57,7 @@ const emptyWhenNone = (status: LoadStatus, count: number): LoadStatus =>
 })
 export class DashboardComponent {
   private readonly workspace = inject(WorkspaceState);
+  private readonly activityState = inject(WorkspaceActivityState);
   private readonly chat = inject(ChatState);
   private readonly tasks = inject(TaskState);
   private readonly notifications = inject(NotificationState);
@@ -100,10 +102,15 @@ export class DashboardComponent {
   protected readonly dueToday = computed(() => tasksDueToday(this.openTasks()));
   protected readonly teams = computed(() => toTeamActivity(this.workspace.teams()));
   protected readonly activity = computed(() =>
-    toActivity(this.workspace.recentActivity(), (userId) => this.workspace.user(userId)),
+    toActivity(this.activityState.events({ category: 'activity' }), (userId) =>
+      this.workspace.user(userId),
+    ),
   );
   protected readonly activityStatus = computed(() =>
-    emptyWhenNone(this.workspace.status(), this.activity().length),
+    emptyWhenNone(
+      firstUnsettled([this.workspace.status(), this.activityState.status()]),
+      this.activity().length,
+    ),
   );
   protected readonly stats = computed(() =>
     toStats({
@@ -139,6 +146,11 @@ export class DashboardComponent {
 
   protected reloadWorkspace(): void {
     void this.workspace.reload();
+  }
+
+  protected reloadActivity(): void {
+    void this.workspace.reload();
+    void this.activityState.reload();
   }
 
   protected reloadConversations(): void {

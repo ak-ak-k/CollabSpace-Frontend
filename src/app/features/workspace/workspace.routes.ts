@@ -1,4 +1,6 @@
-import { Routes } from '@angular/router';
+import { Route, Routes } from '@angular/router';
+import { workspaceAccessGuard } from '../../core/guards/workspace-access.guard';
+import { canOpenWorkspaceSettings } from './workspace-settings/workspace-settings-sections';
 
 const loadOverview = () =>
   import('./workspace-overview/workspace-overview.component').then(
@@ -10,10 +12,29 @@ const loadMembers = () =>
     (module) => module.WorkspaceMembersComponent,
   );
 
+const loadActivity = () =>
+  import('./workspace-activity/workspace-activity.component').then(
+    (module) => module.WorkspaceActivityComponent,
+  );
+
 const loadSettings = () =>
   import('./workspace-settings/workspace-settings.component').then(
     (module) => module.WorkspaceSettingsComponent,
   );
+
+const settingsGuard = workspaceAccessGuard((workspace, route) =>
+  canOpenWorkspaceSettings(
+    route.paramMap.get('section'),
+    workspace.access().isGuest,
+    (permission) => workspace.can(permission),
+  ),
+);
+
+const guardedSettings: Omit<Route, 'path'> = {
+  loadComponent: loadSettings,
+  canActivate: [settingsGuard],
+  runGuardsAndResolvers: 'always',
+};
 
 export const WORKSPACE_ROUTES: Routes = [
   {
@@ -26,8 +47,9 @@ export const WORKSPACE_ROUTES: Routes = [
       { path: '', loadComponent: loadOverview },
       { path: 'members', loadComponent: loadMembers },
       { path: 'members/:filter', loadComponent: loadMembers },
-      { path: 'settings', loadComponent: loadSettings },
-      { path: 'settings/:section', loadComponent: loadSettings },
+      { path: 'activity', loadComponent: loadActivity },
+      { path: 'settings', ...guardedSettings },
+      { path: 'settings/:section', ...guardedSettings },
       { path: '**', redirectTo: '' },
     ],
   },

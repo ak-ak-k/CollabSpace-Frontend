@@ -18,7 +18,7 @@
       @for (event of shown(); track event.id) {
         <li class="event">
           <app-avatar
-            [name]="event.actorName"
+            [name]="event.avatarName"
             [text]="event.avatarText"
             [seed]="event.seed"
             [size]="32"
@@ -27,7 +27,11 @@
             <span class="event__sentence">
               <strong class="event__actor">{{ event.actorName }}</strong>
               {{ event.verb }}
-              <a class="event__object" [routerLink]="event.route">{{ event.object }}</a>
+              @if (event.route) {
+                <a class="event__object" [routerLink]="linkTo(event.route)">{{ event.object }}</a>
+              } @else {
+                <span class="event__object">{{ event.object }}</span>
+              }
             </span>
             <span class="event__meta">
               <app-icon [name]="event.icon" [size]="13" />
@@ -37,17 +41,10 @@
         </li>
       }
     </ol>
-    @if (canExpand()) {
-      <button
-        appButton
-        type="button"
-        variant="ghost"
-        class="events__toggle"
-        [attr.aria-expanded]="expanded()"
-        (click)="toggle()"
-      >
-        {{ toggleLabel() }}
-      </button>
-    }
   }
+
+  <a appButton variant="ghost" class="events__all" [routerLink]="activityRoute">
+    View all activity
+    <app-icon name="arrow-right" [size]="14" />
+  </a>
 </section>

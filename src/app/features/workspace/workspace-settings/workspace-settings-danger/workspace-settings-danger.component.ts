@@ -8,22 +8,25 @@ import { formatDate } from '../../../../shared/pipes/time-format';
 import { ButtonComponent } from '../../../../shared/ui/button/button.component';
 import { IconComponent } from '../../../../shared/ui/icon/icon.component';
 import { DangerZoneComponent } from '../../../settings/danger-zone/danger-zone.component';
-import { WorkspacePreferenceUpdates } from '../workspace-preference-updates.service';
 import { WorkspaceSettingsNoteComponent } from '../workspace-settings-note/workspace-settings-note.component';
 import { ownerOnlyNoteOf } from '../workspace-settings-view';
-
-const WORKSPACE_OBJECT = 'the workspace';
+import { WorkspaceTransferOwnershipComponent } from '../workspace-transfer-ownership/workspace-transfer-ownership.component';
 
 @Component({
   selector: 'app-workspace-settings-danger',
-  imports: [ButtonComponent, DangerZoneComponent, IconComponent, WorkspaceSettingsNoteComponent],
+  imports: [
+    ButtonComponent,
+    DangerZoneComponent,
+    IconComponent,
+    WorkspaceSettingsNoteComponent,
+    WorkspaceTransferOwnershipComponent,
+  ],
   templateUrl: './workspace-settings-danger.component.html',
   styleUrl: './workspace-settings-danger.component.scss',
 })
 export class WorkspaceSettingsDangerComponent {
   private readonly workspace = inject(WorkspaceState);
   private readonly admin = inject(WorkspaceAdminState);
-  private readonly updates = inject(WorkspacePreferenceUpdates);
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
 
@@ -63,17 +66,15 @@ export class WorkspaceSettingsDangerComponent {
       return;
     }
     void this.admin.setArchived(true);
-    const eventId = this.recordArchive('archived', WORKSPACE_OBJECT);
     this.toasts.show(`${name} archived — it’s now read-only`, {
       icon: 'archive',
       actionLabel: 'Undo',
-      onAction: () => this.undo(() => this.admin.setArchived(false), eventId),
+      onAction: () => void this.admin.setArchived(false),
     });
   }
 
   protected unarchive(): void {
     void this.admin.setArchived(false);
-    this.recordArchive('unarchived', WORKSPACE_OBJECT);
     this.toasts.show(`${this.name()} is active again`, { icon: 'archive-restore' });
   }
 
@@ -90,26 +91,15 @@ export class WorkspaceSettingsDangerComponent {
       return;
     }
     void this.admin.scheduleDeletion(true);
-    const eventId = this.recordArchive('scheduled deletion of', WORKSPACE_OBJECT);
     this.toasts.show(`Deletion scheduled — ${name} will be deleted in 14 days`, {
       icon: 'trash-2',
       actionLabel: 'Undo',
-      onAction: () => this.undo(() => this.admin.scheduleDeletion(false), eventId),
+      onAction: () => void this.admin.scheduleDeletion(false),
     });
   }
 
   protected cancelDeletion(): void {
     void this.admin.scheduleDeletion(false);
-    this.recordArchive('cancelled deletion of', WORKSPACE_OBJECT);
     this.toasts.show('Deletion cancelled', { icon: 'rotate-ccw' });
-  }
-
-  private recordArchive(verb: string, object: string): string {
-    return this.updates.record({ kind: 'archive', verb, object, section: 'danger' });
-  }
-
-  private undo(revert: () => Promise<void>, eventId: string): void {
-    void revert();
-    this.updates.forget(eventId);
   }
 }

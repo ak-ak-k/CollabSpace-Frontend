@@ -36,7 +36,7 @@ export const injectMessageHandler = (options: MessageHandlerOptions): MessageHan
   const chat = inject(ChatState);
   const workspace = inject(WorkspaceState);
   const menuContext = computed<MessageMenuContext>(() => ({
-    canPin: workspace.access().myRole !== 'guest',
+    canPin: !workspace.access().isGuest,
     inThread: (options.rootId?.() ?? null) !== null,
   }));
   const find = (messageId: string) =>

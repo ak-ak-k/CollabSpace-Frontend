@@ -13,7 +13,7 @@
           <div class="role-card__body">
             <p class="role-card__description">{{ row.description }}</p>
             <ul class="role-card__permissions" [attr.aria-label]="row.permissionsLabel">
-              @for (permission of row.permissions; track permission.label) {
+              @for (permission of row.permissions; track permission.id) {
                 <li class="permission" [class.permission--denied]="!permission.allowed">
                   <app-icon
                     class="permission__icon"
@@ -78,6 +78,6 @@
 
 <p class="roles__footer">
   Change someone’s role from
-  <a class="roles__footer-link" routerLink="/workspace/members">Members</a>. Custom roles are
-  available on the Enterprise plan.
+  <a class="roles__footer-link" routerLink="/workspace/members">Members</a>. Owners always have
+  every permission; locked cells can’t be changed. Custom roles aren’t available yet.
 </p>

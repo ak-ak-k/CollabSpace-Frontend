@@ -36,8 +36,9 @@ describe('IconComponent', () => {
   });
 
   it('registers every icon the design uses', () => {
-    expect(ICON_NAMES.length).toBe(153);
+    expect(ICON_NAMES.length).toBe(154);
     expect(ICON_NAMES).toContain('github');
     expect(ICON_NAMES).toContain('figma');
+    expect(ICON_NAMES).toContain('scroll-text');
   });
 });

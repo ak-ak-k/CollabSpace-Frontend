@@ -1,0 +1,9 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.transfer__field {
+  flex: 1 1 var(--workspace-settings-transfer-field-basis);
+  min-width: 0;
+}

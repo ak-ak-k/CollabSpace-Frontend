@@ -99,13 +99,7 @@ export interface TaskComment {
   readonly edited: boolean;
 }
 
-export interface TaskHistoryEntry {
-  readonly id: string;
-  readonly taskId: string;
-  readonly actorId: string;
-  readonly text: string;
-  readonly at: number;
-}
+export const taskRouteOf = (taskId: string): string => `/tasks?task=${taskId}`;
 
 export const isTaskStatus = (value: string): value is TaskStatus =>
   TASK_COLUMNS.some((column) => column.status === value);

@@ -3,8 +3,8 @@ import { NewTask } from '../models/task';
 import { DataModeState } from './data-mode.state';
 import { NetworkState } from './network.state';
 import { INSTANT_MOCK_DATA, settle } from './state.testing';
-import { TaskHistoryState } from './task-history.state';
 import { TaskState } from './task.state';
+import { WorkspaceActivityState } from './workspace-activity.state';
 import { WorkspaceState } from './workspace.state';
 
 const newTask = (title: string): NewTask => ({
@@ -47,27 +47,48 @@ describe('TaskState', () => {
     expect(ids).toEqual(['NS-160', 'NS-147']);
   });
 
-  it('moves a task and records the status change', async () => {
+  it('moves a task and logs the status change', async () => {
     const tasks = await loaded();
-    const history = TestBed.inject(TaskHistoryState);
+    const activity = TestBed.inject(WorkspaceActivityState);
 
     await tasks.move('NS-151', 'review');
 
     const review = tasks.tasks().filter((task) => task.status === 'review');
     expect(review.at(-1)?.id).toBe('NS-151');
-    expect(history.entriesFor('NS-151')[0]?.text).toBe('changed status: Todo → Review');
+    expect(activity.entityEvents('task', 'NS-151')[0]).toMatchObject({
+      actorId: 'u0',
+      verb: 'moved',
+      object: 'NS-151 to Review',
+      kind: 'task',
+      category: 'activity',
+      teamId: 't-frontend',
+      change: { from: 'Todo', to: 'Review' },
+    });
   });
 
-  it('creates tasks with the next id and a created entry', async () => {
+  it('creates tasks with the next id and a created event', async () => {
     const tasks = await loaded();
 
     const created = await tasks.create(newTask('Write release notes'));
 
     expect(created.id).toBe('NS-162');
     expect(created.reporterId).toBe('u0');
-    expect(TestBed.inject(TaskHistoryState).entriesFor('NS-162')[0]?.text).toBe(
-      'created this task',
-    );
+    expect(TestBed.inject(WorkspaceActivityState).entityEvents('task', 'NS-162')[0]).toMatchObject({
+      verb: 'created',
+      object: 'NS-162 · Write release notes',
+      route: '/tasks?task=NS-162',
+    });
+  });
+
+  it('logs a deletion and drops the links of the deleted task', async () => {
+    const tasks = await loaded();
+    const activity = TestBed.inject(WorkspaceActivityState);
+
+    await tasks.remove('NS-151');
+
+    const events = activity.events().filter((event) => event.entity?.id === 'NS-151');
+    expect(events[0]).toMatchObject({ verb: 'deleted', route: '' });
+    expect(events.every((event) => event.route === '')).toBe(true);
   });
 
   it('marks offline edits as pending and syncs them on reconnect', async () => {

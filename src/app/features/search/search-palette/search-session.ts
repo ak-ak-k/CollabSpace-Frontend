@@ -83,7 +83,8 @@ export class SearchSession {
         request,
         await this.data.search(this.term(), this.filter(), {
           workspaceId: this.workspace.currentWorkspaceId(),
-          memberIds: this.workspace.memberIds(),
+          memberIds: new Set(this.workspace.memberDirectory().map((member) => member.id)),
+          teamIds: this.workspace.teamIds(),
         }),
         false,
       );

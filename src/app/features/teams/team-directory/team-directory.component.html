@@ -22,10 +22,12 @@
           [(value)]="layout"
         />
       }
-      <button appButton type="button" variant="primary" (click)="actions.createTeam()">
-        <app-icon name="plus" [size]="16" />
-        Create team
-      </button>
+      @if (canCreateTeams()) {
+        <button appButton type="button" variant="primary" (click)="actions.createTeam()">
+          <app-icon name="plus" [size]="16" />
+          Create team
+        </button>
+      }
     </div>
   </header>
 

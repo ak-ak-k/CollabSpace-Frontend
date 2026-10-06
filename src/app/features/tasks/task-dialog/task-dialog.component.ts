@@ -112,7 +112,7 @@ export class TaskDialogComponent {
   );
 
   constructor() {
-    if (this.workspace.access().myRole === 'guest') {
+    if (!this.workspace.access().canCreateTasks) {
       const workspaceName = this.workspace.currentWorkspace()?.name ?? 'this workspace';
       this.toasts.show(`Guests can’t create tasks in ${workspaceName}`, { icon: 'lock' });
       afterNextRender(() => this.dialogRef.close());

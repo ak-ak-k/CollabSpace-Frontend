@@ -38,7 +38,9 @@
               <span class="activity__sentence">
                 <strong>{{ event.actor.firstName }}</strong>
                 {{ event.verb }}
-                <span class="activity__object">{{ event.object }}</span>
+                @if (event.object) {
+                  <span class="activity__object">{{ event.object }}</span>
+                }
               </span>
               <span class="activity__meta">
                 <app-icon [name]="event.icon" [size]="13" />

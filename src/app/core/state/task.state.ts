@@ -5,9 +5,17 @@ import { NewTask, Subtask, Task, TaskChanges, TaskStatus } from '../models/task'
 import { firstNameOf } from '../models/user';
 import { DataModeState } from './data-mode.state';
 import { Loadable, settledStatus } from './loadable';
+import { ActivityLogState } from './activity-log.state';
 import { NetworkState } from './network.state';
-import { TaskHistoryState } from './task-history.state';
-import { CREATED_NOTE, statusNote, taskChangeNote, TaskNoteLookup } from './task-history-note';
+import {
+  createdNote,
+  deletedNote,
+  statusNote,
+  taskActivityEntry,
+  taskChangeNote,
+  TaskNote,
+  TaskNoteLookup,
+} from './task-activity-note';
 import {
   RemovedSubtask,
   withoutSubtask,
@@ -24,7 +32,7 @@ export class TaskState {
   private readonly dataMode = inject(DataModeState);
   private readonly workspace = inject(WorkspaceState);
   private readonly network = inject(NetworkState);
-  private readonly history = inject(TaskHistoryState);
+  private readonly activity = inject(ActivityLogState);
 
   private readonly allTasks = signal<readonly Task[]>([]);
   private createdSubtasks = 0;
@@ -80,7 +88,7 @@ export class TaskState {
       reporterId: CURRENT_USER_ID,
     });
     this.allTasks.update((tasks) => [...tasks, task]);
-    this.history.record(task.id, CREATED_NOTE);
+    this.log(task, createdNote(task));
     return task;
   }
 
@@ -96,7 +104,7 @@ export class TaskState {
       ),
     );
     if (statusChanged) {
-      this.history.record(id, statusNote(previous.status, status));
+      this.log(previous, statusNote(previous, status));
     }
     if (!this.markPendingWhileOffline(id)) {
       await this.data.moveTask(id, status, beforeId);
@@ -112,7 +120,7 @@ export class TaskState {
     this.replace(id, (task) => ({ ...task, ...stamped }));
     const note = taskChangeNote(previous, changes, this.noteLookup);
     if (note) {
-      this.history.record(id, note);
+      this.log(previous, note);
     }
     if (!this.markPendingWhileOffline(id)) {
       await this.data.updateTask(id, stamped);
@@ -123,6 +131,7 @@ export class TaskState {
     const removed = this.task(id);
     if (removed) {
       this.allTasks.update((tasks) => tasks.filter((task) => task.id !== id));
+      this.log(removed, deletedNote(removed));
       await this.data.deleteTask(id);
     }
     return removed;
@@ -174,6 +183,10 @@ export class TaskState {
   ): Promise<void> {
     const task = this.task(id);
     return task ? this.update(id, { subtasks: change(task.subtasks) }) : Promise.resolve();
+  }
+
+  log(task: Task, note: TaskNote): void {
+    this.activity.record(taskActivityEntry(task, note), task.workspaceId);
   }
 
   private replace(id: string, change: (task: Task) => Task): void {

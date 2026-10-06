@@ -107,7 +107,7 @@ export const injectConversationAccess = (
       view: current,
       team,
       me,
-      manager: workspace.access().canManage || (team !== null && teams.canManageTeam(team.id)),
+      manager: team ? teams.canManageTeam(team.id) : workspace.access().canManage,
       archived: chat.isArchived(current.id),
       left: chat.hasLeft(current.id),
     });

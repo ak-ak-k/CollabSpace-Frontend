@@ -42,8 +42,7 @@ export interface FileRow {
 export interface FileRowContext {
   readonly usersById: ReadonlyMap<string, User>;
   readonly currentUserId: string;
-  readonly isAdmin: boolean;
-  readonly isGuest: boolean;
+  readonly canManage: (file: FileItem) => boolean;
   readonly lookup: FileSourceLookup;
   readonly now: number;
 }
@@ -109,7 +108,7 @@ export const toFileRow = (file: FileItem, context: FileRowContext): FileRow => {
     teamName: file.teamId ? (context.lookup.teamName(file.teamId) ?? '') : '',
     conversationId: file.source.type === 'message' ? file.source.conversationId : null,
     previewUrl: file.previewUrl,
-    canManage: !context.isGuest && (mine || context.isAdmin),
+    canManage: context.canManage(file),
     typeLine: typeLineOf(typeLabel, file.extension, file.starred),
     gridMeta: [typeLabel, file.sizeLabel, source.label].join(SEPARATOR),
     listMeta: [typeLabel, file.sizeLabel, modifiedLabel].join(SEPARATOR),

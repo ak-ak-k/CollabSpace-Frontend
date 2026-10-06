@@ -63,5 +63,21 @@ export const canChangeRole = (
   return !!current && current !== role && userId !== actorId && !losesLastOwner;
 };
 
+export const canTransferOwnership = (
+  roster: Readonly<Record<string, WorkspaceRole>>,
+  userId: string,
+  actorId: string,
+): boolean => roster[actorId] === 'owner' && !!roster[userId] && userId !== actorId;
+
+export const withTransferredOwnership = (
+  roster: Readonly<Record<string, WorkspaceRole>>,
+  newOwnerId: string,
+  previousOwnerId: string,
+): Readonly<Record<string, WorkspaceRole>> => ({
+  ...roster,
+  [newOwnerId]: 'owner',
+  [previousOwnerId]: 'admin',
+});
+
 export const roleWithArticle = (role: WorkspaceRole): string =>
   `${isWorkspaceManager(role) ? 'an' : 'a'} ${WORKSPACE_ROLE_LABELS[role]}`;

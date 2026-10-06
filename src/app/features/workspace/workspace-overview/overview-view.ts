@@ -1,11 +1,8 @@
+import { ActivityEvent, activityIconOf } from '../../../core/models/activity';
 import { Channel } from '../../../core/models/channel';
 import { Team } from '../../../core/models/team';
 import { User, userColorSeed, WorkspaceRole } from '../../../core/models/user';
 import { Workspace } from '../../../core/models/workspace';
-import {
-  WORKSPACE_ACTIVITY_ICONS,
-  WorkspaceActivityEvent,
-} from '../../../core/models/workspace-activity';
 import { WORKSPACE_ROLE_LABELS } from '../../../core/models/workspace-role';
 import { workspaceUrlOf } from '../../../core/models/workspace-rules';
 import { formatCount } from '../../../shared/pipes/count.pipe';
@@ -32,6 +29,7 @@ export interface OverviewStatInput {
 export interface OverviewActivityItem {
   readonly id: string;
   readonly actorName: string;
+  readonly avatarName: string;
   readonly avatarText: string;
   readonly seed: number;
   readonly verb: string;
@@ -108,7 +106,7 @@ export const overviewStats = ({
 };
 
 export const overviewActivityItem = (
-  event: WorkspaceActivityEvent,
+  event: ActivityEvent,
   usersById: ReadonlyMap<string, User>,
   viewerId: string,
   now = Date.now(),
@@ -118,12 +116,13 @@ export const overviewActivityItem = (
   return {
     id: event.id,
     actorName,
+    avatarName: actor?.name ?? UNKNOWN_ACTOR,
     avatarText: actor ? '' : UNKNOWN_AVATAR_TEXT,
     seed: userColorSeed(event.actorId),
     verb: event.verb,
     object: event.object,
     route: event.route,
-    icon: WORKSPACE_ACTIVITY_ICONS[event.kind] ?? 'activity',
+    icon: activityIconOf(event.kind),
     when: formatRelative(event.occurredAt, now),
   };
 };

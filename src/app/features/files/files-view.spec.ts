@@ -16,8 +16,7 @@ const rows = MOCK_FILES.map((file) =>
   toFileRow(file, {
     usersById: new Map(MOCK_USERS.map((user) => [user.id, user])),
     currentUserId: 'u0',
-    isAdmin: false,
-    isGuest: false,
+    canManage: (file) => file.ownerId === 'u0',
     lookup,
     now: Date.now(),
   }),

@@ -14,7 +14,8 @@ import { IconName } from '../../shared/ui/icon/icon-registry';
 import { TagTone } from '../../shared/ui/tag/tag.component';
 import { WORKSPACE_ROUTE } from './workspace-actions.service';
 
-export type MemberFilter = 'all' | 'online' | 'admins' | 'members' | 'guests';
+export type PeopleFilter = 'all' | 'online' | 'admins' | 'members' | 'guests';
+export type MemberFilter = PeopleFilter | 'invited';
 
 export interface MemberRow {
   readonly id: string;
@@ -50,7 +51,7 @@ export interface MembersEmptyView {
 export const MEMBERS_ROUTE = `${WORKSPACE_ROUTE}/members`;
 export const MANAGE_INVITATIONS_ROUTE = `${WORKSPACE_ROUTE}/settings/members`;
 
-const FILTER_LABELS: Record<MemberFilter, string> = {
+const PEOPLE_FILTER_LABELS: Record<PeopleFilter, string> = {
   all: 'All',
   online: 'Online',
   admins: 'Admins',
@@ -58,9 +59,12 @@ const FILTER_LABELS: Record<MemberFilter, string> = {
   guests: 'Guests',
 };
 
-export const MEMBER_FILTERS = Object.keys(FILTER_LABELS) as MemberFilter[];
+const PEOPLE_FILTERS = Object.keys(PEOPLE_FILTER_LABELS) as PeopleFilter[];
+const INVITED_LABEL = 'Invited';
 
-const FILTER_MATCHERS: Record<MemberFilter, (user: User) => boolean> = {
+export const MEMBER_FILTERS: readonly MemberFilter[] = [...PEOPLE_FILTERS, 'invited'];
+
+const FILTER_MATCHERS: Record<PeopleFilter, (user: User) => boolean> = {
   all: () => true,
   online: (user) => user.status === 'online',
   admins: (user) => isWorkspaceManager(user.role),
@@ -92,13 +96,30 @@ export const memberFilterOf = (value: string | undefined): MemberFilter =>
 export const memberFilterLink = (filter: MemberFilter): string =>
   filter === 'all' ? MEMBERS_ROUTE : `${MEMBERS_ROUTE}/${filter}`;
 
-export const memberFilterChips = (people: readonly User[]): readonly MemberFilterChip[] =>
-  MEMBER_FILTERS.map((filter) => ({
+export const memberFilterChips = (
+  people: readonly User[],
+  invitedCount?: number,
+): readonly MemberFilterChip[] => {
+  const chips = PEOPLE_FILTERS.map((filter) => ({
     filter,
-    label: FILTER_LABELS[filter],
+    label: PEOPLE_FILTER_LABELS[filter],
     link: memberFilterLink(filter),
     count: people.filter(FILTER_MATCHERS[filter]).length,
   }));
+  if (invitedCount === undefined) {
+    return chips;
+  }
+  const invited: MemberFilterChip = {
+    filter: 'invited',
+    label: INVITED_LABEL,
+    link: memberFilterLink('invited'),
+    count: invitedCount,
+  };
+  return [...chips, invited];
+};
+
+export const allowedMemberFilter = (filter: MemberFilter, canInvite: boolean): MemberFilter =>
+  filter === 'invited' && !canInvite ? 'all' : filter;
 
 const matchesQuery = (user: User, query: string): boolean =>
   !query ||
@@ -108,7 +129,7 @@ const matchesQuery = (user: User, query: string): boolean =>
 
 export const visibleMembers = (
   people: readonly User[],
-  filter: MemberFilter,
+  filter: PeopleFilter,
   query: string,
 ): readonly User[] => {
   const normalized = query.trim().toLowerCase();
@@ -149,7 +170,7 @@ export const memberRowOf = (user: User, viewerId: string, now = Date.now()): Mem
 };
 
 export const noMatchingMembers = (
-  filter: MemberFilter,
+  filter: PeopleFilter,
   query: string,
   workspaceName: string,
 ): MembersEmptyView => {
@@ -161,7 +182,7 @@ export const noMatchingMembers = (
       message: `Nobody matches “${trimmed}”. Try a name, email or job title.`,
     };
   }
-  const views: Record<Exclude<MemberFilter, 'all'>, MembersEmptyView> = {
+  const views: Record<Exclude<PeopleFilter, 'all'>, MembersEmptyView> = {
     online: {
       icon: 'activity',
       heading: 'No one is online',

@@ -4,7 +4,6 @@ import { CURRENT_USER_ID } from '../mocks/users.mock';
 import { Channel } from '../models/channel';
 import { AssignableTeamRole, Team, TeamChanges, TeamRole } from '../models/team';
 import {
-  canManageTeam,
   channelWithMembers,
   channelWithoutMember,
   teamRoleOf,
@@ -12,14 +11,19 @@ import {
   withTeamMembers,
   withTeamRole,
 } from '../models/team-rules';
+import { ActivityLogState } from './activity-log.state';
 import { ChatMembershipState } from './chat-membership.state';
+import { teamArchiveEntry, teamMemberRemovedEntry, teamMembersAddedEntry } from './team-activity';
 import { WorkspaceState } from './workspace.state';
+
+const UNKNOWN_PERSON = 'Someone';
 
 @Service()
 export class TeamMembershipState {
   private readonly workspace = inject(WorkspaceState);
   private readonly teamsData = inject(TeamsData);
   private readonly chatMembership = inject(ChatMembershipState);
+  private readonly activity = inject(ActivityLogState);
 
   private readonly currentUserId = computed(
     () => this.workspace.currentUser()?.id ?? CURRENT_USER_ID,
@@ -32,7 +36,7 @@ export class TeamMembershipState {
 
   canManageTeam(teamId: string): boolean {
     const team = this.workspace.team(teamId);
-    return !!team && canManageTeam(team, this.currentUserId(), this.workspace.access().canManage);
+    return !!team && this.workspace.can('teams.manage', { team });
   }
 
   async addToTeam(teamId: string, userIds: readonly string[]): Promise<void> {
@@ -44,6 +48,8 @@ export class TeamMembershipState {
       withTeamMembers(team, userIds, this.currentUserId()),
       (channel) => channelWithMembers(channel, userIds),
     );
+    const names = userIds.map((userId) => this.nameOf(userId));
+    this.activity.record(teamMembersAddedEntry(team, names));
     await Promise.all([
       this.teamsData.addMembers(teamId, userIds),
       ...channels
@@ -61,6 +67,7 @@ export class TeamMembershipState {
       withoutTeamMember(team, userId, this.currentUserId()),
       (channel) => channelWithoutMember(channel, userId),
     );
+    this.activity.record(teamMemberRemovedEntry(team, this.nameOf(userId)));
     await Promise.all([
       this.teamsData.removeMember(teamId, userId),
       ...channels.map((channel) => this.chatMembership.removeFromGroup(channel.id, userId)),
@@ -91,7 +98,12 @@ export class TeamMembershipState {
       return;
     }
     this.workspace.putTeam({ ...team, archived });
+    this.activity.record(teamArchiveEntry(team, archived), team.workspaceId);
     await this.teamsData.setArchived(teamId, archived);
+  }
+
+  private nameOf(userId: string): string {
+    return this.workspace.user(userId)?.name ?? UNKNOWN_PERSON;
   }
 
   private applyMembership(team: Team, change: (channel: Channel) => Channel): readonly Channel[] {

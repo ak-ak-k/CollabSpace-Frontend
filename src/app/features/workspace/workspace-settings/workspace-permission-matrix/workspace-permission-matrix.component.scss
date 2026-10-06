@@ -1,3 +1,5 @@
+@use 'touch';
+
 :host {
   display: block;
   min-width: 0;
@@ -21,16 +23,38 @@
   font-size: var(--font-size-14);
 }
 
-.permission-mark {
+.permission-switch {
+  position: relative;
   display: inline-grid;
   place-items: center;
-  width: var(--workspace-settings-permission-mark-size);
-  height: var(--workspace-settings-permission-mark-size);
+  width: var(--workspace-settings-permission-cell-size);
+  height: var(--workspace-settings-permission-cell-size);
+  padding: var(--space-0);
+  border: var(--border-width-hairline) solid var(--border-control);
+  background: transparent;
   color: var(--text-secondary);
   vertical-align: middle;
+  cursor: default;
+
+  @include touch.on-touch {
+    @include touch.minimum-hit-area;
+  }
 }
 
-.permission-mark--allowed {
+.permission-switch--allowed {
   background: var(--text-primary);
   color: var(--background);
+}
+
+.permission-switch--locked {
+  border-color: transparent;
+}
+
+.permission-switch--editable {
+  cursor: pointer;
+
+  &:not(.permission-switch--allowed):hover {
+    background: var(--hover);
+    color: var(--text-primary);
+  }
 }

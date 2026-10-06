@@ -1,6 +1,6 @@
 <nav class="settings-nav" aria-label="Workspace settings">
   <ul class="settings-nav__list">
-    @for (section of sections; track section.id) {
+    @for (section of sections(); track section.id) {
       <li class="settings-nav__item">
         <a
           #sectionLink

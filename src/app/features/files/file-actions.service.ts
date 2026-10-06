@@ -61,6 +61,9 @@ export class FileActions {
   }
 
   async rename(file: FileRow): Promise<void> {
+    if (!file.canManage) {
+      return;
+    }
     const dialog = this.dialogs.open<string, FileRenameData>(FileRenameDialogComponent, {
       size: 'sm',
       data: { name: file.name },
@@ -77,6 +80,9 @@ export class FileActions {
   }
 
   async remove(file: FileRow): Promise<boolean> {
+    if (!file.canManage) {
+      return false;
+    }
     const confirmed = await this.dialogs.confirm({
       title: `Delete “${file.name}”?`,
       body: 'It may no longer be available in the conversations or tasks where it was shared.',

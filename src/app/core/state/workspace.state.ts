@@ -3,9 +3,9 @@ import { CreatedTeam, TeamsData, WorkspaceDirectory } from '../data/teams.data';
 import { WorkspaceCatalog, WorkspaceData } from '../data/workspace.data';
 import { CURRENT_USER_ID } from '../mocks/users.mock';
 import { CURRENT_WORKSPACE_ID } from '../mocks/workspaces.mock';
-import { ActivityEvent } from '../models/activity';
 import { Channel, ChannelChanges, NewChannel } from '../models/channel';
 import { Conversation } from '../models/conversation';
+import { CheckedPermission, RolePermissionMap, RolePermissions } from '../models/permission';
 import { NewTeam, Team } from '../models/team';
 import { PresenceStatus, User } from '../models/user';
 import {
@@ -17,11 +17,14 @@ import {
   WorkspaceScoped,
 } from '../models/workspace';
 import { DataModeState } from './data-mode.state';
+import { canSeeTeam, readableTeamIdsOf, visibleMembersFor } from './guest-visibility';
 import { Loadable, settledStatus } from './loadable';
+import { allows, PermissionResource, PermissionSubject } from './permission-check';
 import {
   accessOf,
   conversationInScope,
   roleIn,
+  rolePermissionsIn,
   summariesOf,
   withRosterRole,
 } from './workspace-access';
@@ -40,11 +43,11 @@ export class WorkspaceState {
   private readonly directoryUsers = signal<readonly User[]>([]);
   private readonly allTeams = signal<readonly Team[]>([]);
   private readonly allChannels = signal<readonly Channel[]>([]);
-  private readonly allActivity = signal<readonly ActivityEvent[]>([]);
 
   readonly workspaces = signal<readonly Workspace[]>([]);
   readonly rosters = signal<WorkspaceRosters>({});
   readonly preferenceMap = signal<WorkspacePreferenceMap>({});
+  readonly rolePermissionMap = signal<RolePermissionMap>({});
   readonly currentWorkspaceId = signal(CURRENT_WORKSPACE_ID);
 
   private readonly loader = new Loadable<WorkspaceSnapshot>({
@@ -71,29 +74,41 @@ export class WorkspaceState {
     () => this.preferenceMap()[this.currentWorkspaceId()] ?? null,
   );
   readonly isArchived = computed(() => !!this.currentWorkspace()?.archivedAt);
-  readonly access = computed(() =>
-    accessOf(roleIn(this.roster(), CURRENT_USER_ID), this.preferences()),
+  readonly accessKnown = computed(() => !!this.rosters()[this.currentWorkspaceId()]);
+  readonly rolePermissions = computed(() =>
+    rolePermissionsIn(this.rolePermissionMap(), this.currentWorkspaceId(), this.preferences()),
   );
+  private readonly permissionSubject = computed<PermissionSubject>(() => ({
+    userId: CURRENT_USER_ID,
+    role: roleIn(this.roster(), CURRENT_USER_ID),
+    rolePermissions: this.rolePermissions(),
+  }));
+  readonly access = computed(() => accessOf(this.permissionSubject()));
   readonly summaries = computed(() =>
     summariesOf(this.workspaces(), this.rosters(), this.currentWorkspaceId(), CURRENT_USER_ID),
   );
 
+  private readonly workspaceTeams = computed(() =>
+    this.allTeams().filter((team) => this.contains(team)),
+  );
   readonly teams = computed(() =>
-    this.allTeams().filter((team) => this.contains(team) && !team.archived),
+    this.workspaceTeams().filter(
+      (team) => !team.archived && canSeeTeam(team, this.permissionSubject()),
+    ),
+  );
+  readonly memberDirectory = computed(() =>
+    visibleMembersFor(this.members(), this.workspaceTeams(), this.permissionSubject()),
   );
   readonly teamIds = computed(() => new Set(this.teams().map((team) => team.id)));
+  private readonly readableTeamIds = computed(() =>
+    readableTeamIdsOf(this.teams(), CURRENT_USER_ID),
+  );
   readonly channels = computed(() =>
     this.allChannels().filter((channel) => this.teamIds().has(channel.teamId)),
-  );
-  readonly activity = computed(() =>
-    this.allActivity().filter((event) => this.teamIds().has(event.teamId)),
   );
   readonly joinedTeams = computed(() => this.teams().filter((team) => team.joined));
   readonly onlineUserCount = computed(
     () => this.members().filter((user) => user.status === 'online').length,
-  );
-  readonly recentActivity = computed(() =>
-    [...this.activity()].sort((first, second) => second.occurredAt - first.occurredAt),
   );
 
   readonly loadStatus = this.loader.status.asReadonly();
@@ -110,12 +125,16 @@ export class WorkspaceState {
     return this.loader.load();
   }
 
+  can(permission: CheckedPermission, resource?: PermissionResource): boolean {
+    return allows(this.permissionSubject(), permission, resource);
+  }
+
   contains(item: WorkspaceScoped): boolean {
     return item.workspaceId === this.currentWorkspaceId();
   }
 
   containsConversation(conversation: Conversation): boolean {
-    return conversationInScope(conversation, this.currentWorkspaceId(), this.teamIds());
+    return conversationInScope(conversation, this.currentWorkspaceId(), this.readableTeamIds());
   }
 
   user(userId: string | null): User | null {
@@ -162,6 +181,10 @@ export class WorkspaceState {
 
   putPreferences(workspaceId: string, preferences: WorkspacePreferences): void {
     this.preferenceMap.update((map) => ({ ...map, [workspaceId]: preferences }));
+  }
+
+  putRolePermissions(workspaceId: string, rolePermissions: RolePermissions): void {
+    this.rolePermissionMap.update((map) => ({ ...map, [workspaceId]: rolePermissions }));
   }
 
   putTeam(updated: Team): void {
@@ -211,10 +234,10 @@ export class WorkspaceState {
     this.directoryUsers.set(directory.users);
     this.allTeams.set(directory.teams);
     this.allChannels.set(directory.channels);
-    this.allActivity.set(directory.activity);
     this.workspaces.set(catalog.workspaces);
     this.rosters.set(catalog.rosters);
     this.preferenceMap.set(catalog.preferences);
+    this.rolePermissionMap.set(catalog.rolePermissions);
   }
 
   private replaceUser(updated: User): void {

@@ -1,0 +1,48 @@
+@if (rows().length === 0) {
+  <app-empty-state
+    compact
+    [icon]="emptyView().icon"
+    [heading]="emptyView().heading"
+    [message]="emptyView().message"
+  />
+} @else {
+  <ul class="invites" aria-label="Pending invitations">
+    @for (row of rows(); track row.invite.id; let index = $index) {
+      <li class="invite">
+        <span class="invite__tile" aria-hidden="true">
+          <app-icon name="mail" [size]="16" />
+        </span>
+        <span class="invite__text">
+          <span class="invite__line">
+            <strong class="invite__email">{{ row.invite.email }}</strong>
+            <app-tag>Invited</app-tag>
+          </span>
+          <span class="invite__meta">{{ row.meta }}</span>
+        </span>
+        <span class="invite__actions">
+          <button
+            #resendButton
+            appButton
+            type="button"
+            variant="ghost"
+            [attr.aria-label]="row.resendLabel"
+            (click)="resend(row)"
+          >
+            Resend
+          </button>
+          <button
+            #revokeButton
+            appButton
+            type="button"
+            variant="ghost"
+            class="invite__revoke"
+            [attr.aria-label]="row.revokeLabel"
+            (click)="revoke(row, index)"
+          >
+            Revoke
+          </button>
+        </span>
+      </li>
+    }
+  </ul>
+}

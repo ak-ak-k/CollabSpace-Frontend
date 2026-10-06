@@ -31,14 +31,13 @@ export class PersonActivityListComponent {
   protected readonly items = computed(() => {
     const now = Date.now();
     const sources = {
-      teamActivity: this.workspace.activity(),
-      workspaceActivity: this.workspaceActivity.events(),
+      events: this.workspaceActivity.events({ category: 'activity', actorId: this.userId() }),
       channels: this.workspace.channels(),
       messages: this.chat.messages(),
     };
     return personActivityOf(this.userId(), sources).map((item) => ({
       ...item,
-      link: this.router.parseUrl(item.route),
+      link: item.route ? this.router.parseUrl(item.route) : null,
       when: formatRelative(item.occurredAt, now),
     }));
   });

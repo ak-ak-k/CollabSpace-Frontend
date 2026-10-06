@@ -45,7 +45,7 @@ export class TeamOverviewComponent {
   protected readonly activityLink = computed(() => `/teams/${this.teamId()}/activity`);
   protected readonly leadFirstName = computed(() => firstNameOf(this.lead()?.name ?? ''));
 
-  protected linkTo(route: string): UrlTree {
-    return this.router.parseUrl(route);
+  protected linkTo(route: string): UrlTree | null {
+    return route ? this.router.parseUrl(route) : null;
   }
 }

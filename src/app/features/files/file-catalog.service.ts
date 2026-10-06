@@ -54,17 +54,13 @@ export class FileCatalog {
     this.fileState.files().filter((file) => this.visibleInGroup(file)),
   );
 
-  private readonly rowContext = computed<FileRowContext>(() => {
-    const access = this.workspace.access();
-    return {
-      usersById: this.workspace.usersById(),
-      currentUserId: this.currentUserId(),
-      isAdmin: access.canManage,
-      isGuest: access.myRole === 'guest',
-      lookup: this.lookup(),
-      now: Date.now(),
-    };
-  });
+  private readonly rowContext = computed<FileRowContext>(() => ({
+    usersById: this.workspace.usersById(),
+    currentUserId: this.currentUserId(),
+    canManage: (file) => this.workspace.can('files.manage', { file }),
+    lookup: this.lookup(),
+    now: Date.now(),
+  }));
 
   readonly rows = computed<readonly FileRow[]>(() => {
     const context = this.rowContext();

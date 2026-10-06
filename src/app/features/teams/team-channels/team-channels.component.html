@@ -1,10 +1,12 @@
 <div class="channels">
-  <div class="channels__toolbar">
-    <button appButton type="button" (click)="createChannel.emit()">
-      <app-icon name="plus" [size]="16" />
-      Create channel
-    </button>
-  </div>
+  @if (canCreate()) {
+    <div class="channels__toolbar">
+      <button appButton type="button" (click)="createChannel.emit()">
+        <app-icon name="plus" [size]="16" />
+        Create channel
+      </button>
+    </div>
+  }
   <ul class="channels__list">
     @for (channel of channels(); track channel.id) {
       <li class="channel">

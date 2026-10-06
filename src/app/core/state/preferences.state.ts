@@ -1,6 +1,6 @@
 import { computed, DOCUMENT, effect, inject, Service, signal, untracked } from '@angular/core';
 import { SettingsData, SettingsSnapshot } from '../data/settings.data';
-import { MOCK_PREFERENCES, MOCK_ROLE_NAMES, MOCK_ROLE_PERMISSIONS } from '../mocks/settings.mock';
+import { MOCK_PREFERENCES } from '../mocks/settings.mock';
 import {
   BooleanPreference,
   DeviceSession,
@@ -21,8 +21,6 @@ export class PreferencesState {
   readonly preferences = signal<Preferences>(MOCK_PREFERENCES);
   readonly sessions = signal<readonly DeviceSession[]>([]);
   readonly integrations = signal<readonly Integration[]>([]);
-  readonly roleNames = MOCK_ROLE_NAMES;
-  readonly rolePermissions = MOCK_ROLE_PERMISSIONS;
 
   private readonly loader = new Loadable<SettingsSnapshot>({
     fetch: () => this.data.getSettings(),

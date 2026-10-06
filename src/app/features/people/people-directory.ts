@@ -33,7 +33,7 @@ const everyoneIn = (workspace: WorkspaceState): Signal<readonly User[]> =>
     if (workspace.loadStatus() === 'empty') {
       return me ? [me] : [];
     }
-    return workspace.members();
+    return workspace.memberDirectory();
   });
 
 const knownTeam = (workspace: WorkspaceState, teamId: Signal<string>): Signal<string> =>

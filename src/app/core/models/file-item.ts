@@ -114,3 +114,5 @@ export const extensionOf = (fileName: string): string =>
 
 export const fileTypeOf = (fileName: string): FileType =>
   FILE_TYPES_BY_EXTENSION[extensionOf(fileName)] ?? 'doc';
+
+export const filePreviewRouteOf = (fileId: string): string => `/files/recent?file=${fileId}`;

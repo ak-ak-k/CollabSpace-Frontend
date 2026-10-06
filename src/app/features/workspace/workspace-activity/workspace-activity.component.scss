@@ -1,0 +1,79 @@
+@use 'touch';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.day__heading {
+  margin: var(--space-0);
+  padding-bottom: var(--space-2);
+  border-bottom: var(--rule-strong);
+  font-family: var(--font-body);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-heavy);
+  letter-spacing: var(--letter-spacing-caps);
+  line-height: var(--line-height-compact);
+  text-transform: uppercase;
+}
+
+.event {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--size-avatar-32) minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-0);
+  border-bottom: var(--rule-hairline);
+
+  &:focus-visible {
+    outline-offset: calc(var(--border-width-rule) * -1);
+  }
+}
+
+.event__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  min-width: 0;
+}
+
+.event__sentence {
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-input);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.event__actor {
+  font-weight: var(--font-weight-heavy);
+}
+
+.event__object {
+  font-weight: var(--font-weight-semibold);
+}
+
+a.event__object {
+  @include touch.on-touch {
+    @include touch.stretched-hit-area;
+  }
+}
+
+.event__context {
+  color: var(--text-secondary);
+  font-size: var(--font-size-13);
+  overflow-wrap: anywhere;
+}
+
+.event__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+}
+
+.activity__more {
+  align-self: flex-start;
+}

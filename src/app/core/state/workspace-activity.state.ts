@@ -1,67 +1,58 @@
-import { computed, effect, inject, Service, signal, untracked } from '@angular/core';
-import { WorkspaceData } from '../data/workspace.data';
-import { CURRENT_USER_ID } from '../mocks/users.mock';
-import { WorkspaceActivityEvent, WorkspaceActivityKind } from '../models/workspace-activity';
-import { DataModeState } from './data-mode.state';
-import { Loadable, settledStatus } from './loadable';
+import { computed, inject, Service } from '@angular/core';
+import { ActivityEntityType, ActivityEntry, ActivityEvent } from '../models/activity';
+import { LoadStatus } from '../models/load-status';
+import { ActivityLogState } from './activity-log.state';
+import {
+  ActivityFilter,
+  ActivityScope,
+  entityEventsOf,
+  eventsInScope,
+  matchesActivityFilter,
+} from './activity-filter';
+import { FileState } from './file.state';
+import { settledStatus } from './loadable';
+import { TaskState } from './task.state';
 import { WorkspaceState } from './workspace.state';
 
-export interface ActivityEntry {
-  readonly kind: WorkspaceActivityKind;
-  readonly verb: string;
-  readonly object: string;
-  readonly route: string;
-}
+const isSettled = (status: LoadStatus): boolean => status === 'ready' || status === 'empty';
 
 @Service()
 export class WorkspaceActivityState {
-  private readonly data = inject(WorkspaceData);
-  private readonly dataMode = inject(DataModeState);
+  private readonly log = inject(ActivityLogState);
   private readonly workspace = inject(WorkspaceState);
+  private readonly tasks = inject(TaskState);
+  private readonly files = inject(FileState);
 
-  private readonly allEvents = signal<readonly WorkspaceActivityEvent[]>([]);
-  private recordedEvents = 0;
-
-  private readonly loader = new Loadable<readonly WorkspaceActivityEvent[]>({
-    fetch: () => this.data.getActivity(),
-    store: (events) => this.allEvents.set(events),
-    isEmpty: (events) => events.length === 0,
+  private readonly scope = computed<ActivityScope>(() => {
+    const tasksKnown = isSettled(this.tasks.loadStatus());
+    const filesKnown = isSettled(this.files.status());
+    const taskIds = new Set(this.tasks.tasks().map((task) => task.id));
+    const fileIds = new Set(this.files.files().map((file) => file.id));
+    return {
+      workspaceId: this.workspace.currentWorkspaceId(),
+      visibleTeamIds: this.workspace.teamIds(),
+      hasTask: (taskId) => !tasksKnown || taskIds.has(taskId),
+      hasFile: (fileId) => !filesKnown || fileIds.has(fileId),
+    };
   });
 
-  readonly events = computed(() =>
-    this.allEvents()
-      .filter((event) => this.workspace.contains(event))
-      .sort((first, second) => second.occurredAt - first.occurredAt),
-  );
-  readonly status = settledStatus(this.loader.status, () => this.events().length === 0);
+  private readonly currentEvents = computed(() => eventsInScope(this.log.events(), this.scope()));
 
-  constructor() {
-    effect(() => {
-      this.dataMode.mode();
-      untracked(() => void this.loader.load());
-    });
+  readonly status = settledStatus(this.log.loadStatus, () => this.currentEvents().length === 0);
+
+  events(filter: ActivityFilter = {}): readonly ActivityEvent[] {
+    return this.currentEvents().filter((event) => matchesActivityFilter(event, filter));
+  }
+
+  entityEvents(type: ActivityEntityType, id: string): readonly ActivityEvent[] {
+    return entityEventsOf(this.log.events(), type, id);
   }
 
   reload(): Promise<void> {
-    return this.loader.load();
+    return this.log.reload();
   }
 
-  record(entry: ActivityEntry, workspaceId = this.workspace.currentWorkspaceId()): string {
-    const occurredAt = Date.now();
-    const event: WorkspaceActivityEvent = {
-      ...entry,
-      id: `wa-new-${occurredAt.toString(36)}-${++this.recordedEvents}`,
-      workspaceId,
-      actorId: CURRENT_USER_ID,
-      occurredAt,
-    };
-    this.allEvents.update((events) => [event, ...events]);
-    void this.data.recordActivity(event);
-    return event.id;
-  }
-
-  remove(eventId: string): void {
-    this.allEvents.update((events) => events.filter((event) => event.id !== eventId));
-    void this.data.removeActivity(eventId);
+  record(entry: ActivityEntry, workspaceId?: string): string {
+    return this.log.record(entry, workspaceId);
   }
 }

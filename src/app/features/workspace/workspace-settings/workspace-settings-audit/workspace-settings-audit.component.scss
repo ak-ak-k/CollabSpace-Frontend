@@ -1,0 +1,116 @@
+@use '../../../settings/settings-section';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.audit__category {
+  color: var(--text-secondary);
+  font-size: var(--font-size-11);
+  font-weight: var(--font-weight-heavy);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+}
+
+.audit__strong {
+  font-weight: var(--font-weight-heavy);
+}
+
+.audit__more {
+  align-self: flex-start;
+}
+
+.audit__note {
+  @include settings-section.helper-text;
+
+  font-size: var(--font-size-12);
+}
+
+.audit-table {
+  table-layout: fixed;
+}
+
+.audit-table__when {
+  width: var(--workspace-settings-audit-when-width);
+}
+
+.audit-table__who {
+  width: var(--workspace-settings-audit-actor-width);
+}
+
+.audit-table__change {
+  width: var(--workspace-settings-audit-change-width);
+}
+
+.audit-table__row:focus-visible {
+  outline-offset: calc(var(--border-width-rule) * -1);
+}
+
+.audit-table__time,
+.audit-table__actor {
+  font-size: var(--font-size-13);
+  white-space: nowrap;
+}
+
+.audit-table__actor {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.audit-table__event {
+  overflow-wrap: anywhere;
+}
+
+.audit-table__category {
+  display: block;
+}
+
+.audit-table__value {
+  font-size: var(--font-size-13);
+  overflow-wrap: anywhere;
+}
+
+.audit-table__none {
+  color: var(--text-secondary);
+}
+
+.audit-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.audit-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--surface);
+}
+
+.audit-card:focus-visible {
+  outline-offset: calc(var(--border-width-rule) * -1);
+}
+
+.audit-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+}
+
+.audit-card__time {
+  color: var(--text-secondary);
+  font-size: var(--font-size-11);
+}
+
+.audit-card__summary {
+  font-size: var(--font-size-14);
+  overflow-wrap: anywhere;
+}
+
+.audit-card__change {
+  font-size: var(--font-size-13);
+}

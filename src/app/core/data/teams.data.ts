@@ -1,9 +1,7 @@
 import { inject, Service } from '@angular/core';
-import { MOCK_ACTIVITY } from '../mocks/activity.mock';
 import { MOCK_CHANNELS } from '../mocks/channels.mock';
 import { MOCK_TEAMS } from '../mocks/teams.mock';
 import { CURRENT_USER_ID, MOCK_USERS } from '../mocks/users.mock';
-import { ActivityEvent } from '../models/activity';
 import { Channel, ChannelChanges, NewChannel } from '../models/channel';
 import { AssignableTeamRole, NewTeam, Team, TeamChanges } from '../models/team';
 import {
@@ -23,7 +21,6 @@ export interface WorkspaceDirectory {
   readonly users: readonly User[];
   readonly teams: readonly Team[];
   readonly channels: readonly Channel[];
-  readonly activity: readonly ActivityEvent[];
 }
 
 export interface TeamMembership {
@@ -31,7 +28,7 @@ export interface TeamMembership {
   readonly channels: readonly Channel[];
 }
 
-const EMPTY_DIRECTORY_LISTS = { teams: [], channels: [], activity: [] };
+const EMPTY_DIRECTORY_LISTS = { teams: [], channels: [] };
 
 @Service()
 export class TeamsData {
@@ -151,7 +148,6 @@ export class TeamsData {
       users: this.users,
       teams: this.teams,
       channels: this.channels,
-      activity: MOCK_ACTIVITY,
     };
   }
 

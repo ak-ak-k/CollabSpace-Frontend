@@ -1,6 +1,6 @@
 import { computed, DOCUMENT, inject, Service } from '@angular/core';
 import { Router } from '@angular/router';
-import { TASK_COLUMNS, TASK_STATUS_LABELS, TaskStatus } from '../../core/models/task';
+import { Task, TASK_COLUMNS, TASK_STATUS_LABELS, TaskStatus } from '../../core/models/task';
 import { DialogService } from '../../core/services/dialog.service';
 import { ToastService } from '../../core/services/toast.service';
 import { TaskState } from '../../core/state/task.state';
@@ -23,7 +23,7 @@ export class TaskActions {
   private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
 
-  readonly canCreate = computed(() => this.workspace.access().myRole !== 'guest');
+  readonly canCreate = computed(() => this.workspace.access().canCreateTasks);
   readonly workspaceName = computed(
     () => this.workspace.currentWorkspace()?.name ?? 'this workspace',
   );
@@ -34,6 +34,10 @@ export class TaskActions {
       return;
     }
     this.dialogs.open<string, TaskDialogData>(TaskDialogComponent, { size: 'lg', data });
+  }
+
+  canDelete(task: Task): boolean {
+    return this.workspace.can('tasks.delete', { task });
   }
 
   open(taskId: string): void {
@@ -91,6 +95,10 @@ export class TaskActions {
   }
 
   async remove(taskId: string): Promise<boolean> {
+    const task = this.tasks.task(taskId);
+    if (!task || !this.canDelete(task)) {
+      return false;
+    }
     const confirmed = await this.dialogs.confirm({
       title: `Delete ${taskId}?`,
       body: 'The task, its comments and attachments will be removed from the board.',

@@ -1,4 +1,4 @@
-import { ActivityEvent, ACTIVITY_ICONS } from '../../core/models/activity';
+import { ActivityEvent, activityIconOf } from '../../core/models/activity';
 import { Task, TASK_PRIORITY_LABELS, TASK_STATUS_LABELS } from '../../core/models/task';
 import { Team } from '../../core/models/team';
 import { firstNameOf, User, userColorSeed } from '../../core/models/user';
@@ -113,7 +113,7 @@ export const toActivity = (
     actor: personViewOf(userOf(event.actorId)) ?? UNKNOWN_PERSON,
     verb: event.verb,
     object: event.object,
-    icon: ACTIVITY_ICONS[event.kind],
+    icon: activityIconOf(event.kind),
     when: formatRelative(event.occurredAt),
     route: event.route,
   }));

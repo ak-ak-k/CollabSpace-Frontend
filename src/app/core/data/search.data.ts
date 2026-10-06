@@ -80,6 +80,7 @@ export interface SearchGroup extends SearchGroupDefinition {
 export interface SearchScope {
   readonly workspaceId: string;
   readonly memberIds: ReadonlySet<string>;
+  readonly teamIds?: ReadonlySet<string>;
 }
 
 export const SEARCH_GROUPS: readonly SearchGroupDefinition[] = [
@@ -106,14 +107,6 @@ const RANKED_GROUPS: ReadonlySet<SearchGroupKey> = new Set([
 
 const otherUsers = MOCK_USERS.filter((user) => user.id !== CURRENT_USER_ID);
 const teamWorkspaces = new Map(MOCK_TEAMS.map((team) => [team.id, team.workspaceId]));
-
-const workspaceOfConversation = (conversationId: string): string | undefined => {
-  const conversation = conversationOf(conversationId);
-  if (conversation?.type === 'channel') {
-    return teamWorkspaces.get(conversation.teamId);
-  }
-  return conversation?.workspaceId;
-};
 
 const hiddenByTeam = (teamId: string | null): boolean => {
   const team = teamOf(teamId);
@@ -145,6 +138,14 @@ const finder =
 
 const findersFor = (scope?: SearchScope): Record<SearchGroupKey, Finder> => {
   const inScope = (workspaceId: string | undefined) => !scope || workspaceId === scope.workspaceId;
+  const teamInScope = (teamId: string) =>
+    inScope(teamWorkspaces.get(teamId)) && (!scope?.teamIds || scope.teamIds.has(teamId));
+  const conversationInScope = (conversationId: string) => {
+    const conversation = conversationOf(conversationId);
+    return conversation?.type === 'channel'
+      ? teamInScope(conversation.teamId)
+      : inScope(conversation?.workspaceId);
+  };
   return {
     people: finder(
       otherUsers.filter((user) => !scope || scope.memberIds.has(user.id)),
@@ -154,21 +155,19 @@ const findersFor = (scope?: SearchScope): Record<SearchGroupKey, Finder> => {
     messages: finder(
       SEARCHABLE_MESSAGES.filter(
         (message) =>
-          inScope(workspaceOfConversation(message.conversationId)) &&
+          conversationInScope(message.conversationId) &&
           canSeeConversation(conversationOf(message.conversationId)),
       ),
       (message) => [message.text],
       toMessage,
     ),
     channels: finder(
-      MOCK_CHANNELS.filter(
-        (channel) => inScope(teamWorkspaces.get(channel.teamId)) && canSeeChannel(channel),
-      ),
+      MOCK_CHANNELS.filter((channel) => teamInScope(channel.teamId) && canSeeChannel(channel)),
       (channel) => [channel.name, channel.description, teamOf(channel.teamId)?.name ?? ''],
       toChannel,
     ),
     teams: finder(
-      MOCK_TEAMS.filter((team) => inScope(team.workspaceId) && canSeeTeam(team)),
+      MOCK_TEAMS.filter((team) => teamInScope(team.id) && canSeeTeam(team)),
       (team) => [team.name, team.description],
       toTeam,
     ),

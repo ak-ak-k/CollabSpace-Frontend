@@ -1,6 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { WorkspaceState } from '../../../../core/state/workspace.state';
 import { WorkspaceSettingsAppearanceComponent } from '../workspace-settings-appearance/workspace-settings-appearance.component';
+import { WorkspaceSettingsAuditComponent } from '../workspace-settings-audit/workspace-settings-audit.component';
 import { WorkspaceSettingsDangerComponent } from '../workspace-settings-danger/workspace-settings-danger.component';
 import { WorkspaceSettingsGeneralComponent } from '../workspace-settings-general/workspace-settings-general.component';
 import { WorkspaceSettingsIntegrationsComponent } from '../workspace-settings-integrations/workspace-settings-integrations.component';
@@ -9,13 +10,18 @@ import { WorkspaceSettingsNoteComponent } from '../workspace-settings-note/works
 import { WorkspaceSettingsNotificationsComponent } from '../workspace-settings-notifications/workspace-settings-notifications.component';
 import { WorkspaceSettingsRolesComponent } from '../workspace-settings-roles/workspace-settings-roles.component';
 import { WorkspaceSettingsSecurityComponent } from '../workspace-settings-security/workspace-settings-security.component';
-import { OWNER_SECTION, WorkspaceSettingsSection } from '../workspace-settings-sections';
+import {
+  AUDIT_SECTION,
+  OWNER_SECTION,
+  WorkspaceSettingsSection,
+} from '../workspace-settings-sections';
 import { readOnlyNoteOf } from '../workspace-settings-view';
 
 @Component({
   selector: 'app-workspace-settings-panel',
   imports: [
     WorkspaceSettingsAppearanceComponent,
+    WorkspaceSettingsAuditComponent,
     WorkspaceSettingsDangerComponent,
     WorkspaceSettingsGeneralComponent,
     WorkspaceSettingsIntegrationsComponent,
@@ -34,9 +40,12 @@ export class WorkspaceSettingsPanelComponent {
   readonly section = input.required<WorkspaceSettingsSection>();
 
   protected readonly ownerSection = OWNER_SECTION;
+  protected readonly auditSection = AUDIT_SECTION;
   protected readonly readOnlyNote = computed(() => {
     const access = this.workspace.access();
     const name = this.workspace.currentWorkspace()?.name ?? 'this workspace';
-    return access.canManage ? '' : readOnlyNoteOf(access.myRole, name);
+    const editable =
+      this.section().id === 'integrations' ? access.canManageIntegrations : access.canManage;
+    return editable ? '' : readOnlyNoteOf(access.myRole, name);
   });
 }

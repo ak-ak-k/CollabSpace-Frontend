@@ -8,12 +8,6 @@ export const teamRoleOf = (team: Pick<Team, 'ownerId' | 'adminIds'>, userId: str
   return team.adminIds.includes(userId) ? 'admin' : 'member';
 };
 
-export const canManageTeam = (
-  team: Pick<Team, 'ownerId' | 'adminIds'>,
-  userId: string,
-  managesWorkspace: boolean,
-): boolean => managesWorkspace || teamRoleOf(team, userId) !== 'member';
-
 export const withTeamMembers = (
   team: Team,
   userIds: readonly string[],

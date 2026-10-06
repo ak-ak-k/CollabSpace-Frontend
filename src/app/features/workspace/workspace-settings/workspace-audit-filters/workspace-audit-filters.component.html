@@ -1,0 +1,30 @@
+<div class="audit-filters__chips" role="group" aria-label="Event category">
+  @for (chip of categoryChips; track chip.value) {
+    <button
+      type="button"
+      class="audit-filters__chip"
+      [class.audit-filters__chip--on]="chip.value === filters().category"
+      [attr.aria-pressed]="chip.value === filters().category"
+      (click)="setCategory(chip.value)"
+    >
+      {{ chip.label }}
+    </button>
+  }
+</div>
+
+<div class="audit-filters__row">
+  <app-select
+    class="audit-filters__actor"
+    label="Changed by"
+    [options]="actorOptions()"
+    [value]="filters().actorId"
+    (valueChange)="setActor($event)"
+  />
+  <app-radio-group
+    label="Date range"
+    hideLabel
+    [options]="dateOptions"
+    [value]="filters().range"
+    (valueChange)="setRange($event)"
+  />
+</div>

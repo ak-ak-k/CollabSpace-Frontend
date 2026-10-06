@@ -21,7 +21,6 @@ import { WorkspacePreferenceUpdates } from '../workspace-preference-updates.serv
 interface SignInUpdate {
   readonly changes: Partial<WorkspacePreferences>;
   readonly label: string;
-  readonly activityObject: string;
 }
 
 const SESSION_LENGTHS: readonly SessionLength[] = ['24 hours', '7 days', '30 days', '90 days'];
@@ -84,7 +83,6 @@ export class WorkspaceSettingsSecurityComponent {
     this.setSignIn(on, this.passwordSignIn, this.googleSignIn(), {
       changes: { passwordSignIn: on },
       label: 'Email and password sign-in',
-      activityObject: 'email and password sign-in',
     });
   }
 
@@ -92,7 +90,6 @@ export class WorkspaceSettingsSecurityComponent {
     this.setSignIn(on, this.googleSignIn, this.passwordSignIn(), {
       changes: { googleSignIn: on },
       label: 'Google sign-in',
-      activityObject: 'Google sign-in',
     });
   }
 
@@ -102,7 +99,6 @@ export class WorkspaceSettingsSecurityComponent {
       return;
     }
     this.updates.set({ sessionLength }, `Sessions now last ${sessionLength}`);
-    this.recordSecurity('set', `session length to ${sessionLength}`);
   }
 
   protected async signEveryoneOut(): Promise<void> {
@@ -114,7 +110,12 @@ export class WorkspaceSettingsSecurityComponent {
     });
     if (confirmed) {
       this.toasts.show('Everyone else has been signed out', { icon: 'log-out' });
-      this.recordSecurity('signed out', 'everyone');
+      this.updates.record({
+        kind: 'security',
+        verb: 'signed out',
+        object: 'everyone',
+        section: 'security',
+      });
     }
   }
 
@@ -125,11 +126,6 @@ export class WorkspaceSettingsSecurityComponent {
         ? 'Two-step verification required for everyone'
         : 'Two-step verification is now optional',
     );
-    if (required) {
-      this.recordSecurity('required', 'two-step verification');
-    } else {
-      this.recordSecurity('made', 'two-step verification optional');
-    }
   }
 
   private setSignIn(
@@ -144,10 +140,5 @@ export class WorkspaceSettingsSecurityComponent {
       return;
     }
     this.updates.set(update.changes, `${update.label} ${on ? 'on' : 'off'}`);
-    this.recordSecurity(on ? 'turned on' : 'turned off', update.activityObject);
-  }
-
-  private recordSecurity(verb: string, object: string): void {
-    this.updates.record({ kind: 'security', verb, object, section: 'security' });
   }
 }

@@ -85,4 +85,28 @@ describe('WorkspaceState', () => {
 
     expect(await admin.setRole('u5', 'member')).toBe(false);
   });
+
+  it('derives access from the role permissions of the current workspace', async () => {
+    const workspace = TestBed.inject(WorkspaceState);
+    await settle();
+
+    workspace.switchWorkspace('w2');
+
+    expect(workspace.access()).toMatchObject({ myRole: 'admin', canManage: true, isGuest: false });
+    expect(workspace.can('workspace.delete')).toBe(false);
+    expect(workspace.rolePermissions().member).not.toContain('members.invite');
+  });
+
+  it('shows guests only their own teams and teammates', async () => {
+    const workspace = TestBed.inject(WorkspaceState);
+    await settle();
+
+    workspace.putRoster('w1', { ...workspace.roster(), u0: 'guest' });
+
+    expect(workspace.access()).toMatchObject({ isGuest: true, canInvite: false });
+    expect(workspace.teams().every((team) => team.memberIds.includes('u0'))).toBe(true);
+    expect(workspace.teams().length).toBeLessThan(6);
+    expect(workspace.memberDirectory().length).toBeLessThan(workspace.members().length);
+    expect(workspace.can('tasks.create')).toBe(false);
+  });
 });

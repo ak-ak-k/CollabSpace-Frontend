@@ -56,6 +56,7 @@ export class WorkspaceSwitcherComponent {
   );
   protected readonly currentName = computed(() => this.current()?.name ?? FALLBACK_NAME);
   protected readonly canInvite = computed(() => this.workspace.access().canInvite);
+  protected readonly canOpenSettings = computed(() => !this.workspace.access().isGuest);
   protected readonly settingsRoute = computed(() =>
     this.breakpoint.isMobile() ? MOBILE_SETTINGS_ROUTE : SETTINGS_ROUTE,
   );

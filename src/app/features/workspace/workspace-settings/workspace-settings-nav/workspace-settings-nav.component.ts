@@ -5,6 +5,7 @@ import {
   OWNER_SECTION,
   WORKSPACE_SETTINGS_SECTIONS,
   workspaceSettingsLinkOf,
+  WorkspaceSettingsSection,
   WorkspaceSettingsSectionId,
 } from '../workspace-settings-sections';
 
@@ -22,10 +23,10 @@ const ICON_SIZES: Record<WorkspaceSettingsNavLayout, number> = { side: 16, chips
 export class WorkspaceSettingsNavComponent {
   readonly layout = input<WorkspaceSettingsNavLayout>('side');
   readonly current = input<WorkspaceSettingsSectionId | null>(null);
+  readonly sections = input<readonly WorkspaceSettingsSection[]>(WORKSPACE_SETTINGS_SECTIONS);
 
   private readonly links = viewChildren<ElementRef<HTMLAnchorElement>>('sectionLink');
 
-  protected readonly sections = WORKSPACE_SETTINGS_SECTIONS;
   protected readonly dangerSection = OWNER_SECTION;
   protected readonly linkOf = workspaceSettingsLinkOf;
   protected readonly iconSize = computed(() => ICON_SIZES[this.layout()]);

@@ -1,5 +1,7 @@
-import { WorkspaceRole } from '../../../core/models/user';
+import { User, WorkspaceRole } from '../../../core/models/user';
+import { roleWithArticle, WORKSPACE_ROLE_LABELS } from '../../../core/models/workspace-role';
 import { formatFileSize } from '../../../shared/pipes/file-size.pipe';
+import { SelectOption } from '../../../shared/ui/select/select.component';
 
 const MILLISECONDS_PER_DAY = 86_400_000;
 const INVITE_LIFETIME_DAYS = 7;
@@ -8,10 +10,12 @@ const DOMAIN_SEPARATORS = /[\s,;]+/;
 const LEADING_AT = /^@/;
 const IMAGE_TYPE = /^image\//;
 
+type TransferCandidate = Pick<User, 'id' | 'name' | 'role'>;
+
 export const LOGO_TYPE_ERROR = 'Choose a PNG, JPG, WebP or SVG image';
 
 export const readOnlyNoteOf = (role: WorkspaceRole, workspaceName: string): string =>
-  `You’re a ${role === 'member' ? 'member' : 'guest'} of ${workspaceName}. Only owners and admins can change these settings — you can still view them.`;
+  `You’re ${roleWithArticle(role).toLowerCase()} of ${workspaceName}. Only owners and admins can change these settings — you can still view them.`;
 
 export const ownerOnlyNoteOf = (workspaceName: string): string =>
   `Only workspace owners can archive or delete ${workspaceName}.`;
@@ -39,3 +43,15 @@ export const logoFileErrorOf = (type: string, bytes: number): string => {
     ? `That image is ${formatFileSize(bytes)} — logos must be 2 MB or smaller`
     : '';
 };
+
+export const transferCandidatesOf = (
+  members: readonly TransferCandidate[],
+  actorId: string | undefined,
+): readonly SelectOption[] =>
+  members
+    .filter((member) => member.id !== actorId && member.role !== 'guest')
+    .map((member) => ({
+      value: member.id,
+      label: `${member.name} · ${WORKSPACE_ROLE_LABELS[member.role]}`,
+    }))
+    .sort((first, second) => first.label.localeCompare(second.label));

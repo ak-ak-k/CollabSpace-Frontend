@@ -55,15 +55,17 @@
         <span class="workspace-switcher__hint">{{ current()?.memberCount }}</span>
       </span>
     </a>
-    <a
-      appDropdownItem
-      class="workspace-switcher__item"
-      [routerLink]="settingsRoute()"
-      (triggered)="close()"
-    >
-      <app-icon name="settings" [size]="18" />
-      Workspace settings
-    </a>
+    @if (canOpenSettings()) {
+      <a
+        appDropdownItem
+        class="workspace-switcher__item"
+        [routerLink]="settingsRoute()"
+        (triggered)="close()"
+      >
+        <app-icon name="settings" [size]="18" />
+        Workspace settings
+      </a>
+    }
     @if (canInvite()) {
       <button appDropdownItem type="button" class="workspace-switcher__item" (triggered)="invite()">
         <app-icon name="user-plus" [size]="18" />

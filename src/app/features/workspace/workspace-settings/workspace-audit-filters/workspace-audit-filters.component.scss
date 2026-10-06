@@ -1,0 +1,31 @@
+@use '../../filter-chip';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.audit-filters__chips {
+  @include filter-chip.row;
+}
+
+.audit-filters__chip {
+  @include filter-chip.chip;
+}
+
+.audit-filters__chip--on {
+  @include filter-chip.chip-on;
+}
+
+.audit-filters__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.audit-filters__actor {
+  min-width: var(--workspace-settings-audit-actor-min-width);
+}

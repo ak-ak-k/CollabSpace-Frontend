@@ -76,6 +76,7 @@ export class TeamDetailComponent {
   protected readonly detail = injectTeamDetail(() => this.teamId());
   protected readonly status = this.workspace.status;
   protected readonly canInvite = computed(() => this.workspace.access().canInvite);
+  protected readonly canCreateChannels = computed(() => this.workspace.access().canCreateChannels);
   protected readonly activeTab = computed(() => tabOf(this.tab()) ?? 'overview');
   protected readonly breadcrumb = computed<readonly BreadcrumbItem[]>(() => [
     { label: this.workspace.currentWorkspace()?.name ?? 'Workspace', link: '/workspace' },

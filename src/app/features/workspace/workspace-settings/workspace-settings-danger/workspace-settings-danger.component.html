@@ -5,6 +5,8 @@
 <fieldset class="danger" [disabled]="!isOwner()">
   <legend class="visually-hidden">Danger zone</legend>
 
+  <app-workspace-transfer-ownership />
+
   <app-danger-zone tone="neutral" [heading]="archiveHeading()" [description]="archiveText()">
     @if (archived()) {
       <button appButton type="button" (click)="unarchive()">

@@ -41,6 +41,7 @@
           @case ('channels') {
             <app-team-channels
               [channels]="detail.channels()"
+              [canCreate]="canCreateChannels()"
               (createChannel)="actions.createChannel(team.id)"
             />
           }
