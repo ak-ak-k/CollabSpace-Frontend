@@ -99,7 +99,7 @@ export interface TaskComment {
   readonly edited: boolean;
 }
 
-export const taskRouteOf = (taskId: string): string => `/tasks?task=${taskId}`;
+export const taskRouteOf = (taskId: string): string => `/tasks/${taskId}`;
 
 export const isTaskStatus = (value: string): value is TaskStatus =>
   TASK_COLUMNS.some((column) => column.status === value);

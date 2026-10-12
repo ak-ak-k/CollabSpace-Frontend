@@ -38,7 +38,7 @@ export class ConfirmDialogComponent {
   }
 
   protected confirm(): void {
-    if (!this.blocked()) {
+    if (!this.blocked() && this.data.canConfirm()) {
       this.dialogRef.close(true);
     }
   }

@@ -6,7 +6,7 @@ import { Channel } from '../models/channel';
 import { Conversation, ConversationPreview, NotifyLevel } from '../models/conversation';
 import { Message, SavedEntry } from '../models/message';
 import { threadKey } from '../models/thread';
-import { firstUnreadId, releaseQueued, sum, Threads } from './chat-mutations';
+import { firstUnreadId, sum, Threads } from './chat-mutations';
 import {
   isListed,
   ListingContext,
@@ -226,10 +226,6 @@ export class ChatState {
           )
         : [...conversations, conversation],
     );
-  }
-
-  flushQueue(): void {
-    this.messages.update(releaseQueued);
   }
 
   setUnreadCount(conversationId: string, count: number): void {

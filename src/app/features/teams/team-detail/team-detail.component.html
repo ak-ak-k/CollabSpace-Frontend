@@ -77,17 +77,6 @@
           }
         }
       </div>
-    } @else {
-      <div class="detail">
-        <app-empty-state
-          icon="users"
-          heading="Team not found"
-          message="This team may have been archived, or you don’t have access to it."
-          actionLabel="All teams"
-          actionIcon="arrow-left"
-          (action)="backToTeams()"
-        />
-      </div>
     }
   }
 }

@@ -1,3 +1,4 @@
+@use 'touch';
 @use '../task-section';
 @use '../../../shared/ui/input/field/field';
 
@@ -48,6 +49,13 @@
 .subtask__check {
   flex: none;
   padding-inline-start: var(--space-1);
+
+  @include touch.on-touch {
+    display: grid;
+    min-width: var(--size-touch-target);
+    min-height: var(--size-touch-target);
+    padding-inline-start: var(--space-0);
+  }
 }
 
 .subtask__title {

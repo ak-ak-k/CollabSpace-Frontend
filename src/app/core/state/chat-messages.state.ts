@@ -5,11 +5,15 @@ import { DeliveryState, Message, MessageDraft } from '../models/message';
 import {
   appendMessage,
   editMessage,
+  failQueued,
   insertMessage,
   reactToMessage,
+  releaseQueued,
   removeMessage,
   setDeliveryState,
+  Threads,
   togglePinned,
+  waitingMessagesOf,
 } from './chat-mutations';
 import { threadOf } from './chat-selectors';
 import { ChatState } from './chat.state';
@@ -87,6 +91,27 @@ export class ChatMessagesState {
       reactToMessage(threads, conversationId, messageId, emoji, CURRENT_USER_ID),
     );
     await this.persist(conversationId, messageId);
+  }
+
+  flushQueue(): number {
+    return this.settleQueue(releaseQueued);
+  }
+
+  failQueue(): number {
+    return this.settleQueue(failQueued);
+  }
+
+  private settleQueue(settle: (threads: Threads) => Threads): number {
+    const waiting = new Set(waitingMessagesOf(this.chat.messages()).map((message) => message.id));
+    if (waiting.size === 0) {
+      return 0;
+    }
+    const settled = settle(this.chat.messages());
+    this.chat.messages.set(settled);
+    Object.values(settled)
+      .flatMap((thread) => thread.filter((message) => waiting.has(message.id)))
+      .forEach((message) => void this.data.saveMessage(message));
+    return waiting.size;
   }
 
   private acknowledgeLater(conversationId: string, messageId: string): void {

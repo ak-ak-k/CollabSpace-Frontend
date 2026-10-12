@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { ActivityChange } from '../../../../core/models/activity';
 import { Integration } from '../../../../core/models/preferences';
+import { ConnectionGuard } from '../../../../core/services/connection-guard.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { PreferencesState } from '../../../../core/state/preferences.state';
 import { WorkspaceState } from '../../../../core/state/workspace.state';
@@ -36,12 +37,16 @@ export class WorkspaceSettingsIntegrationsComponent {
   private readonly updates = inject(WorkspacePreferenceUpdates);
   private readonly toasts = inject(ToastService);
   private readonly workspace = inject(WorkspaceState);
+  private readonly connection = inject(ConnectionGuard);
 
   protected readonly status = this.state.status;
   protected readonly integrations = this.state.integrations;
 
   protected toggle(integration: Integration): void {
-    if (!this.workspace.can('integrations.manage')) {
+    if (
+      !this.workspace.can('integrations.manage') ||
+      !this.connection.allows('toggleIntegration')
+    ) {
       return;
     }
     const connected = !integration.connected;
@@ -51,6 +56,7 @@ export class WorkspaceSettingsIntegrationsComponent {
       verb: connected ? 'connected' : 'disconnected',
       object: integration.name,
       section: 'integrations',
+      action: connected ? 'integration.connected' : 'integration.disconnected',
       change: connectionChangeOf(connected),
     });
     this.toasts.show(`${integration.name} ${connected ? 'connected' : 'disconnected'}`, {

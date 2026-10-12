@@ -1,0 +1,20 @@
+@if (view(); as bar) {
+  @if (bar.busy) {
+    <app-spinner class="network-bar__spinner" />
+    <app-icon class="network-bar__still" [name]="bar.icon" [size]="16" />
+  } @else {
+    <app-icon [name]="bar.icon" [size]="16" />
+  }
+  <span class="network-bar__message">
+    <strong class="network-bar__title">{{ bar.title }}</strong>
+    {{ bar.text }}
+  </span>
+  @if (bar.showDetails) {
+    <a class="network-bar__link" routerLink="/offline">Details</a>
+  }
+  @if (bar.action; as action) {
+    <button type="button" class="network-bar__action" (click)="run(action.command)">
+      {{ action.label }}
+    </button>
+  }
+}

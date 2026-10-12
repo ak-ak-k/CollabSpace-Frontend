@@ -1,0 +1,87 @@
+@use 'breakpoints';
+
+@mixin touch-target {
+  min-width: var(--size-touch-target);
+  min-height: var(--size-touch-target);
+}
+
+:host {
+  --network-bar-background: var(--secondary);
+  --network-bar-foreground: var(--on-secondary);
+  --focus-ring: var(--network-bar-foreground);
+
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  background: var(--network-bar-background);
+  color: var(--network-bar-foreground);
+  font-size: var(--font-size-13);
+}
+
+:host(.network-bar--danger) {
+  --network-bar-background: var(--danger-surface);
+  --network-bar-foreground: var(--on-danger-surface);
+}
+
+.network-bar__message {
+  flex: 1;
+  min-width: var(--network-bar-message-min-width);
+}
+
+.network-bar__title {
+  font-weight: var(--font-weight-heavy);
+}
+
+.network-bar__still {
+  display: none;
+}
+
+.network-bar__link,
+.network-bar__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--network-bar-foreground);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semibold);
+
+  @include breakpoints.tablet-and-down {
+    @include touch-target;
+  }
+
+  @include breakpoints.touch-device {
+    @include touch-target;
+  }
+}
+
+.network-bar__action {
+  padding: var(--space-1) var(--space-2-5);
+  border: var(--border-width-hairline) solid var(--network-bar-foreground);
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--network-bar-action-hover);
+  }
+}
+
+@mixin still-icon {
+  .network-bar__spinner {
+    display: none;
+  }
+
+  .network-bar__still {
+    display: inline-flex;
+  }
+}
+
+@include breakpoints.reduced-motion {
+  @include still-icon;
+}
+
+:host-context([data-reduce-motion]) {
+  @include still-icon;
+}

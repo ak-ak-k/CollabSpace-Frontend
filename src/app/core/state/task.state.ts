@@ -4,12 +4,14 @@ import { CURRENT_USER_ID } from '../mocks/users.mock';
 import { NewTask, Subtask, Task, TaskChanges, TaskStatus } from '../models/task';
 import { firstNameOf } from '../models/user';
 import { DataModeState } from './data-mode.state';
-import { Loadable, settledStatus } from './loadable';
+import { Loadable, loadingWhile, settledStatus } from './loadable';
 import { ActivityLogState } from './activity-log.state';
+import { pendingOfKind } from './activity-outcome';
 import { NetworkState } from './network.state';
 import {
   createdNote,
   deletedNote,
+  restoredNote,
   statusNote,
   taskActivityEntry,
   taskChangeNote,
@@ -48,12 +50,13 @@ export class TaskState {
       const user = this.workspace.user(userId);
       return user ? firstNameOf(user.name) : null;
     },
+    userFullName: (userId) => this.workspace.user(userId)?.name ?? null,
     teamName: (teamId) => this.workspace.team(teamId)?.name ?? null,
   };
 
   readonly tasks = computed(() => this.allTasks().filter((task) => this.workspace.contains(task)));
-  readonly loadStatus = this.loader.status.asReadonly();
-  readonly status = settledStatus(this.loader.status, () => this.tasks().length === 0);
+  readonly loadStatus = loadingWhile(this.loader.status, this.workspace.switching);
+  readonly status = settledStatus(this.loadStatus, () => this.tasks().length === 0);
   readonly openTasks = computed(() => this.tasks().filter((task) => task.status !== 'done'));
   readonly openCount = computed(() => this.openTasks().length);
   readonly pendingCount = computed(() => this.allTasks().filter((task) => task.pending).length);
@@ -62,11 +65,6 @@ export class TaskState {
     effect(() => {
       this.dataMode.mode();
       untracked(() => void this.loader.load());
-    });
-    effect(() => {
-      if (this.network.online() && untracked(this.pendingCount) > 0) {
-        untracked(() => void this.syncPending());
-      }
     });
   }
 
@@ -89,6 +87,7 @@ export class TaskState {
     });
     this.allTasks.update((tasks) => [...tasks, task]);
     this.log(task, createdNote(task));
+    this.markPendingWhileOffline(task.id);
     return task;
   }
 
@@ -138,7 +137,11 @@ export class TaskState {
   }
 
   async restore(task: Task): Promise<void> {
+    const wasGone = !this.allTasks().some(({ id }) => id === task.id);
     this.allTasks.update((tasks) => [...tasks.filter(({ id }) => id !== task.id), task]);
+    if (wasGone) {
+      this.log(task, restoredNote(task));
+    }
     await this.data.restoreTask(task);
   }
 
@@ -186,17 +189,24 @@ export class TaskState {
   }
 
   log(task: Task, note: TaskNote): void {
-    this.activity.record(taskActivityEntry(task, note), task.workspaceId);
+    const outcome = this.network.online() ? 'succeeded' : 'pending';
+    this.activity.record({ ...taskActivityEntry(task, note), outcome }, task.workspaceId);
+  }
+
+  async flushPending(): Promise<number> {
+    const pending = this.allTasks().filter((task) => task.pending).length;
+    this.activity.setOutcome(pendingOfKind('task'), 'succeeded');
+    if (pending === 0) {
+      return 0;
+    }
+    this.allTasks.update((tasks) =>
+      tasks.map((task) => (task.pending ? { ...task, pending: false } : task)),
+    );
+    await this.data.syncTasks(this.allTasks());
+    return pending;
   }
 
   private replace(id: string, change: (task: Task) => Task): void {
     this.allTasks.update((tasks) => tasks.map((task) => (task.id === id ? change(task) : task)));
-  }
-
-  private async syncPending(): Promise<void> {
-    await this.data.syncTasks(this.allTasks());
-    this.allTasks.update((tasks) =>
-      tasks.map((task) => (task.pending ? { ...task, pending: false } : task)),
-    );
   }
 }

@@ -7,8 +7,10 @@ import {
   PresenceOption,
   userColorSeed,
 } from '../../core/models/user';
+import { HomeScreenHelp } from '../../core/services/home-screen-help.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthState } from '../../core/state/auth.state';
+import { DataModeState } from '../../core/state/data-mode.state';
 import { InstallState } from '../../core/state/install.state';
 import { NetworkState } from '../../core/state/network.state';
 import { ThemeState } from '../../core/state/theme.state';
@@ -51,8 +53,10 @@ export class DrawerMenuComponent {
 
   protected readonly theme = inject(ThemeState);
   protected readonly network = inject(NetworkState);
+  protected readonly devTools = inject(DataModeState).available;
   protected readonly badges = inject(NavigationBadges);
   protected readonly installer = inject(InstallState);
+  private readonly homeScreenHelp = inject(HomeScreenHelp);
 
   protected readonly links = DRAWER_NAVIGATION;
   protected readonly statusOptions = PRESENCE_OPTIONS;
@@ -72,6 +76,11 @@ export class DrawerMenuComponent {
   protected install(): void {
     this.close();
     void this.installer.install();
+  }
+
+  protected explainHomeScreen(): void {
+    this.close();
+    void this.homeScreenHelp.explain();
   }
 
   protected async setStatus(option: PresenceOption): Promise<void> {

@@ -8,6 +8,7 @@ import {
   RadioOption,
 } from '../../../../shared/ui/radio/radio-group.component';
 import { SettingRowComponent } from '../../../settings/setting-row/setting-row.component';
+import { preferenceControl } from '../preference-control';
 import { WorkspacePreferenceUpdates } from '../workspace-preference-updates.service';
 import { WorkspaceSettingsNoteComponent } from '../workspace-settings-note/workspace-settings-note.component';
 
@@ -42,10 +43,20 @@ export class WorkspaceSettingsAppearanceComponent {
   protected readonly preferences = inject(WorkspaceState).preferences;
   protected readonly themeOptions = THEME_OPTIONS;
   protected readonly densityOptions = DENSITY_OPTIONS;
+  protected readonly theme = preferenceControl<string>(
+    () => this.preferences()?.defaultTheme ?? '',
+  );
+  protected readonly density = preferenceControl<string>(
+    () => this.preferences()?.defaultDensity ?? '',
+  );
 
   protected setTheme(value: string): void {
     const defaultTheme = themeOf(value);
-    this.updates.set({ defaultTheme }, `Default theme: ${labelOf(THEME_OPTIONS, defaultTheme)}`);
+    this.updates.set(
+      { defaultTheme },
+      `Default theme: ${labelOf(THEME_OPTIONS, defaultTheme)}`,
+      this.theme.reset,
+    );
   }
 
   protected setDensity(value: string): void {
@@ -53,6 +64,7 @@ export class WorkspaceSettingsAppearanceComponent {
     this.updates.set(
       { defaultDensity },
       `Default density: ${labelOf(DENSITY_OPTIONS, defaultDensity)}`,
+      this.density.reset,
     );
   }
 }

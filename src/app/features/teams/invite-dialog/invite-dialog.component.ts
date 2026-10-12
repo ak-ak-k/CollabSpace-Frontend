@@ -84,6 +84,7 @@ export class InviteDialogComponent {
   private readonly emailRows = viewChild(InviteEmailRowsComponent);
   private readonly doneButton = viewChild('doneButton', { read: ElementRef<HTMLButtonElement> });
   private sendTimer: ReturnType<typeof setTimeout> | undefined;
+  private destroyed = false;
 
   protected readonly rows = signal<readonly EmailRow[]>(freshRows());
   protected readonly tried = signal(false);
@@ -157,7 +158,10 @@ export class InviteDialogComponent {
   );
 
   constructor() {
-    inject(DestroyRef).onDestroy(() => clearTimeout(this.sendTimer));
+    inject(DestroyRef).onDestroy(() => {
+      this.destroyed = true;
+      clearTimeout(this.sendTimer);
+    });
   }
 
   protected submit(event: Event): void {
@@ -199,19 +203,26 @@ export class InviteDialogComponent {
     const teamId = this.teamId() || null;
     const queued = this.network.offline();
     const outcome = await this.invites.invite({ emails, role, teamId, queued });
+    const teamName = teamId ? (this.workspace.team(teamId)?.name ?? '') : '';
     this.activity.record({
       kind: 'invite',
       verb: 'invited',
       object: invitedObject(emails),
       route: PENDING_INVITES_ROUTE,
+      action: 'invite.sent',
+      meta: { role, count: emails.length, team: teamName || null },
+      outcome: queued ? 'pending' : 'succeeded',
     });
+    if (this.destroyed) {
+      return;
+    }
     this.busy.set(false);
     this.result.set({
       emails,
       resent: new Set(outcome.resent.map((invite) => invite.email.toLowerCase())),
       skipped: summary.skipped.map((row) => row.email),
       roleLabel: WORKSPACE_ROLE_LABELS[role],
-      teamName: teamId ? (this.workspace.team(teamId)?.name ?? '') : '',
+      teamName,
       queued,
     });
     afterNextRender(() => this.doneButton()?.nativeElement.focus(), { injector: this.injector });

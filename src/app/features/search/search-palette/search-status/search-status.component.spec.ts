@@ -44,6 +44,19 @@ describe('SearchStatusComponent', () => {
     expect(host.querySelector('[aria-live="polite"]')?.textContent).toBe('12 results for priya');
   });
 
+  it('says the results come from this device while offline', async () => {
+    fixture.componentRef.setInput('local', true);
+    fixture.componentRef.setInput('status', 'results');
+    fixture.componentRef.setInput('total', 1);
+    await fixture.whenStable();
+    const live = host.querySelector('[aria-live="polite"]');
+
+    expect(live?.textContent).toBe('1 result on this device for priya');
+    fixture.componentRef.setInput('status', 'empty');
+    await fixture.whenStable();
+    expect(live?.textContent).toBe('No results on this device for priya');
+  });
+
   it('raises an alert with a retry button when search fails', async () => {
     let retried = false;
     fixture.componentInstance.retry.subscribe(() => (retried = true));

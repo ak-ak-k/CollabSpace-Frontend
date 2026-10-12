@@ -14,33 +14,7 @@
       message="New members, teams, channels and role changes will show up here."
     />
   } @else {
-    <ol class="events">
-      @for (event of shown(); track event.id) {
-        <li class="event">
-          <app-avatar
-            [name]="event.avatarName"
-            [text]="event.avatarText"
-            [seed]="event.seed"
-            [size]="32"
-          />
-          <span class="event__body">
-            <span class="event__sentence">
-              <strong class="event__actor">{{ event.actorName }}</strong>
-              {{ event.verb }}
-              @if (event.route) {
-                <a class="event__object" [routerLink]="linkTo(event.route)">{{ event.object }}</a>
-              } @else {
-                <span class="event__object">{{ event.object }}</span>
-              }
-            </span>
-            <span class="event__meta">
-              <app-icon [name]="event.icon" [size]="13" />
-              {{ event.when }}
-            </span>
-          </span>
-        </li>
-      }
-    </ol>
+    <app-activity-feed [items]="shown()" label="Recent activity in this workspace" />
   }
 
   <a appButton variant="ghost" class="events__all" [routerLink]="activityRoute">

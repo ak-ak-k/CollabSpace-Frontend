@@ -2,10 +2,12 @@
 
 @mixin touch-height {
   --close-height: var(--size-touch-target);
+  --close-min-width: var(--size-touch-target);
 }
 
 :host {
   --close-height: var(--size-search-close);
+  --close-min-width: auto;
 
   position: fixed;
   inset: var(--space-0);
@@ -89,6 +91,7 @@
 
 .panel__close {
   flex: none;
+  min-width: var(--close-min-width);
   height: var(--close-height);
   padding: var(--space-0) var(--space-2);
   border: var(--border-width-hairline) solid var(--border-control);
@@ -118,12 +121,20 @@
 
 .panel__offline {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-2);
   margin: var(--space-0);
   padding: var(--space-2) var(--space-4);
   background: var(--surface-secondary);
   font-size: var(--font-size-13);
+}
+
+.panel__offline-icon {
+  margin-top: var(--space-0-5);
+}
+
+.panel__offline-title {
+  font-weight: var(--font-weight-heavy);
 }
 
 .panel__footer {

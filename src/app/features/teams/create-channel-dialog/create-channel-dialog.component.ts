@@ -2,8 +2,10 @@ import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { Component, computed, inject, signal } from '@angular/core';
 import { form, FormField, FormRoot, maxLength, validate } from '@angular/forms/signals';
 import { Router } from '@angular/router';
+import { ConnectionGuard } from '../../../core/services/connection-guard.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { ChatState } from '../../../core/state/chat.state';
+import { channelCreatedEntry, channelRouteOf } from '../../../core/state/channel-activity';
 import { WorkspaceActivityState } from '../../../core/state/workspace-activity.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
@@ -64,6 +66,7 @@ export class CreateChannelDialogComponent {
   private readonly activity = inject(WorkspaceActivityState);
   private readonly router = inject(Router);
   private readonly toasts = inject(ToastService);
+  private readonly connection = inject(ConnectionGuard);
 
   protected readonly nameMaxLength = CHANNEL_NAME_MAX_LENGTH;
   protected readonly descriptionMaxLength = CHANNEL_DESCRIPTION_MAX_LENGTH;
@@ -104,7 +107,11 @@ export class CreateChannelDialogComponent {
     },
     {
       submission: {
-        action: async () => this.create(),
+        action: async () => {
+          if (this.connection.allowsSave()) {
+            await this.create();
+          }
+        },
         onInvalid: (submitted) => submitted().errorSummary()[0]?.fieldTree().focusBoundControl(),
       },
     },
@@ -137,17 +144,9 @@ export class CreateChannelDialogComponent {
       isPrivate: privacy === 'private',
     });
     this.chat.addChannel(channel);
-    const route = `/teams/${teamId}/channels/${channel.id}`;
-    this.activity.record({
-      kind: 'channel',
-      verb: 'created',
-      object: `#${name} in ${team.name}`,
-      route,
-      teamId,
-      entity: { type: 'channel', id: channel.id },
-    });
+    this.activity.record(channelCreatedEntry(channel, team.name));
     this.dialogRef.close();
-    await this.router.navigateByUrl(route);
+    await this.router.navigateByUrl(channelRouteOf(channel));
     this.toasts.show(`#${name} created`, { icon: 'hash' });
   }
 }

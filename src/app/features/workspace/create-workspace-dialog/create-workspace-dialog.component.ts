@@ -17,6 +17,7 @@ import {
   workspaceNameError,
   workspaceSlugError,
 } from '../../../core/models/workspace-rules';
+import { ConnectionGuard } from '../../../core/services/connection-guard.service';
 import { WorkspaceAdminState } from '../../../core/state/workspace-admin.state';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
@@ -53,6 +54,7 @@ export class CreateWorkspaceDialogComponent {
   private readonly dialogRef = inject<DialogRef<void>>(DialogRef);
   private readonly admin = inject(WorkspaceAdminState);
   private readonly actions = inject(WorkspaceActions);
+  private readonly connection = inject(ConnectionGuard);
 
   protected readonly nameMaxLength = WORKSPACE_NAME_MAX_LENGTH;
   protected readonly slugMaxLength = WORKSPACE_SLUG_MAX_LENGTH;
@@ -104,6 +106,9 @@ export class CreateWorkspaceDialogComponent {
   }
 
   private finish(): void {
+    if (!this.connection.allowsSave()) {
+      return;
+    }
     const { name, slug, description } = this.draft();
     this.dialogRef.close();
     void this.actions.createWorkspace({

@@ -1,6 +1,5 @@
 import { Permission } from '../../../core/models/permission';
 import {
-  canOpenWorkspaceSettings,
   resolveWorkspaceSettingsSection,
   visibleWorkspaceSettingsSections,
   workspaceSettingsRedirectOf,
@@ -42,15 +41,5 @@ describe('workspace settings sections', () => {
     expect(
       visibleWorkspaceSettingsSections(adminWithoutAuditCan).map((section) => section.id),
     ).not.toContain('audit');
-    expect(canOpenWorkspaceSettings('audit', false, ownerCan)).toBe(true);
-    expect(canOpenWorkspaceSettings('audit', false, adminWithoutAuditCan)).toBe(false);
-    expect(canOpenWorkspaceSettings('audit', false, memberCan)).toBe(false);
-  });
-
-  it('keeps guests out of settings and non-managers out of manager sections', () => {
-    expect(canOpenWorkspaceSettings('general', true, ownerCan)).toBe(false);
-    expect(canOpenWorkspaceSettings('general', false, memberCan)).toBe(true);
-    expect(canOpenWorkspaceSettings('security', false, memberCan)).toBe(false);
-    expect(canOpenWorkspaceSettings(null, false, memberCan)).toBe(true);
   });
 });

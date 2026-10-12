@@ -3,6 +3,7 @@ import { inject, Service } from '@angular/core';
 import { Router } from '@angular/router';
 import { WorkspaceRole } from '../../core/models/user';
 import { roleWithArticle } from '../../core/models/workspace-role';
+import { ConnectionGuard } from '../../core/services/connection-guard.service';
 import { DialogService } from '../../core/services/dialog.service';
 import { ToastService } from '../../core/services/toast.service';
 import { WorkspaceAdminState } from '../../core/state/workspace-admin.state';
@@ -36,6 +37,7 @@ export class MemberActions {
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly connection = inject(ConnectionGuard);
 
   private readonly handlers: Record<MemberActionKind, (userId: string) => void> = {
     profile: (userId) => this.openProfile(userId),
@@ -94,7 +96,7 @@ export class MemberActions {
   async remove(userId: string): Promise<void> {
     const member = this.workspace.user(userId);
     const workspaceName = this.workspaceName();
-    if (!member) {
+    if (!member || !this.connection.allows('removeMember')) {
       return;
     }
     const confirmed = await this.dialogs.confirm({
@@ -102,6 +104,7 @@ export class MemberActions {
       body: 'They’ll lose access to every team, channel and file in this workspace right away. Messages and files they’ve already shared stay put.',
       confirmLabel: 'Remove member',
       icon: 'user-minus',
+      canConfirm: this.connection.recheck('removeMember'),
     });
     const workspaceId = this.workspace.currentWorkspaceId();
     const role = confirmed ? await this.admin.removeMember(userId) : null;

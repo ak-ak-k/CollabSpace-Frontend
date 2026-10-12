@@ -3,14 +3,14 @@
   <a class="appearance__link" routerLink="/settings/appearance">their own appearance settings</a>.
 </app-workspace-settings-note>
 
-@if (preferences(); as settings) {
+@if (preferences()) {
   <ul class="appearance-rows">
     <li appSettingRow wrap label="Default theme">
       <app-radio-group
         label="Default theme"
         hideLabel
         [options]="themeOptions"
-        [value]="settings.defaultTheme"
+        [(value)]="theme.value"
         (valueChange)="setTheme($event)"
       />
     </li>
@@ -19,7 +19,7 @@
         label="Default density"
         hideLabel
         [options]="densityOptions"
-        [value]="settings.defaultDensity"
+        [(value)]="density.value"
         (valueChange)="setDensity($event)"
       />
     </li>

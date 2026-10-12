@@ -1,12 +1,10 @@
-import { ActivityEvent, activityIconOf } from '../../../core/models/activity';
 import { Channel } from '../../../core/models/channel';
 import { Team } from '../../../core/models/team';
-import { User, userColorSeed, WorkspaceRole } from '../../../core/models/user';
+import { User, WorkspaceRole } from '../../../core/models/user';
 import { Workspace } from '../../../core/models/workspace';
 import { WORKSPACE_ROLE_LABELS } from '../../../core/models/workspace-role';
 import { workspaceUrlOf } from '../../../core/models/workspace-rules';
 import { formatCount } from '../../../shared/pipes/count.pipe';
-import { formatRelative } from '../../../shared/pipes/time-format';
 import { IconName } from '../../../shared/ui/icon/icon-registry';
 import { memberFilterLink, MEMBERS_ROUTE } from '../members-view';
 
@@ -26,19 +24,6 @@ export interface OverviewStatInput {
   readonly channels: readonly Channel[];
 }
 
-export interface OverviewActivityItem {
-  readonly id: string;
-  readonly actorName: string;
-  readonly avatarName: string;
-  readonly avatarText: string;
-  readonly seed: number;
-  readonly verb: string;
-  readonly object: string;
-  readonly route: string;
-  readonly icon: IconName;
-  readonly when: string;
-}
-
 export interface OverviewTeamRow {
   readonly id: string;
   readonly name: string;
@@ -55,8 +40,6 @@ export interface OverviewDetail {
 const TEAMS_ROUTE = '/teams';
 const NONE_YET = 'None yet';
 const NO_VALUE = '—';
-const UNKNOWN_ACTOR = 'Someone';
-const UNKNOWN_AVATAR_TEXT = '?';
 
 export const overviewStats = ({
   people,
@@ -103,28 +86,6 @@ export const overviewStats = ({
       link: memberFilterLink('online'),
     },
   ];
-};
-
-export const overviewActivityItem = (
-  event: ActivityEvent,
-  usersById: ReadonlyMap<string, User>,
-  viewerId: string,
-  now = Date.now(),
-): OverviewActivityItem => {
-  const actor = usersById.get(event.actorId);
-  const actorName = actor ? (actor.id === viewerId ? 'You' : actor.name) : UNKNOWN_ACTOR;
-  return {
-    id: event.id,
-    actorName,
-    avatarName: actor?.name ?? UNKNOWN_ACTOR,
-    avatarText: actor ? '' : UNKNOWN_AVATAR_TEXT,
-    seed: userColorSeed(event.actorId),
-    verb: event.verb,
-    object: event.object,
-    route: event.route,
-    icon: activityIconOf(event.kind),
-    when: formatRelative(event.occurredAt, now),
-  };
 };
 
 export const overviewTeamRow = (team: Team): OverviewTeamRow => ({

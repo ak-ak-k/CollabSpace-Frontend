@@ -1,0 +1,42 @@
+@use '../../workspace/filter-chip';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: var(--rule-strong);
+}
+
+.filters__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.filters__field {
+  flex: 1 1 var(--activity-filter-basis);
+  max-width: var(--activity-filter-max-width);
+}
+
+.filters__date {
+  flex: 1 1 var(--activity-date-basis);
+  max-width: var(--activity-date-max-width);
+}
+
+.filters__chips {
+  @include filter-chip.row;
+}
+
+.filters__chip {
+  @include filter-chip.chip;
+}
+
+.filters__chip--on {
+  @include filter-chip.chip-on;
+}
+
+.filters__clear {
+  font-size: var(--font-size-13);
+}

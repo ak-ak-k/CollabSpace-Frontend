@@ -1,7 +1,14 @@
 import { effect, inject, Service, signal, untracked } from '@angular/core';
 import { ActivityData } from '../data/activity.data';
 import { CURRENT_USER_ID } from '../mocks/users.mock';
-import { activityCategoryOf, ActivityEntry, ActivityEvent } from '../models/activity';
+import {
+  activityCategoryOf,
+  ActivityEntry,
+  ActivityEvent,
+  ActivityOutcome,
+  legacyActionOf,
+} from '../models/activity';
+import { ActivityMatcher, withOutcome } from './activity-outcome';
 import { DataModeState } from './data-mode.state';
 import { Loadable } from './loadable';
 import { WorkspaceState } from './workspace.state';
@@ -50,9 +57,22 @@ export class ActivityLogState {
       entity: entry.entity ?? null,
       teamId: entry.teamId ?? null,
       change: entry.change ?? null,
+      action: entry.action ?? legacyActionOf(entry.kind, entry.object),
+      meta: entry.meta ?? null,
+      outcome: entry.outcome ?? 'succeeded',
+      audit: entry.audit ?? false,
     };
     this.allEvents.update((events) => [event, ...events]);
     void this.data.recordActivity(event);
     return event.id;
+  }
+
+  setOutcome(matches: ActivityMatcher, outcome: ActivityOutcome): number {
+    const change = withOutcome(this.allEvents(), matches, outcome);
+    if (change.changedIds.size > 0) {
+      this.allEvents.set(change.events);
+      void this.data.setOutcome(change.changedIds, outcome);
+    }
+    return change.changedIds.size;
   }
 }

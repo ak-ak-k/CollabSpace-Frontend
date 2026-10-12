@@ -1,10 +1,11 @@
 import { inject, Service } from '@angular/core';
 import { Router } from '@angular/router';
 import { Team } from '../../core/models/team';
+import { ConnectionGuard } from '../../core/services/connection-guard.service';
 import { DialogService } from '../../core/services/dialog.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ChatState } from '../../core/state/chat.state';
-import { WorkspaceState } from '../../core/state/workspace.state';
+import { TeamMembershipState } from '../../core/state/team-membership.state';
 import { WorkspaceActions } from '../workspace/workspace-actions.service';
 import {
   CreateTeamDialogComponent,
@@ -14,13 +15,14 @@ import { TeamAdminActions } from './team-admin-actions.service';
 
 @Service()
 export class TeamActions {
-  private readonly workspace = inject(WorkspaceState);
+  private readonly membership = inject(TeamMembershipState);
   private readonly workspaceActions = inject(WorkspaceActions);
   private readonly admin = inject(TeamAdminActions);
   private readonly chat = inject(ChatState);
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly connection = inject(ConnectionGuard);
 
   createTeam(): void {
     this.workspaceActions.openCreateTeam();
@@ -35,6 +37,9 @@ export class TeamActions {
   }
 
   openSettings(teamId: string): void {
+    if (!this.connection.allows('editTeam')) {
+      return;
+    }
     const data: TeamDialogData = { teamId };
     this.dialogs.open(CreateTeamDialogComponent, { size: 'md', data });
   }
@@ -48,19 +53,26 @@ export class TeamActions {
   }
 
   async join(team: Team): Promise<void> {
-    await this.workspace.toggleMembership(team.id);
+    if (!this.connection.allows('joinTeam')) {
+      return;
+    }
+    await this.membership.toggleMembership(team.id);
     this.toasts.show(`Joined ${team.name}`, { icon: 'users' });
   }
 
   async leave(team: Team): Promise<void> {
+    if (!this.connection.allows('joinTeam')) {
+      return;
+    }
     const confirmed = await this.dialogs.confirm({
       title: `Leave ${team.name}?`,
       body: 'You’ll lose access to its private channels. You can rejoin public teams any time.',
       confirmLabel: 'Leave team',
       icon: 'log-out',
+      canConfirm: this.connection.recheck('joinTeam'),
     });
     if (confirmed) {
-      await this.workspace.toggleMembership(team.id);
+      await this.membership.toggleMembership(team.id);
       this.toasts.show(`Left ${team.name}`, { icon: 'users' });
     }
   }

@@ -132,12 +132,3 @@ export const visibleWorkspaceSettingsSections = (
   can: PermissionCheck,
 ): readonly WorkspaceSettingsSection[] =>
   WORKSPACE_SETTINGS_SECTIONS.filter((section) => sectionAllowed(section, can));
-
-export const canOpenWorkspaceSettings = (
-  id: string | null,
-  isGuest: boolean,
-  can: PermissionCheck,
-): boolean => {
-  const section = workspaceSettingsSectionOf(id);
-  return !isGuest && (!section || sectionAllowed(section, can));
-};

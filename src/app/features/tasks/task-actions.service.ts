@@ -1,8 +1,16 @@
 import { computed, DOCUMENT, inject, Service } from '@angular/core';
 import { Router } from '@angular/router';
-import { Task, TASK_COLUMNS, TASK_STATUS_LABELS, TaskStatus } from '../../core/models/task';
+import {
+  Task,
+  TASK_COLUMNS,
+  TASK_STATUS_LABELS,
+  taskRouteOf,
+  TaskStatus,
+} from '../../core/models/task';
+import { ConnectionGuard } from '../../core/services/connection-guard.service';
 import { DialogService } from '../../core/services/dialog.service';
 import { ToastService } from '../../core/services/toast.service';
+import { NetworkState } from '../../core/state/network.state';
 import { TaskState } from '../../core/state/task.state';
 import { WorkspaceState } from '../../core/state/workspace.state';
 import { TaskDialogComponent, TaskDialogData } from './task-dialog/task-dialog.component';
@@ -14,6 +22,8 @@ export const TEAM_QUERY_PARAM = 'team';
 export const VIEW_QUERY_PARAM = 'view';
 const TASKS_PATH = '/tasks';
 
+const OFFLINE_MOVE_NOTE = ' — saved offline, syncs when you reconnect';
+
 @Service()
 export class TaskActions {
   private readonly tasks = inject(TaskState);
@@ -22,6 +32,8 @@ export class TaskActions {
   private readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
+  private readonly connection = inject(ConnectionGuard);
+  private readonly network = inject(NetworkState);
 
   readonly canCreate = computed(() => this.workspace.access().canCreateTasks);
   readonly workspaceName = computed(
@@ -41,11 +53,11 @@ export class TaskActions {
   }
 
   open(taskId: string): void {
-    this.navigate({ [TASK_QUERY_PARAM]: taskId });
+    this.navigate({}, [TASKS_PATH, taskId]);
   }
 
   close(): void {
-    this.navigate({ [TASK_QUERY_PARAM]: null });
+    this.navigate({});
   }
 
   showLayout(layout: TaskLayout): void {
@@ -65,7 +77,8 @@ export class TaskActions {
     const previousBeforeId = nextTaskIdInColumn(this.tasks.tasks(), taskId);
     await this.tasks.move(taskId, status, beforeId);
     if (previousStatus !== status) {
-      this.toasts.show(`${taskId} moved to ${TASK_STATUS_LABELS[status]}`, {
+      const offlineNote = this.network.offline() ? OFFLINE_MOVE_NOTE : '';
+      this.toasts.show(`${taskId} moved to ${TASK_STATUS_LABELS[status]}${offlineNote}`, {
         icon: 'arrow-right',
         actionLabel: 'Undo',
         onAction: () => void this.tasks.move(taskId, previousStatus, previousBeforeId),
@@ -83,7 +96,7 @@ export class TaskActions {
   }
 
   async copyLink(taskId: string): Promise<void> {
-    const url = `${this.document.location.origin}${TASKS_PATH}?${TASK_QUERY_PARAM}=${taskId}`;
+    const url = `${this.document.location.origin}${taskRouteOf(taskId)}`;
     try {
       await this.document.defaultView?.navigator.clipboard.writeText(url);
       this.toasts.show(`Link to ${taskId} copied`, { icon: 'link' });
@@ -96,7 +109,7 @@ export class TaskActions {
 
   async remove(taskId: string): Promise<boolean> {
     const task = this.tasks.task(taskId);
-    if (!task || !this.canDelete(task)) {
+    if (!task || !this.canDelete(task) || !this.connection.allows('removeTask')) {
       return false;
     }
     const confirmed = await this.dialogs.confirm({
@@ -104,6 +117,7 @@ export class TaskActions {
       body: 'The task, its comments and attachments will be removed from the board.',
       confirmLabel: 'Delete task',
       icon: 'trash-2',
+      canConfirm: this.connection.recheck('removeTask'),
     });
     if (!confirmed) {
       return false;
@@ -120,7 +134,13 @@ export class TaskActions {
     return true;
   }
 
-  private navigate(queryParams: Record<string, string | null>): void {
-    void this.router.navigate([TASKS_PATH], { queryParams, queryParamsHandling: 'merge' });
+  private navigate(
+    queryParams: Record<string, string | null>,
+    commands: readonly string[] = [TASKS_PATH],
+  ): void {
+    void this.router.navigate(commands, {
+      queryParams: { ...queryParams, [TASK_QUERY_PARAM]: null },
+      queryParamsHandling: 'merge',
+    });
   }
 }

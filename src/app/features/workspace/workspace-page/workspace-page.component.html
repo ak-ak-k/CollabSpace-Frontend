@@ -1,42 +1,46 @@
-<div class="workspace">
-  @if (workspace(); as current) {
-    <header class="workspace__header">
-      <span class="workspace__logo" aria-hidden="true">
-        @if (current.logoUrl; as logo) {
-          <img class="workspace__logo-image" [src]="logo" alt="" />
-        } @else {
-          {{ current.code }}
-        }
-      </span>
-      <div class="workspace__identity">
-        <span class="caps-label">Workspace</span>
-        <h1 class="workspace__name">{{ current.name }}</h1>
-        @if (current.description) {
-          <p class="workspace__description">{{ current.description }}</p>
-        }
-        <div class="workspace__tags">
-          <app-tag>{{ current.plan }} plan</app-tag>
-          <app-tag tone="outline">
-            <app-icon [name]="roleIcon()" [size]="12" />
-            {{ roleTag() }}
-          </app-tag>
-          <span class="workspace__url">
-            <app-icon name="globe" [size]="13" />
-            {{ url() }}
-          </span>
+@if (block(); as blocked) {
+  <app-route-block [block]="blocked" />
+} @else {
+  <div class="workspace">
+    @if (workspace(); as current) {
+      <header class="workspace__header">
+        <span class="workspace__logo" aria-hidden="true">
+          @if (current.logoUrl; as logo) {
+            <img class="workspace__logo-image" [src]="logo" alt="" />
+          } @else {
+            {{ current.code }}
+          }
+        </span>
+        <div class="workspace__identity">
+          <span class="caps-label">Workspace</span>
+          <h1 class="workspace__name">{{ current.name }}</h1>
+          @if (current.description) {
+            <p class="workspace__description">{{ current.description }}</p>
+          }
+          <div class="workspace__tags">
+            <app-tag>{{ current.plan }} plan</app-tag>
+            <app-tag tone="outline">
+              <app-icon [name]="roleIcon()" [size]="12" />
+              {{ roleTag() }}
+            </app-tag>
+            <span class="workspace__url">
+              <app-icon name="globe" [size]="13" />
+              {{ url() }}
+            </span>
+          </div>
         </div>
-      </div>
-    </header>
-  }
+      </header>
+    }
 
-  <app-tabs
-    label="Workspace sections"
-    gap="lg"
-    size="lg"
-    wrap
-    [tabs]="tabs()"
-    [active]="activeTab()"
-  />
+    <app-tabs
+      label="Workspace sections"
+      gap="lg"
+      size="lg"
+      wrap
+      [tabs]="tabs()"
+      [active]="activeTab()"
+    />
 
-  <router-outlet />
-</div>
+    <router-outlet />
+  </div>
+}

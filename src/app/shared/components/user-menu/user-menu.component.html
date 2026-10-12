@@ -54,10 +54,28 @@
     <app-icon name="wifi-off" [size]="18" />
     Simulate offline
   </button>
+  @if (dataMode.available) {
+    <button
+      appDropdownItem
+      type="button"
+      selection="checkbox"
+      [selected]="network.simulatedSyncFailure()"
+      (triggered)="network.toggleSimulatedSyncFailure()"
+    >
+      <app-icon name="cloud-off" [size]="18" />
+      Make sync fail
+    </button>
+  }
   @if (installer.canInstall()) {
     <button appDropdownItem type="button" (triggered)="installer.install()">
       <app-icon name="download" [size]="18" />
       Install CollabSpace
+    </button>
+  }
+  @if (installer.canAddToHomeScreen()) {
+    <button appDropdownItem type="button" (triggered)="homeScreenHelp.explain()">
+      <app-icon name="smartphone" [size]="18" />
+      Add to Home Screen
     </button>
   }
 
@@ -74,6 +92,10 @@
         {{ option.label }}
       </button>
     }
+    <button appDropdownItem type="button" (triggered)="updates.simulate()">
+      <app-icon name="refresh-cw" [size]="18" />
+      Simulate new version
+    </button>
   }
 
   <app-dropdown-divider />

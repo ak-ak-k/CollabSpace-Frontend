@@ -7,6 +7,7 @@ import {
   workspaceNameError,
   workspaceSlugError,
 } from '../../../../core/models/workspace-rules';
+import { ConnectionGuard } from '../../../../core/services/connection-guard.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { WorkspaceAdminState } from '../../../../core/state/workspace-admin.state';
 import { WorkspaceState } from '../../../../core/state/workspace.state';
@@ -51,6 +52,7 @@ export class WorkspaceSettingsGeneralComponent {
   private readonly workspace = inject(WorkspaceState);
   private readonly admin = inject(WorkspaceAdminState);
   private readonly toasts = inject(ToastService);
+  private readonly connection = inject(ConnectionGuard);
 
   private readonly saved = computed<GeneralDraft>(
     () => {
@@ -100,7 +102,7 @@ export class WorkspaceSettingsGeneralComponent {
 
   protected async submit(event: Event): Promise<void> {
     event.preventDefault();
-    if (!this.dirty()) {
+    if (!this.dirty() || !this.connection.allowsSave()) {
       return;
     }
     this.attempted.set(true);

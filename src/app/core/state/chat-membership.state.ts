@@ -4,7 +4,7 @@ import { MemberConversation } from '../models/conversation';
 import { ActivityLogState } from './activity-log.state';
 import { setIn } from './chat-mutations';
 import { ChatState } from './chat.state';
-import { channelArchiveEntry } from './team-activity';
+import { channelArchiveEntry } from './channel-activity';
 
 @Service()
 export class ChatMembershipState {

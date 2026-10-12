@@ -13,7 +13,14 @@ import {
 } from '../models/team-rules';
 import { ActivityLogState } from './activity-log.state';
 import { ChatMembershipState } from './chat-membership.state';
-import { teamArchiveEntry, teamMemberRemovedEntry, teamMembersAddedEntry } from './team-activity';
+import {
+  teamArchiveEntry,
+  teamMemberRemovedEntry,
+  teamMembersAddedEntry,
+  teamMembershipEntry,
+  teamRoleEntry,
+  teamUpdateEntries,
+} from './team-activity';
 import { WorkspaceState } from './workspace.state';
 
 const UNKNOWN_PERSON = 'Someone';
@@ -76,10 +83,15 @@ export class TeamMembershipState {
 
   async setTeamRole(teamId: string, userId: string, role: AssignableTeamRole): Promise<void> {
     const team = this.workspace.team(teamId);
-    if (!team || teamRoleOf(team, userId) === 'owner') {
+    const previous = team ? teamRoleOf(team, userId) : 'owner';
+    if (!team || previous === 'owner') {
       return;
     }
     this.workspace.putTeam(withTeamRole(team, userId, role));
+    if (previous !== role) {
+      const name = this.nameOf(userId);
+      this.activity.record(teamRoleEntry(team, name, previous === 'admin', role === 'admin'));
+    }
     await this.teamsData.setRole(teamId, userId, role);
   }
 
@@ -89,7 +101,20 @@ export class TeamMembershipState {
       return;
     }
     this.workspace.putTeam({ ...team, ...changes });
+    teamUpdateEntries(team, changes)
+      .reverse()
+      .forEach((entry) => this.activity.record(entry, team.workspaceId));
     await this.teamsData.updateTeam(teamId, changes);
+  }
+
+  async toggleMembership(teamId: string): Promise<Team | null> {
+    const team = this.workspace.team(teamId);
+    if (!team) {
+      return null;
+    }
+    const updated = await this.workspace.toggleMembership(teamId);
+    this.activity.record(teamMembershipEntry(team, updated.joined), team.workspaceId);
+    return updated;
   }
 
   async setArchived(teamId: string, archived: boolean): Promise<void> {

@@ -1,5 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { WORKSPACE_ROLE_DETAILS } from '../../../../core/models/workspace-role';
+import { ConnectionGuard } from '../../../../core/services/connection-guard.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { WorkspaceAdminState } from '../../../../core/state/workspace-admin.state';
 import { WorkspaceState } from '../../../../core/state/workspace.state';
@@ -22,6 +23,7 @@ export class WorkspacePermissionMatrixComponent {
   private readonly workspace = inject(WorkspaceState);
   private readonly admin = inject(WorkspaceAdminState);
   private readonly toasts = inject(ToastService);
+  private readonly connection = inject(ConnectionGuard);
 
   protected readonly roles = WORKSPACE_ROLE_DETAILS;
   protected readonly rows = computed(() =>
@@ -29,10 +31,9 @@ export class WorkspacePermissionMatrixComponent {
   );
 
   protected toggle(cell: PermissionCellView): void {
-    if (!cell.editable) {
+    if (!cell.editable || !this.flip(cell)) {
       return;
     }
-    this.flip(cell);
     this.toasts.show(permissionToggleMessageOf(cell), {
       icon: 'shield-check',
       actionLabel: 'Undo',
@@ -40,7 +41,11 @@ export class WorkspacePermissionMatrixComponent {
     });
   }
 
-  private flip({ role, permission }: PermissionCellView): void {
+  private flip({ role, permission }: PermissionCellView): boolean {
+    if (!this.connection.allows('toggleRolePerm')) {
+      return false;
+    }
     void this.admin.toggleRolePermission(role, permission);
+    return true;
   }
 }

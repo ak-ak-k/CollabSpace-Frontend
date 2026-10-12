@@ -11,9 +11,11 @@ import {
   ValidationError,
 } from '@angular/forms/signals';
 import { Team, TeamPrivacy } from '../../../core/models/team';
+import { ConnectionGuard } from '../../../core/services/connection-guard.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { ChatState } from '../../../core/state/chat.state';
 import { TeamMembershipState } from '../../../core/state/team-membership.state';
+import { teamCreatedEntry } from '../../../core/state/team-activity';
 import { WorkspaceActivityState } from '../../../core/state/workspace-activity.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
@@ -76,6 +78,7 @@ export class CreateTeamDialogComponent {
   private readonly activity = inject(WorkspaceActivityState);
   private readonly router = inject(Router);
   private readonly toasts = inject(ToastService);
+  private readonly connection = inject(ConnectionGuard);
 
   private readonly editedTeam = this.workspace.team(this.data?.teamId ?? '');
 
@@ -105,7 +108,11 @@ export class CreateTeamDialogComponent {
     },
     {
       submission: {
-        action: async () => (this.editedTeam ? this.save(this.editedTeam) : this.create()),
+        action: async () => {
+          if (this.connection.allowsSave()) {
+            await (this.editedTeam ? this.save(this.editedTeam) : this.create());
+          }
+        },
         onInvalid: (submitted) => submitted().errorSummary()[0]?.fieldTree().focusBoundControl(),
       },
     },
@@ -160,14 +167,7 @@ export class CreateTeamDialogComponent {
       privacy: privacyOf(this.draft().privacy),
     });
     this.chat.addChannel(channel);
-    this.activity.record({
-      kind: 'team',
-      verb: 'created',
-      object: `the ${name} team`,
-      route: `/teams/${team.id}`,
-      teamId: team.id,
-      entity: { type: 'team', id: team.id },
-    });
+    this.activity.record(teamCreatedEntry(team));
     this.dialogRef.close();
     await this.router.navigate(['/teams', team.id]);
     this.toasts.show(`Team “${name}” created — #general is ready`, { icon: 'users' });

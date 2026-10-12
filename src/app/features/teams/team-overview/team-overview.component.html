@@ -40,20 +40,15 @@
         linkLabel="View all"
         [link]="activityLink()"
       />
-      <ol>
-        @for (event of recentActivity(); track event.id) {
-          <li class="overview__row activity">
-            <app-avatar [name]="event.actorName" [seed]="event.seed" [size]="28" />
-            <span class="activity__text">
-              <strong>{{ event.actorFirstName }}</strong> {{ event.verb }}
-              <a class="activity__object" [routerLink]="linkTo(event.route)">{{ event.object }}</a>
-              <span class="activity__when">{{ event.when }}</span>
-            </span>
-          </li>
-        } @empty {
-          <li class="overview__empty">No activity in this team yet.</li>
-        }
-      </ol>
+      @if (recentActivity().length) {
+        <app-activity-feed
+          [items]="recentActivity()"
+          [showTeam]="false"
+          label="Recent activity in this team"
+        />
+      } @else {
+        <p class="overview__empty">No activity in this team yet.</p>
+      }
     </section>
   </div>
 

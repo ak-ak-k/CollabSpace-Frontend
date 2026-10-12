@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { NewTask } from '../models/task';
+import { NewTask, taskRouteOf } from '../models/task';
 import { DataModeState } from './data-mode.state';
 import { NetworkState } from './network.state';
 import { INSTANT_MOCK_DATA, settle } from './state.testing';
@@ -76,7 +76,7 @@ describe('TaskState', () => {
     expect(TestBed.inject(WorkspaceActivityState).entityEvents('task', 'NS-162')[0]).toMatchObject({
       verb: 'created',
       object: 'NS-162 · Write release notes',
-      route: '/tasks?task=NS-162',
+      route: '/tasks/NS-162',
     });
   });
 
@@ -91,20 +91,58 @@ describe('TaskState', () => {
     expect(events.every((event) => event.route === '')).toBe(true);
   });
 
-  it('marks offline edits as pending and syncs them on reconnect', async () => {
+  it('marks deleted task events, then logs the restore after Undo', async () => {
+    const tasks = await loaded();
+    const activity = TestBed.inject(WorkspaceActivityState);
+
+    const removed = await tasks.remove('NS-151');
+    expect(activity.entityEvents('task', 'NS-151')[0].object).toContain('(deleted)');
+
+    await tasks.restore(removed!);
+
+    expect(activity.entityEvents('task', 'NS-151')[0]).toMatchObject({
+      verb: 'restored',
+      action: 'task.restored',
+      route: taskRouteOf('NS-151'),
+    });
+  });
+
+  it('logs reopening a done task and reassigning it with full names', async () => {
+    const tasks = await loaded();
+    const activity = TestBed.inject(WorkspaceActivityState);
+    const done = tasks.tasks().find((task) => task.status === 'done' && task.assigneeId);
+
+    await tasks.update(done!.id, { status: 'todo' });
+    expect(activity.entityEvents('task', done!.id)[0]).toMatchObject({
+      verb: 'reopened',
+      action: 'task.reopened',
+      change: { from: 'Done', to: 'Todo' },
+    });
+
+    await tasks.update(done!.id, { assigneeId: 'u0' });
+    expect(activity.entityEvents('task', done!.id)[0]).toMatchObject({
+      verb: 'reassigned',
+      action: 'task.reassigned',
+      object: `${done!.id} to Aarav`,
+    });
+  });
+
+  it('marks offline edits and their events as pending until they are flushed', async () => {
     const tasks = await loaded();
     const network = TestBed.inject(NetworkState);
+    const activity = TestBed.inject(WorkspaceActivityState);
 
     network.simulateOffline(true);
     await tasks.update('NS-142', { priority: 'urgent' });
     expect(tasks.task('NS-142')?.pending).toBe(true);
+    expect(activity.entityEvents('task', 'NS-142')[0].outcome).toBe('pending');
 
     network.simulateOffline(false);
-    await settle();
-    await settle();
+    expect(await tasks.flushPending()).toBe(1);
 
     expect(tasks.task('NS-142')?.pending).toBe(false);
     expect(tasks.task('NS-142')?.priority).toBe('urgent');
+    expect(activity.entityEvents('task', 'NS-142')[0].outcome).toBe('succeeded');
   });
 
   it('reports the forced error state', async () => {

@@ -2,6 +2,7 @@ import { inject, Service } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChannelConversation } from '../../core/models/conversation';
 import { firstNameOf } from '../../core/models/user';
+import { ConnectionGuard } from '../../core/services/connection-guard.service';
 import { DialogService } from '../../core/services/dialog.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ChatMembershipState } from '../../core/state/chat-membership.state';
@@ -23,14 +24,19 @@ export class MembershipActions {
   private readonly teamAdmin = inject(TeamAdminActions);
   private readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly connection = inject(ConnectionGuard);
 
   async leaveGroup(conversationId: string): Promise<void> {
+    if (!this.connection.allows('leaveGroup')) {
+      return;
+    }
     const title = this.titleOf(conversationId);
     const confirmed = await this.dialogs.confirm({
       title: `Leave ${title}?`,
       body: 'You’ll stop getting messages from this group. Anyone still in it can add you back.',
       confirmLabel: 'Leave group',
       icon: 'log-out',
+      canConfirm: this.connection.recheck('leaveGroup'),
     });
     if (!confirmed) {
       return;
@@ -46,7 +52,7 @@ export class MembershipActions {
 
   async leaveChannel(conversationId: string): Promise<void> {
     const channel = this.channelOf(conversationId);
-    if (!channel) {
+    if (!channel || !this.connection.allows('leaveChannel')) {
       return;
     }
     const confirmed = await this.dialogs.confirm({
@@ -54,6 +60,7 @@ export class MembershipActions {
       body: 'You’ll stop getting messages from this channel. You can rejoin any time.',
       confirmLabel: 'Leave',
       icon: 'log-out',
+      canConfirm: this.connection.recheck('leaveChannel'),
     });
     if (!confirmed) {
       return;
@@ -68,13 +75,16 @@ export class MembershipActions {
   }
 
   rejoinChannel(conversationId: string): void {
+    if (!this.connection.allows('rejoinChannel')) {
+      return;
+    }
     this.membership.rejoinChannel(conversationId);
     this.toasts.show(`Joined ${this.titleOf(conversationId)}`, { icon: 'hash' });
   }
 
   async archiveChannel(conversationId: string): Promise<void> {
     const channel = this.channelOf(conversationId);
-    if (!channel) {
+    if (!channel || !this.connection.allows('archiveChannel')) {
       return;
     }
     const confirmed = await this.dialogs.confirm({
@@ -83,6 +93,7 @@ export class MembershipActions {
       confirmLabel: 'Archive channel',
       icon: 'archive',
       tone: 'neutral',
+      canConfirm: this.connection.recheck('archiveChannel'),
     });
     if (!confirmed) {
       return;
@@ -97,6 +108,9 @@ export class MembershipActions {
   }
 
   unarchiveChannel(conversationId: string): void {
+    if (!this.connection.allows('unarchiveChannel')) {
+      return;
+    }
     this.membership.unarchiveChannel(conversationId);
     this.toasts.show(`${this.titleOf(conversationId)} is active again`, {
       icon: 'archive-restore',
@@ -105,12 +119,15 @@ export class MembershipActions {
 
   editChannel(conversationId: string): void {
     const channel = this.workspace.channels().find((candidate) => candidate.id === conversationId);
-    if (channel) {
+    if (channel && this.connection.allows('editChannel')) {
       this.dialogs.open(EditChannelDialogComponent, { data: { channel }, size: 'md' });
     }
   }
 
   async renameGroup(conversationId: string, name: string): Promise<void> {
+    if (!this.connection.allows('renameGroup')) {
+      return;
+    }
     await this.membership.renameGroup(conversationId, name);
     this.toasts.show(`Group renamed to ${name}`, { icon: 'pencil' });
   }
@@ -123,6 +140,9 @@ export class MembershipActions {
     const channel = this.workspace.channels().find((candidate) => candidate.id === conversationId);
     if (conversation.type === 'channel' && channel && !channel.isPrivate) {
       return this.teamAdmin.addMembers(conversation.teamId);
+    }
+    if (!this.connection.allows('addPeople')) {
+      return;
     }
     const title = this.titleOf(conversationId);
     const userIds = await this.addPeopleDialog.open({
@@ -139,6 +159,9 @@ export class MembershipActions {
   }
 
   async removeMember(conversationId: string, userId: string): Promise<void> {
+    if (!this.connection.allows('removeFromGroup')) {
+      return;
+    }
     const name = this.workspace.user(userId)?.name ?? 'Someone';
     await this.membership.removeFromGroup(conversationId, userId);
     this.toasts.show(`${name} removed from ${this.titleOf(conversationId)}`, {

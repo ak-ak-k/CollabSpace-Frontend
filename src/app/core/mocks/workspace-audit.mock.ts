@@ -1,4 +1,4 @@
-import { ActivityEvent, WorkspaceActivityKind } from '../models/activity';
+import { ActivityEvent, settledRecordFields, WorkspaceActivityKind } from '../models/activity';
 import { MINUTES_PER_DAY, minutesAgo } from './mock-clock';
 
 type AuditSeed = readonly [
@@ -137,6 +137,7 @@ const toAuditEvent = ([
   entity: null,
   teamId: null,
   change: change ? { from: change[0], to: change[1] } : null,
+  ...settledRecordFields(kind, object),
 });
 
 export const MOCK_WORKSPACE_AUDIT: readonly ActivityEvent[] =

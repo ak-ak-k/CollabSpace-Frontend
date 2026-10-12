@@ -42,3 +42,8 @@ export const settledStatus = (
     }
     return isEmpty() ? 'empty' : 'ready';
   });
+
+export const loadingWhile = (
+  status: Signal<LoadStatus>,
+  busy: Signal<boolean>,
+): Signal<LoadStatus> => computed(() => (busy() ? 'loading' : status()));

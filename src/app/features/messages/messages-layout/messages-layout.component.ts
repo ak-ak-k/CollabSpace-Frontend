@@ -5,8 +5,10 @@ import { Router, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs';
 import { BreakpointService } from '../../../core/services/breakpoint.service';
 import { ChatState } from '../../../core/state/chat.state';
+import { RouteAccessState } from '../../../core/state/route-access.state';
 import { CurrentRoute } from '../../../layout/current-route';
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { RouteBlockComponent } from '../../system/route-block/route-block.component';
 import { ConversationListComponent } from '../conversation-list/conversation-list.component';
 
 const CONVERSATION_PATH = /^\/messages\/([^/?#]+)/;
@@ -16,7 +18,7 @@ const SAVED_SEGMENT = 'saved';
 
 @Component({
   selector: 'app-messages-layout',
-  imports: [RouterOutlet, ConversationListComponent, EmptyStateComponent],
+  imports: [RouterOutlet, ConversationListComponent, EmptyStateComponent, RouteBlockComponent],
   templateUrl: './messages-layout.component.html',
   styleUrl: './messages-layout.component.scss',
 })
@@ -31,6 +33,7 @@ export class MessagesLayoutComponent {
     { initialValue: this.observer.isMatched(ROOMY_DESKTOP_QUERY) },
   );
 
+  protected readonly block = inject(RouteAccessState).conversationBlock;
   private readonly segment = computed(() => CONVERSATION_PATH.exec(this.route.path())?.[1] ?? null);
   protected readonly savedOpen = computed(() => this.segment() === SAVED_SEGMENT);
   protected readonly conversationId = computed(() => (this.savedOpen() ? null : this.segment()));

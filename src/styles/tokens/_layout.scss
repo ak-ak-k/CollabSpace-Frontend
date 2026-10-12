@@ -21,6 +21,9 @@
   --secondary-sidebar-width-tablet: 220px;
 
   --offline-banner-message-min-width: 200px;
+  --network-bar-message-min-width: var(--offline-banner-message-min-width);
+  --network-bar-action-hover: color-mix(in srgb, currentColor 14%, transparent);
+  --update-banner-message-min-width: var(--offline-banner-message-min-width);
 
   --dialog-field-min-width-sm: 160px;
   --dialog-field-min-width-md: 200px;

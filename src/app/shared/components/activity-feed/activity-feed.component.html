@@ -1,0 +1,109 @@
+@for (group of groups(); track group.key) {
+  <section class="feed__group" [attr.aria-labelledby]="group.headingId">
+    @if (group.heading) {
+      <h2 class="feed__heading" [id]="group.headingId">{{ group.heading }}</h2>
+    }
+    <ol class="feed__list" [attr.aria-label]="group.listLabel">
+      @for (row of group.rows; track row.id) {
+        @if (variant() === 'timeline') {
+          <li #rowElement class="line" tabindex="-1">
+            <strong class="line__actor">{{ row.actor.shortName }}</strong>
+            <span class="line__text">{{ row.verb }} {{ row.object }}</span>
+            @if (row.change; as change) {
+              <span class="line__text"
+                >(<span class="visually-hidden">from </span>{{ change.from
+                }}<span aria-hidden="true"> → </span><span class="visually-hidden"> to </span
+                >{{ change.to }})</span
+              >
+            }
+            <span class="line__when"
+              >·
+              <time [attr.datetime]="row.iso" [attr.title]="row.fullTime">{{
+                row.when
+              }}</time></span
+            >
+            @if (row.outcome !== 'succeeded') {
+              <span class="outcome" [class.outcome--failed]="row.outcome === 'failed'">
+                <app-icon
+                  [name]="row.outcome === 'failed' ? 'circle-alert' : 'clock'"
+                  [size]="12"
+                />
+                {{ row.outcomeLabel }}
+              </span>
+            }
+          </li>
+        } @else {
+          <li #rowElement class="entry" tabindex="-1">
+            <app-avatar
+              [name]="row.actor.avatarName"
+              [text]="row.actor.avatarText"
+              [seed]="row.actor.seed"
+              [size]="32"
+            />
+            <div class="entry__body">
+              <p class="entry__sentence">
+                @if (row.actor.link) {
+                  <a
+                    class="entry__actor"
+                    [routerLink]="row.actor.link"
+                    [attr.aria-label]="row.actor.label"
+                    >{{ row.actor.name }}</a
+                  >
+                } @else {
+                  <strong class="entry__actor">{{ row.actor.name }}</strong>
+                }
+                {{ row.verb }}
+                @if (row.route) {
+                  <a class="entry__object" [routerLink]="linkTo(row.route)">{{ row.object }}</a>
+                } @else {
+                  <span class="entry__object">{{ row.object }}</span>
+                }
+              </p>
+              @if (row.change; as change) {
+                <p class="entry__change">
+                  <span class="visually-hidden">Changed from </span>{{ change.from
+                  }}<span aria-hidden="true"> → </span><span class="visually-hidden"> to </span
+                  ><strong class="entry__to">{{ change.to }}</strong>
+                </p>
+              }
+              <p class="entry__meta">
+                <span class="entry__type">
+                  <app-icon [name]="row.icon" [size]="13" />
+                  @if (showType()) {
+                    {{ row.typeLabel }}
+                  }
+                </span>
+                @if (showTeam() && row.team; as team) {
+                  @if (team.link) {
+                    <span
+                      >· <a class="entry__team" [routerLink]="team.link">{{ team.name }}</a></span
+                    >
+                  } @else {
+                    <span>· {{ team.name }} (archived)</span>
+                  }
+                }
+                <span>
+                  @if (hasTimeSeparator(row)) {
+                    ·
+                  }
+                  <time [attr.datetime]="row.iso" [attr.title]="row.fullTime">{{
+                    row.when
+                  }}</time></span
+                >
+                @if (row.outcome !== 'succeeded') {
+                  <span class="outcome" [class.outcome--failed]="row.outcome === 'failed'">
+                    <app-icon
+                      [name]="row.outcome === 'failed' ? 'circle-alert' : 'clock'"
+                      [size]="12"
+                    />
+                    {{ row.outcomeLabel }}
+                  </span>
+                }
+              </p>
+            </div>
+          </li>
+        }
+      }
+    </ol>
+  </section>
+}

@@ -69,9 +69,13 @@ export const injectMessageHandler = (options: MessageHandlerOptions): MessageHan
   const saveEdit = async (messageId: string, text: string): Promise<void> => {
     const original = find(messageId)?.text ?? '';
     const edited = text.trim();
+    const changed = edited !== '' && edited !== original;
+    if (changed && !actions.allowsEdit()) {
+      return;
+    }
     session.editingId.set(null);
     options.focusComposer();
-    if (edited && edited !== original) {
+    if (changed) {
       await actions.saveEdit(id(), messageId, edited);
     }
   };

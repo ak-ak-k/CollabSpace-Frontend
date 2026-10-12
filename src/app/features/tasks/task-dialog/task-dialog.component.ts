@@ -140,7 +140,12 @@ export class TaskDialogComponent {
       dueAt: timestampOf(draft.dueDate),
     });
     this.dialogRef.close(task.id);
-    this.toasts.show(`${task.id} created in ${TASK_STATUS_LABELS[task.status]}`, {
+    const savedOffline = this.tasks.task(task.id)?.pending ?? false;
+    const message = savedOffline
+      ? `${task.id} saved offline — it syncs when you reconnect`
+      : `${task.id} created in ${TASK_STATUS_LABELS[task.status]}`;
+    this.toasts.show(message, {
+      icon: savedOffline ? 'cloud-off' : undefined,
       actionLabel: 'View',
       onAction: () => void this.router.navigate(['/tasks'], { queryParams: { task: task.id } }),
     });

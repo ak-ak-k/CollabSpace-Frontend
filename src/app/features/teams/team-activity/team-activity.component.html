@@ -5,19 +5,11 @@
     message="Messages, files and task updates from this team will show up here."
   />
 } @else {
-  <ol class="activity">
-    @for (event of activity(); track event.id) {
-      <li class="event">
-        <app-avatar [name]="event.actorName" [seed]="event.seed" [size]="28" />
-        <span class="event__text">
-          <strong>{{ event.actorName }}</strong> {{ event.verb }}
-          <a class="event__object" [routerLink]="linkTo(event.route)">{{ event.object }}</a>
-        </span>
-        <span class="event__when">
-          <app-icon [name]="event.icon" [size]="13" />
-          {{ event.when }}
-        </span>
-      </li>
-    }
-  </ol>
+  <app-activity-feed
+    class="activity"
+    [items]="activity()"
+    [showTeam]="false"
+    showType
+    label="Team activity"
+  />
 }

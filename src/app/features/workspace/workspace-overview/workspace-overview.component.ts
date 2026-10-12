@@ -13,12 +13,7 @@ import { OverviewActivityComponent } from '../overview-activity/overview-activit
 import { OverviewStatsComponent } from '../overview-stats/overview-stats.component';
 import { OverviewTeamsComponent } from '../overview-teams/overview-teams.component';
 import { WorkspaceActions } from '../workspace-actions.service';
-import {
-  overviewActivityItem,
-  overviewStats,
-  overviewTeamRow,
-  workspaceDetails,
-} from './overview-view';
+import { overviewStats, overviewTeamRow, workspaceDetails } from './overview-view';
 
 @Component({
   selector: 'app-workspace-overview',
@@ -67,12 +62,7 @@ export class WorkspaceOverviewComponent {
       channels: this.workspace.channels(),
     }),
   );
-  protected readonly activity = computed(() => {
-    const usersById = this.workspace.usersById();
-    return this.activityState
-      .events({ category: 'activity' })
-      .map((event) => overviewActivityItem(event, usersById, this.viewerId()));
-  });
+  protected readonly activity = computed(() => this.activityState.rows({ category: 'activity' }));
   protected readonly teams = computed(() => this.workspace.teams().map(overviewTeamRow));
   protected readonly details = computed(() => {
     const current = this.workspace.currentWorkspace();

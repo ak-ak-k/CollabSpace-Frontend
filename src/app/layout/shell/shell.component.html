@@ -6,8 +6,11 @@
   }
 
   <div class="shell__column">
-    @if (network.offline()) {
-      <app-offline-banner (retry)="retryNetwork()" />
+    @if (connection.phase() !== 'online') {
+      <app-network-bar />
+    }
+    @if (updates.bannerVisible()) {
+      <app-update-banner (closed)="focusMain()" />
     }
     <app-workspace-banner (resolved)="focusMain()" />
     @if (breakpoint.isMobile() && !immersive()) {

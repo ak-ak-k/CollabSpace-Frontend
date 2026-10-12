@@ -8,6 +8,7 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { SessionLength, WorkspacePreferences } from '../../../../core/models/workspace';
+import { ConnectionGuard } from '../../../../core/services/connection-guard.service';
 import { DialogService } from '../../../../core/services/dialog.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { WorkspaceState } from '../../../../core/state/workspace.state';
@@ -16,6 +17,7 @@ import { IconComponent } from '../../../../shared/ui/icon/icon.component';
 import { SelectComponent, SelectOption } from '../../../../shared/ui/select/select.component';
 import { SettingRowComponent } from '../../../settings/setting-row/setting-row.component';
 import { SettingSwitchComponent } from '../../../settings/setting-switch/setting-switch.component';
+import { preferenceControl } from '../preference-control';
 import { WorkspacePreferenceUpdates } from '../workspace-preference-updates.service';
 
 interface SignInUpdate {
@@ -47,6 +49,7 @@ export class WorkspaceSettingsSecurityComponent {
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
   private readonly injector = inject(Injector);
+  private readonly connection = inject(ConnectionGuard);
 
   private readonly memberCount = computed(() => this.workspace.members().length);
 
@@ -59,10 +62,17 @@ export class WorkspaceSettingsSecurityComponent {
     () => this.preferences()?.passwordSignIn ?? true,
   );
   protected readonly googleSignIn = linkedSignal(() => this.preferences()?.googleSignIn ?? true);
+  protected readonly sessionLength = preferenceControl<string>(
+    () => this.preferences()?.sessionLength ?? '',
+  );
 
   protected async setTwoFactor(required: boolean): Promise<void> {
     if (!required) {
       this.applyTwoFactor(false);
+      return;
+    }
+    if (!this.connection.allows('setWsPref')) {
+      this.restore(this.requireTwoFactor, false);
       return;
     }
     const confirmed = await this.dialogs.confirm({
@@ -71,6 +81,7 @@ export class WorkspaceSettingsSecurityComponent {
       title: 'Require two-step verification?',
       body: `All ${this.memberCount()} members will need an authenticator app. Anyone without one is asked to set it up the next time they sign in.`,
       confirmLabel: 'Require it',
+      canConfirm: this.connection.recheck('setWsPref'),
     });
     if (confirmed) {
       this.applyTwoFactor(true);
@@ -98,7 +109,11 @@ export class WorkspaceSettingsSecurityComponent {
     if (!sessionLength) {
       return;
     }
-    this.updates.set({ sessionLength }, `Sessions now last ${sessionLength}`);
+    this.updates.set(
+      { sessionLength },
+      `Sessions now last ${sessionLength}`,
+      this.sessionLength.reset,
+    );
   }
 
   protected async signEveryoneOut(): Promise<void> {
@@ -115,6 +130,7 @@ export class WorkspaceSettingsSecurityComponent {
         verb: 'signed out',
         object: 'everyone',
         section: 'security',
+        action: 'security.sessions_revoked',
       });
     }
   }
@@ -125,7 +141,12 @@ export class WorkspaceSettingsSecurityComponent {
       required
         ? 'Two-step verification required for everyone'
         : 'Two-step verification is now optional',
+      () => this.requireTwoFactor.set(!required),
     );
+  }
+
+  private restore(control: WritableSignal<boolean>, value: boolean): void {
+    afterNextRender(() => control.set(value), { injector: this.injector });
   }
 
   private setSignIn(
@@ -135,10 +156,10 @@ export class WorkspaceSettingsSecurityComponent {
     update: SignInUpdate,
   ): void {
     if (!on && !otherMethodOn) {
-      afterNextRender(() => method.set(true), { injector: this.injector });
+      this.restore(method, true);
       this.updates.warn('Keep at least one sign-in method turned on');
       return;
     }
-    this.updates.set(update.changes, `${update.label} ${on ? 'on' : 'off'}`);
+    this.updates.set(update.changes, `${update.label} ${on ? 'on' : 'off'}`, () => method.set(!on));
   }
 }

@@ -4,7 +4,7 @@ import { NetworkState } from '../../../core/state/network.state';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { IconName } from '../../../shared/ui/icon/icon-registry';
 
-export type SystemTileTone = 'inverted' | 'warning' | 'danger';
+export type SystemTileTone = 'inverted' | 'neutral' | 'warning' | 'danger';
 
 export interface SystemListItem {
   readonly label: string;
@@ -21,18 +21,21 @@ export interface SystemList {
 export const WORKS_OFFLINE: SystemList = {
   title: 'Works offline',
   items: [
-    { label: 'Conversations you’ve already opened', icon: 'check', tone: 'success' },
-    { label: 'Drafts and queued messages', icon: 'check', tone: 'success' },
-    { label: 'Your task board (read-only)', icon: 'check', tone: 'success' },
+    { label: 'Screens and conversations you’ve already opened', icon: 'check', tone: 'success' },
+    { label: 'New messages — queued, sent when you reconnect', icon: 'check', tone: 'success' },
+    { label: 'Task updates — saved as Pending sync', icon: 'check', tone: 'success' },
+    { label: 'Invitations — queued until you reconnect', icon: 'check', tone: 'success' },
   ],
 };
 
 export const NEEDS_CONNECTION: SystemList = {
   title: 'Needs a connection',
   items: [
-    { label: 'Sending messages and reactions', icon: 'clock', tone: 'muted' },
-    { label: 'Search across the workspace', icon: 'clock', tone: 'muted' },
+    { label: 'Reactions, edits and deleting messages', icon: 'clock', tone: 'muted' },
     { label: 'File uploads and downloads', icon: 'clock', tone: 'muted' },
+    { label: 'Creating or changing teams and channels', icon: 'clock', tone: 'muted' },
+    { label: 'Workspace, role and permission changes', icon: 'clock', tone: 'muted' },
+    { label: 'Search beyond what’s already loaded', icon: 'clock', tone: 'muted' },
   ],
 };
 

@@ -3,7 +3,7 @@ import { MOCK_TEAM_ACTIVITY } from '../mocks/activity.mock';
 import { MOCK_TASK_EVENTS } from '../mocks/task-events.mock';
 import { MOCK_WORKSPACE_ACTIVITY } from '../mocks/workspace-activity.mock';
 import { MOCK_WORKSPACE_AUDIT } from '../mocks/workspace-audit.mock';
-import { ActivityEvent } from '../models/activity';
+import { ActivityEvent, ActivityOutcome } from '../models/activity';
 import { MockRequest } from './mock-request';
 
 @Service()
@@ -24,6 +24,14 @@ export class ActivityData {
   recordActivity(event: ActivityEvent): Promise<void> {
     return this.request.write(() => {
       this.events = [event, ...this.events];
+    });
+  }
+
+  setOutcome(eventIds: ReadonlySet<string>, outcome: ActivityOutcome): Promise<void> {
+    return this.request.write(() => {
+      this.events = this.events.map((event) =>
+        eventIds.has(event.id) ? { ...event, outcome } : event,
+      );
     });
   }
 }

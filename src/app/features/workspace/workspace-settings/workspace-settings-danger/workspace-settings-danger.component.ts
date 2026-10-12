@@ -1,4 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
+import { ConnectionGuard } from '../../../../core/services/connection-guard.service';
 import { DialogService } from '../../../../core/services/dialog.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { WorkspaceAdminState } from '../../../../core/state/workspace-admin.state';
@@ -29,6 +30,7 @@ export class WorkspaceSettingsDangerComponent {
   private readonly admin = inject(WorkspaceAdminState);
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
+  private readonly connection = inject(ConnectionGuard);
 
   private readonly name = computed(() => this.workspace.currentWorkspace()?.name ?? '');
   private readonly memberCount = computed(() => this.workspace.members().length);
@@ -54,6 +56,9 @@ export class WorkspaceSettingsDangerComponent {
   });
 
   protected async archive(): Promise<void> {
+    if (!this.connection.allows('archiveWorkspace')) {
+      return;
+    }
     const name = this.name();
     const confirmed = await this.dialogs.confirm({
       tone: 'neutral',
@@ -61,6 +66,7 @@ export class WorkspaceSettingsDangerComponent {
       title: `Archive ${name}?`,
       body: 'Everyone keeps read access, but nobody can post, upload files or create teams until an owner unarchives it.',
       confirmLabel: 'Archive workspace',
+      canConfirm: this.connection.recheck('archiveWorkspace'),
     });
     if (!confirmed) {
       return;
@@ -74,11 +80,17 @@ export class WorkspaceSettingsDangerComponent {
   }
 
   protected unarchive(): void {
+    if (!this.connection.allows('archiveWorkspace')) {
+      return;
+    }
     void this.admin.setArchived(false);
     this.toasts.show(`${this.name()} is active again`, { icon: 'archive-restore' });
   }
 
   protected async scheduleDeletion(): Promise<void> {
+    if (!this.connection.allows('deleteWorkspace')) {
+      return;
+    }
     const name = this.name();
     const confirmed = await this.dialogs.confirm({
       icon: 'trash-2',
@@ -86,6 +98,7 @@ export class WorkspaceSettingsDangerComponent {
       body: `All teams, channels, messages, tasks and files for ${this.memberCount()} members will be permanently deleted after 14 days. Owners can cancel until then.`,
       confirmLabel: 'Delete workspace',
       confirmText: name,
+      canConfirm: this.connection.recheck('deleteWorkspace'),
     });
     if (!confirmed) {
       return;
@@ -99,6 +112,9 @@ export class WorkspaceSettingsDangerComponent {
   }
 
   protected cancelDeletion(): void {
+    if (!this.connection.allows('cancelDeletion')) {
+      return;
+    }
     void this.admin.scheduleDeletion(false);
     this.toasts.show('Deletion cancelled', { icon: 'rotate-ccw' });
   }

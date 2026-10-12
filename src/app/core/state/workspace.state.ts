@@ -18,7 +18,7 @@ import {
 } from '../models/workspace';
 import { DataModeState } from './data-mode.state';
 import { canSeeTeam, readableTeamIdsOf, visibleMembersFor } from './guest-visibility';
-import { Loadable, settledStatus } from './loadable';
+import { Loadable, loadingWhile, settledStatus } from './loadable';
 import { allows, PermissionResource, PermissionSubject } from './permission-check';
 import {
   accessOf,
@@ -49,6 +49,7 @@ export class WorkspaceState {
   readonly preferenceMap = signal<WorkspacePreferenceMap>({});
   readonly rolePermissionMap = signal<RolePermissionMap>({});
   readonly currentWorkspaceId = signal(CURRENT_WORKSPACE_ID);
+  readonly switching = signal(false);
 
   private readonly loader = new Loadable<WorkspaceSnapshot>({
     fetch: () => this.fetchSnapshot(),
@@ -111,8 +112,8 @@ export class WorkspaceState {
     () => this.members().filter((user) => user.status === 'online').length,
   );
 
-  readonly loadStatus = this.loader.status.asReadonly();
-  readonly status = settledStatus(this.loader.status, () => this.teams().length === 0);
+  readonly loadStatus = loadingWhile(this.loader.status, this.switching);
+  readonly status = settledStatus(this.loadStatus, () => this.teams().length === 0);
 
   constructor() {
     effect(() => {

@@ -2,6 +2,7 @@ import { DialogRef } from '@angular/cdk/dialog';
 import { DOCUMENT, inject, Service } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { ConnectionGuard } from '../../core/services/connection-guard.service';
 import { DialogService } from '../../core/services/dialog.service';
 import { ToastService } from '../../core/services/toast.service';
 import { FileState } from '../../core/state/file.state';
@@ -25,6 +26,7 @@ export class FileActions {
   private readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
+  private readonly connection = inject(ConnectionGuard);
 
   preview(fileId: string): void {
     void this.router.navigate([], {
@@ -61,7 +63,7 @@ export class FileActions {
   }
 
   async rename(file: FileRow): Promise<void> {
-    if (!file.canManage) {
+    if (!file.canManage || !this.connection.allows('renameFile')) {
       return;
     }
     const dialog = this.dialogs.open<string, FileRenameData>(FileRenameDialogComponent, {
@@ -80,7 +82,7 @@ export class FileActions {
   }
 
   async remove(file: FileRow): Promise<boolean> {
-    if (!file.canManage) {
+    if (!file.canManage || !this.connection.allows('removeFile')) {
       return false;
     }
     const confirmed = await this.dialogs.confirm({
@@ -88,6 +90,7 @@ export class FileActions {
       body: 'It may no longer be available in the conversations or tasks where it was shared.',
       confirmLabel: 'Delete file',
       icon: 'trash-2',
+      canConfirm: this.connection.recheck('removeFile'),
     });
     const removed = confirmed ? this.files.remove(file.id) : null;
     if (removed) {

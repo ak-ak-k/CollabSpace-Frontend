@@ -1,6 +1,7 @@
 import { booleanAttribute, Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ConversationFilter } from '../../../core/models/conversation';
+import { ConnectionGuard } from '../../../core/services/connection-guard.service';
 import { DialogService } from '../../../core/services/dialog.service';
 import { SearchService } from '../../../core/services/search.service';
 import { ChatState } from '../../../core/state/chat.state';
@@ -45,6 +46,7 @@ export class ConversationListComponent {
   private readonly workspace = inject(WorkspaceState);
   private readonly dialogs = inject(DialogService);
   private readonly search = inject(SearchService);
+  private readonly connection = inject(ConnectionGuard);
 
   readonly selectedId = input<string | null>(null);
   readonly savedOpen = input(false, { transform: booleanAttribute });
@@ -93,7 +95,9 @@ export class ConversationListComponent {
   }
 
   protected newGroup(): void {
-    this.dialogs.open(NewGroupDialogComponent, { size: 'md' });
+    if (this.connection.allows('createGroup')) {
+      this.dialogs.open(NewGroupDialogComponent, { size: 'md' });
+    }
   }
 
   protected searchMessages(): void {

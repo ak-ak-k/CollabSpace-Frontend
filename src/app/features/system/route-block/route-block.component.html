@@ -1,0 +1,37 @@
+@let context = page();
+<app-system-page
+  [kicker]="context.kicker"
+  [heading]="context.title"
+  [message]="context.body"
+  [code]="code()"
+  [icon]="context.icon ?? undefined"
+  [tileTone]="context.tone"
+  [lists]="lists()"
+>
+  @if (context.request; as request) {
+    <button appButton type="button" variant="primary" size="lg" (click)="requestAccess(request)">
+      <app-icon name="send-horizontal" [size]="16" />
+      Request access
+    </button>
+    <a appButton size="lg" [routerLink]="context.back.href">
+      <app-icon [name]="context.back.icon" [size]="16" />
+      {{ context.back.label }}
+    </a>
+  } @else {
+    <a appButton variant="primary" size="lg" [routerLink]="context.back.href">
+      <app-icon [name]="context.back.icon" [size]="16" />
+      {{ context.back.label }}
+    </a>
+    @if (backIsDashboard()) {
+      <button appButton type="button" size="lg" (click)="search.open()">
+        <app-icon name="search" [size]="16" />
+        Search CollabSpace
+      </button>
+    } @else {
+      <a appButton size="lg" [routerLink]="dashboardRoute">
+        <app-icon name="house" [size]="16" />
+        Go to dashboard
+      </a>
+    }
+  }
+</app-system-page>

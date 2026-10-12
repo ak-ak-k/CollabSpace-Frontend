@@ -1,0 +1,13 @@
+<app-icon name="refresh-cw" [size]="16" />
+<span class="update-banner__message">
+  <strong class="update-banner__title">A new version of CollabSpace is ready.</strong>
+  {{ hint() }}
+</span>
+<button
+  type="button"
+  class="update-banner__action update-banner__action--filled"
+  (click)="reload()"
+>
+  Reload to update
+</button>
+<button type="button" class="update-banner__action" (click)="later()">Later</button>

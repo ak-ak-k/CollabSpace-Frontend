@@ -1,6 +1,8 @@
 import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { PRESENCE_OPTIONS, PresenceOption, userColorSeed } from '../../../core/models/user';
+import { AppUpdateService } from '../../../core/services/app-update.service';
+import { HomeScreenHelp } from '../../../core/services/home-screen-help.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthState } from '../../../core/state/auth.state';
 import { DATA_MODE_OPTIONS, DataModeState } from '../../../core/state/data-mode.state';
@@ -29,6 +31,8 @@ export class UserMenuComponent {
   protected readonly network = inject(NetworkState);
   protected readonly dataMode = inject(DataModeState);
   protected readonly installer = inject(InstallState);
+  protected readonly updates = inject(AppUpdateService);
+  protected readonly homeScreenHelp = inject(HomeScreenHelp);
 
   protected readonly statusOptions = PRESENCE_OPTIONS;
   protected readonly dataModeOptions = DATA_MODE_OPTIONS;

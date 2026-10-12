@@ -1,8 +1,15 @@
-import { ActivityChange, ActivityEvent, ActivityKind } from '../../../core/models/activity';
+import {
+  ActivityChange,
+  ActivityEvent,
+  ActivityKind,
+  ActivityOutcome,
+} from '../../../core/models/activity';
+import { ActivityRow, formatFullTime } from '../../../core/state/activity-row';
+import { IconName } from '../../../shared/ui/icon/icon-registry';
 import { RadioOption } from '../../../shared/ui/radio/radio-group.component';
 import { SelectOption } from '../../../shared/ui/select/select.component';
 
-export type AuditGroup = 'members' | 'roles' | 'permissions' | 'workspace' | 'security';
+export type AuditGroup = 'members' | 'roles' | 'permissions' | 'teams' | 'workspace' | 'security';
 export type AuditCategory = AuditGroup | 'all';
 export type AuditDateRange = 'any' | '7' | '30';
 
@@ -17,20 +24,20 @@ export interface AuditCategoryChip {
   readonly label: string;
 }
 
-export interface AuditChangeView {
-  readonly from: string;
-  readonly to: string;
-  readonly label: string;
-}
-
 export interface AuditRow {
   readonly id: string;
   readonly iso: string;
   readonly when: string;
   readonly who: string;
   readonly category: string;
-  readonly summary: string;
-  readonly change: AuditChangeView | null;
+  readonly verb: string;
+  readonly object: string;
+  readonly route: string;
+  readonly metaText: string;
+  readonly change: ActivityChange | null;
+  readonly outcome: ActivityOutcome;
+  readonly outcomeLabel: string;
+  readonly outcomeIcon: IconName;
 }
 
 export interface AuditEmptyCopy {
@@ -58,6 +65,10 @@ const AUDIT_GROUPS: Partial<Record<ActivityKind, AuditGroup>> = {
   remove: 'members',
   role: 'roles',
   permission: 'permissions',
+  team: 'teams',
+  channel: 'teams',
+  leave: 'teams',
+  join: 'teams',
   archive: 'workspace',
   'workspace-settings': 'workspace',
   deletion: 'workspace',
@@ -69,6 +80,7 @@ export const AUDIT_GROUP_LABELS: Record<AuditGroup, string> = {
   members: 'Members',
   roles: 'Roles',
   permissions: 'Permissions',
+  teams: 'Teams & channels',
   workspace: 'Workspace',
   security: 'Security & integrations',
 };
@@ -89,13 +101,11 @@ export const AUDIT_DATE_OPTIONS: readonly RadioOption[] = [
   { value: '30', label: '30 days' },
 ];
 
-const AUDIT_TIME_FORMAT = new Intl.DateTimeFormat('en-GB', {
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-});
+const OUTCOME_ICONS: Record<ActivityOutcome, IconName> = {
+  succeeded: 'check',
+  pending: 'clock',
+  failed: 'circle-alert',
+};
 
 export const isAuditDateRange = (value: string): value is AuditDateRange =>
   Object.hasOwn(DATE_RANGE_DAYS, value);
@@ -148,23 +158,34 @@ export const auditActorOptionsOf = (
   return [{ value: ANY_ACTOR, label: 'Anyone' }, ...actors];
 };
 
-export const formatAuditTime = (timestamp: number): string => AUDIT_TIME_FORMAT.format(timestamp);
+export const formatAuditTime = formatFullTime;
 
-const auditChangeOf = ({ from, to }: ActivityChange): AuditChangeView => ({
-  from,
-  to,
-  label: `Changed from ${from} to ${to}`,
+export const auditRowOf = (row: ActivityRow): AuditRow => ({
+  id: row.id,
+  iso: row.iso,
+  when: row.fullTime,
+  who: row.actor.name,
+  category: AUDIT_GROUP_LABELS[auditGroupOf(row.kind)],
+  verb: row.verb,
+  object: row.object,
+  route: row.route,
+  metaText: row.metaText,
+  change: row.change,
+  outcome: row.outcome,
+  outcomeLabel: row.outcomeLabel,
+  outcomeIcon: OUTCOME_ICONS[row.outcome],
 });
 
-export const auditRowOf = (event: ActivityEvent, who: string): AuditRow => ({
-  id: event.id,
-  iso: new Date(event.occurredAt).toISOString(),
-  when: formatAuditTime(event.occurredAt),
-  who,
-  category: AUDIT_GROUP_LABELS[auditGroupOf(event.kind)],
-  summary: event.object ? `${event.verb} ${event.object}` : event.verb,
-  change: event.change ? auditChangeOf(event.change) : null,
-});
+export const auditCountLabel = (count: number, filtered: boolean): string => {
+  if (!count) {
+    return '';
+  }
+  const entries = count === 1 ? '1 entry' : `${count} entries`;
+  if (!filtered) {
+    return entries;
+  }
+  return `${entries} ${count === 1 ? 'matches' : 'match'} these filters`;
+};
 
 export const auditEmptyCopyOf = (filtered: boolean): AuditEmptyCopy =>
   filtered

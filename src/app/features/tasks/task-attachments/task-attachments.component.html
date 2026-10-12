@@ -1,7 +1,7 @@
 <section class="section" [attr.aria-labelledby]="headingId">
   <div class="section__head">
     <h3 class="section__title" [id]="headingId">Attachments · {{ rows().length }}</h3>
-    <button appButton type="button" variant="ghost" size="sm" (click)="picker.click()">
+    <button appButton type="button" variant="ghost" size="sm" (click)="pick(picker)">
       <app-icon name="paperclip" [size]="14" />
       Attach file
     </button>

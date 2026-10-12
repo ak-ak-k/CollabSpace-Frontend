@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { firstNameOf } from '../../../core/models/user';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthState } from '../../../core/state/auth.state';
+import { SessionReturnState } from '../../../core/state/session-return.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { CheckboxComponent } from '../../../shared/ui/checkbox/checkbox.component';
@@ -49,6 +50,7 @@ export class LoginComponent {
   private readonly router = inject(Router);
   private readonly toasts = inject(ToastService);
   private readonly workspace = inject(WorkspaceState);
+  private readonly sessionReturn = inject(SessionReturnState);
   private readonly queryParameters = toSignal(inject(ActivatedRoute).queryParamMap);
 
   private readonly credentials = signal<LoginModel>({
@@ -96,8 +98,9 @@ export class LoginComponent {
   private async logIn(): Promise<void> {
     await this.auth.login();
     this.toasts.show(this.welcomeMessage(), { icon: 'circle-check' });
+    const remembered = this.sessionReturn.take();
     const returnUrl = safeReturnUrl(this.queryParameters()?.get(RETURN_URL_PARAMETER));
-    await this.router.navigateByUrl(returnUrl ?? HOME_URL);
+    await this.router.navigateByUrl(returnUrl ?? remembered ?? HOME_URL);
   }
 
   private welcomeMessage(): string {

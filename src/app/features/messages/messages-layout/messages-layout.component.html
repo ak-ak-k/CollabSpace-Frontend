@@ -1,23 +1,27 @@
-<div class="messages">
-  @if (showList()) {
-    <app-conversation-list
-      class="messages__list"
-      [selectedId]="conversationId()"
-      [savedOpen]="savedOpen()"
-    />
-  }
-  @if (showPane()) {
-    <div class="messages__pane">
-      @if (conversationId() || savedOpen()) {
-        <router-outlet />
-      } @else {
-        <app-empty-state
-          class="messages__placeholder"
-          icon="message-square"
-          heading="No conversation selected"
-          message="Pick a conversation from the list, or start a new one."
-        />
-      }
-    </div>
-  }
-</div>
+@if (block(); as blocked) {
+  <app-route-block [block]="blocked" />
+} @else {
+  <div class="messages">
+    @if (showList()) {
+      <app-conversation-list
+        class="messages__list"
+        [selectedId]="conversationId()"
+        [savedOpen]="savedOpen()"
+      />
+    }
+    @if (showPane()) {
+      <div class="messages__pane">
+        @if (conversationId() || savedOpen()) {
+          <router-outlet />
+        } @else {
+          <app-empty-state
+            class="messages__placeholder"
+            icon="message-square"
+            heading="No conversation selected"
+            message="Pick a conversation from the list, or start a new one."
+          />
+        }
+      </div>
+    }
+  </div>
+}

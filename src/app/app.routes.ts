@@ -88,6 +88,12 @@ export const routes: Routes = [
           import('./features/people/people.routes').then((module) => module.PEOPLE_ROUTES),
       },
       {
+        path: 'activity',
+        title: 'Activity · CollabSpace',
+        loadChildren: () =>
+          import('./features/activity/activity.routes').then((module) => module.ACTIVITY_ROUTES),
+      },
+      {
         path: 'messages',
         title: 'Messages · CollabSpace',
         loadChildren: () =>

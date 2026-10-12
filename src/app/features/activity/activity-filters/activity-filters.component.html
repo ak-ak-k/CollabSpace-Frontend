@@ -1,0 +1,59 @@
+<div class="filters__row">
+  <app-radio-group
+    #ownerGroup
+    label="Whose activity"
+    hideLabel
+    [options]="ownerOptions"
+    [value]="filters().owner"
+    (valueChange)="setOwner($event)"
+  />
+  <app-select
+    class="filters__field"
+    label="Team"
+    [options]="teamOptions()"
+    [value]="filters().teamId"
+    (valueChange)="setTeam($event)"
+  />
+  @if (filters().owner !== 'mine') {
+    <app-select
+      class="filters__field"
+      label="Person"
+      [options]="personOptions()"
+      [value]="filters().personId"
+      (valueChange)="setPerson($event)"
+    />
+  }
+  <app-select
+    class="filters__date"
+    label="Date"
+    [options]="dateOptions"
+    [value]="filters().range"
+    (valueChange)="setRange($event)"
+  />
+</div>
+
+<div class="filters__chips" role="group" aria-label="Activity type">
+  @for (chip of typeChips; track chip.value) {
+    <button
+      type="button"
+      class="filters__chip"
+      [class.filters__chip--on]="chip.value === filters().type"
+      [attr.aria-pressed]="chip.value === filters().type"
+      (click)="setType(chip.value)"
+    >
+      {{ chip.label }}
+    </button>
+  }
+  @if (filtered()) {
+    <button
+      appButton
+      type="button"
+      variant="ghost"
+      size="sm"
+      class="filters__clear"
+      (click)="clear()"
+    >
+      Clear filters
+    </button>
+  }
+</div>

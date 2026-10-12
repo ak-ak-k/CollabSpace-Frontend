@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { ActivityLogState } from './activity-log.state';
 import { INSTANT_MOCK_DATA, settle } from './state.testing';
 import { TeamMembershipState } from './team-membership.state';
 import { WorkspaceState } from './workspace.state';
@@ -72,5 +73,68 @@ describe('TeamMembershipState', () => {
 
     await teams.setArchived('t-growth', false);
     expect(workspace.team('t-growth')?.archived).toBe(false);
+  });
+
+  it('logs renames, privacy and description changes, flagging admin changes for the audit log', async () => {
+    const { teams } = await load();
+    const log = TestBed.inject(ActivityLogState);
+
+    await teams.updateTeam('t-growth', { name: 'Growth Lab', description: 'New', isPrivate: true });
+
+    expect(log.events().slice(0, 3)).toEqual([
+      expect.objectContaining({
+        verb: 'renamed',
+        object: 'the Growth team to Growth Lab',
+        action: 'team.renamed',
+        audit: true,
+        change: { from: 'Growth', to: 'Growth Lab' },
+      }),
+      expect.objectContaining({
+        verb: 'made',
+        object: 'the Growth Lab team private',
+        action: 'team.privacy_changed',
+        audit: true,
+        change: { from: 'Public', to: 'Private' },
+      }),
+      expect.objectContaining({ action: 'team.updated', audit: false }),
+    ]);
+  });
+
+  it('logs admin role changes only when the role really changes', async () => {
+    const { teams } = await load();
+    const log = TestBed.inject(ActivityLogState);
+    const before = log.events().length;
+
+    await teams.setTeamRole('t-design', 'u2', 'member');
+    expect(log.events()).toHaveLength(before);
+
+    await teams.setTeamRole('t-design', 'u2', 'admin');
+    expect(log.events()[0]).toMatchObject({
+      verb: 'made',
+      action: 'team.role_changed',
+      audit: true,
+      change: { from: 'Team member', to: 'Team admin' },
+    });
+  });
+
+  it('logs leaving and joining a team and removing a member', async () => {
+    const { teams } = await load();
+    const log = TestBed.inject(ActivityLogState);
+
+    await teams.toggleMembership('t-design');
+    expect(log.events()[0]).toMatchObject({
+      kind: 'leave',
+      verb: 'left',
+      object: 'the Design team',
+      action: 'team.member_left',
+    });
+
+    await teams.removeFromTeam('t-frontend', 'u1');
+    expect(log.events()[0]).toMatchObject({
+      kind: 'leave',
+      action: 'team.member_removed',
+      category: 'activity',
+      audit: true,
+    });
   });
 });

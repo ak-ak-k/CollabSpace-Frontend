@@ -82,6 +82,11 @@
   color: var(--on-secondary);
 }
 
+.system__tile--neutral {
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+}
+
 .system__tile--warning {
   background: var(--danger-surface);
   color: var(--danger);

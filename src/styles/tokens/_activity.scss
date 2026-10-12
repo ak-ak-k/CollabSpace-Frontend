@@ -1,0 +1,10 @@
+@mixin activity-tokens {
+  --activity-tag-padding-block: 1px;
+  --activity-page-max-width: 880px;
+  --activity-page-padding: clamp(var(--space-4), 3vw, var(--space-10));
+  --activity-title-size: clamp(25px, 3vw, 32px);
+  --activity-filter-basis: 160px;
+  --activity-filter-max-width: 220px;
+  --activity-date-basis: 140px;
+  --activity-date-max-width: 180px;
+}

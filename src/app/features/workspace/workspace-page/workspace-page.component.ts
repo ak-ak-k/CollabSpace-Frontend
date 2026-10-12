@@ -3,18 +3,19 @@ import { RouterOutlet } from '@angular/router';
 import { WORKSPACE_ROLE_LABELS, roleWithArticle } from '../../../core/models/workspace-role';
 import { workspaceUrlOf } from '../../../core/models/workspace-rules';
 import { BreakpointService } from '../../../core/services/breakpoint.service';
+import { RouteAccessState } from '../../../core/state/route-access.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import { CurrentRoute } from '../../../layout/current-route';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { IconName } from '../../../shared/ui/icon/icon-registry';
 import { TabItem, TabsComponent } from '../../../shared/ui/tabs/tabs.component';
 import { TagComponent } from '../../../shared/ui/tag/tag.component';
+import { RouteBlockComponent } from '../../system/route-block/route-block.component';
 import { WORKSPACE_ROUTE } from '../workspace-actions.service';
 
-type WorkspaceTab = 'overview' | 'members' | 'activity' | 'settings';
+type WorkspaceTab = 'overview' | 'members' | 'settings';
 
 const MEMBERS_ROUTE = `${WORKSPACE_ROUTE}/members`;
-const ACTIVITY_ROUTE = `${WORKSPACE_ROUTE}/activity`;
 const SETTINGS_ROUTE = `${WORKSPACE_ROUTE}/settings`;
 const GENERAL_SETTINGS_ROUTE = `${SETTINGS_ROUTE}/general`;
 
@@ -27,7 +28,6 @@ const ROLE_ICONS = {
 
 const SECTION_TABS: readonly (readonly [route: string, tab: WorkspaceTab])[] = [
   [MEMBERS_ROUTE, 'members'],
-  [ACTIVITY_ROUTE, 'activity'],
   [SETTINGS_ROUTE, 'settings'],
 ];
 
@@ -36,7 +36,7 @@ const tabOf = (path: string): WorkspaceTab =>
 
 @Component({
   selector: 'app-workspace-page',
-  imports: [RouterOutlet, IconComponent, TabsComponent, TagComponent],
+  imports: [RouterOutlet, IconComponent, RouteBlockComponent, TabsComponent, TagComponent],
   templateUrl: './workspace-page.component.html',
   styleUrl: './workspace-page.component.scss',
 })
@@ -45,6 +45,7 @@ export class WorkspacePageComponent {
   private readonly route = inject(CurrentRoute);
   private readonly breakpoint = inject(BreakpointService);
 
+  protected readonly block = inject(RouteAccessState).settingsBlock;
   protected readonly workspace = this.state.currentWorkspace;
   protected readonly myRole = computed(() => this.state.access().myRole);
   protected readonly roleIcon = computed<IconName>(() => ROLE_ICONS[this.myRole()]);
@@ -67,7 +68,6 @@ export class WorkspacePageComponent {
         link: MEMBERS_ROUTE,
         count: ready ? this.state.memberDirectory().length : undefined,
       },
-      { id: 'activity', label: 'Activity', link: ACTIVITY_ROUTE },
       ...(this.state.access().isGuest ? [] : [settings]),
     ];
   });

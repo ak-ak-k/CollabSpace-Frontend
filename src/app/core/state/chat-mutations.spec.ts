@@ -2,6 +2,7 @@ import { Message } from '../models/message';
 import {
   advanceDelivery,
   editMessage,
+  failQueued,
   firstUnreadId,
   reactToMessage,
   releaseQueued,
@@ -74,5 +75,21 @@ describe('chat mutations', () => {
   it('finds the first unread message', () => {
     expect(firstUnreadId(THREADS['dm-u1'], 1)).toBe('2');
     expect(firstUnreadId(THREADS['dm-u1'], 0)).toBeNull();
+  });
+
+  it('fails queued messages for a later retry and releases them on the next sync', () => {
+    const threads = { 'dm-u1': [message('1', 'u0', 'queued'), message('2', 'u0', 'failed')] };
+
+    const failed = failQueued(threads);
+    expect(failed['dm-u1'].map((item) => [item.deliveryState, item.syncFailed])).toEqual([
+      ['failed', true],
+      ['failed', undefined],
+    ]);
+
+    const released = releaseQueued(failed);
+    expect(released['dm-u1'].map((item) => [item.deliveryState, item.syncFailed])).toEqual([
+      ['sent', false],
+      ['failed', undefined],
+    ]);
   });
 });

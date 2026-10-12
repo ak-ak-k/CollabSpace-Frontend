@@ -7,6 +7,7 @@ export class NetworkState {
   private readonly browserOnline = signal(this.window?.navigator.onLine ?? true);
 
   readonly simulatedOffline = signal(false);
+  readonly simulatedSyncFailure = signal(false);
   readonly online = computed(() => this.browserOnline() && !this.simulatedOffline());
   readonly offline = computed(() => !this.online());
 
@@ -21,6 +22,14 @@ export class NetworkState {
 
   toggleSimulatedOffline(): void {
     this.simulatedOffline.update((offline) => !offline);
+  }
+
+  simulateSyncFailure(failing: boolean): void {
+    this.simulatedSyncFailure.set(failing);
+  }
+
+  toggleSimulatedSyncFailure(): void {
+    this.simulatedSyncFailure.update((failing) => !failing);
   }
 
   retry(): boolean {

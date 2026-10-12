@@ -1,6 +1,7 @@
 import { formatDate } from '@angular/common';
 import { Component, computed, inject, LOCALE_ID, output } from '@angular/core';
 import { Workspace } from '../../core/models/workspace';
+import { ConnectionGuard } from '../../core/services/connection-guard.service';
 import { ToastService } from '../../core/services/toast.service';
 import { WorkspaceAdminState } from '../../core/state/workspace-admin.state';
 import { WorkspaceState } from '../../core/state/workspace.state';
@@ -29,6 +30,7 @@ export class WorkspaceBannerComponent {
   private readonly workspace = inject(WorkspaceState);
   private readonly admin = inject(WorkspaceAdminState);
   private readonly toasts = inject(ToastService);
+  private readonly connection = inject(ConnectionGuard);
   private readonly locale = inject(LOCALE_ID);
 
   readonly resolved = output<void>();
@@ -40,6 +42,11 @@ export class WorkspaceBannerComponent {
   });
 
   protected act(action: WorkspaceBannerAction): void {
+    if (
+      !this.connection.allows(action === 'cancel-deletion' ? 'cancelDeletion' : 'archiveWorkspace')
+    ) {
+      return;
+    }
     if (action === 'cancel-deletion') {
       this.cancelDeletion();
     } else {

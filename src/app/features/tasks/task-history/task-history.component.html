@@ -1,6 +1,6 @@
 <section class="section" [attr.aria-labelledby]="headingId">
   <div class="section__head">
-    <h3 class="section__title" [id]="headingId">History</h3>
+    <h3 class="section__title" [id]="headingId">Activity</h3>
     <button
       appButton
       type="button"
@@ -13,16 +13,13 @@
       {{ toggleLabel() }}
     </button>
   </div>
-  @if (expanded()) {
-    <ol class="entries">
-      @for (row of rows(); track row.id) {
-        <li class="entry">
-          <strong class="entry__who">{{ row.who }}</strong>
-          <span>{{ row.text }}</span>
-          <span class="entry__when">· {{ row.when }}</span>
-        </li>
-      }
-    </ol>
+  @if (expanded() && rows().length) {
+    <app-activity-feed
+      [items]="rows()"
+      variant="timeline"
+      [showTeam]="false"
+      label="Task activity"
+    />
   }
   <p class="section__meta">{{ metaLine() }}</p>
 </section>

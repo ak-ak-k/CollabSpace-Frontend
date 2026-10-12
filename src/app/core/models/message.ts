@@ -34,6 +34,7 @@ export interface Message {
   readonly pinnedBy?: string | null;
   readonly pinnedAt?: number | null;
   readonly deliveryState: DeliveryState;
+  readonly syncFailed?: boolean;
 }
 
 export interface MessageDraft {

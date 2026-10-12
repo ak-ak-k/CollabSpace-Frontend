@@ -2,6 +2,7 @@ import { inject, Service } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssignableTeamRole } from '../../core/models/team';
 import { firstNameOf } from '../../core/models/user';
+import { ConnectionGuard } from '../../core/services/connection-guard.service';
 import { DialogService } from '../../core/services/dialog.service';
 import { ToastService } from '../../core/services/toast.service';
 import { TeamMembershipState } from '../../core/state/team-membership.state';
@@ -19,10 +20,11 @@ export class TeamAdminActions {
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly connection = inject(ConnectionGuard);
 
   async addMembers(teamId: string): Promise<void> {
     const team = this.workspace.team(teamId);
-    if (!team) {
+    if (!team || !this.connection.allows('addPeople')) {
       return;
     }
     const userIds = await this.addPeopleDialog.open({
@@ -40,6 +42,9 @@ export class TeamAdminActions {
   }
 
   async setRole(teamId: string, userId: string, role: AssignableTeamRole): Promise<void> {
+    if (!this.connection.allows('setTeamRole')) {
+      return;
+    }
     const saving = this.membership.setTeamRole(teamId, userId, role);
     const status = role === 'admin' ? 'is now a team admin' : 'is now a team member';
     this.toasts.show(`${this.firstNameOf(userId)} ${status}`, { icon: 'shield-check' });
@@ -49,7 +54,7 @@ export class TeamAdminActions {
   async removeMember(teamId: string, userId: string): Promise<void> {
     const team = this.workspace.team(teamId);
     const name = this.workspace.user(userId)?.name ?? UNKNOWN_PERSON;
-    if (!team) {
+    if (!team || !this.connection.allows('removeFromTeam')) {
       return;
     }
     const confirmed = await this.dialogs.confirm({
@@ -57,6 +62,7 @@ export class TeamAdminActions {
       body: 'They’ll lose access to the team’s private channels but stay in the workspace.',
       confirmLabel: 'Remove from team',
       icon: 'user-minus',
+      canConfirm: this.connection.recheck('removeFromTeam'),
     });
     if (!confirmed) {
       return;
@@ -75,12 +81,14 @@ export class TeamAdminActions {
     const team = this.workspace.team(teamId);
     const confirmed =
       !!team &&
+      this.connection.allows('archiveTeam') &&
       (await this.dialogs.confirm({
         title: `Archive ${team.name}?`,
         body: 'The team and its channels become read-only and leave every list. You can restore it from the undo message.',
         confirmLabel: 'Archive team',
         icon: 'archive',
         tone: 'neutral',
+        canConfirm: this.connection.recheck('archiveTeam'),
       }));
     if (!team || !confirmed) {
       return false;

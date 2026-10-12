@@ -56,13 +56,17 @@
         (checkedChange)="network.simulateOffline($event)"
       />
     </div>
+    @if (devTools) {
+      <div class="drawer-menu__switch">
+        <app-icon name="cloud-off" [size]="20" />
+        <app-toggle
+          label="Make sync fail"
+          [checked]="network.simulatedSyncFailure()"
+          (checkedChange)="network.simulateSyncFailure($event)"
+        />
+      </div>
+    }
   </div>
-
-  <button type="button" class="drawer-menu__row" aria-haspopup="menu" (click)="switchWorkspace()">
-    <app-icon name="chevrons-up-down" [size]="20" />
-    <span class="drawer-menu__row-label">Switch workspace</span>
-    <span class="drawer-menu__count">{{ workspaceCount() | count: 'workspace' }}</span>
-  </button>
 
   @if (installer.canInstall()) {
     <button type="button" class="drawer-menu__row" (click)="install()">
@@ -70,6 +74,18 @@
       <span class="drawer-menu__row-label">Install CollabSpace</span>
     </button>
   }
+  @if (installer.canAddToHomeScreen()) {
+    <button type="button" class="drawer-menu__row" (click)="explainHomeScreen()">
+      <app-icon name="smartphone" [size]="20" />
+      <span class="drawer-menu__row-label">Add to Home Screen</span>
+    </button>
+  }
+
+  <button type="button" class="drawer-menu__row" aria-haspopup="menu" (click)="switchWorkspace()">
+    <app-icon name="chevrons-up-down" [size]="20" />
+    <span class="drawer-menu__row-label">Switch workspace</span>
+    <span class="drawer-menu__count">{{ workspaceCount() | count: 'workspace' }}</span>
+  </button>
 
   <button drawerFooter appButton type="button" block size="lg" (click)="signOut()">
     <app-icon name="log-out" [size]="18" />

@@ -56,7 +56,7 @@ describe('WorkspaceActivityState', () => {
     expect(audit.slice(0, 2)).toEqual([forced, invite]);
   });
 
-  it('lists a team’s activity and hides it once the team is archived', async () => {
+  it('lists a team’s activity and keeps it after the team is archived', async () => {
     const activity = await loaded();
 
     const design = activity.events({ teamId: 't-design' });
@@ -66,6 +66,31 @@ describe('WorkspaceActivityState', () => {
 
     await TestBed.inject(TeamMembershipState).setArchived('t-design', true);
 
-    expect(activity.events({ teamId: 't-design' })).toEqual([]);
+    const archived = activity.events({ teamId: 't-design' });
+    expect(archived.length).toBe(design.length + 1);
+    expect(archived[0]).toMatchObject({ verb: 'archived', audit: true });
+    expect(activity.events({ category: 'audit' })[0]).toMatchObject({ verb: 'archived' });
+    expect(activity.rows({ teamId: 't-design' })[0].team).toMatchObject({ link: null });
+  });
+
+  it('hides the audit log from people without audit access', async () => {
+    const activity = await loaded();
+    const workspace = TestBed.inject(WorkspaceState);
+
+    expect(activity.events({ category: 'audit' }).length).toBeGreaterThan(0);
+
+    workspace.putRoster('w1', { ...workspace.roster(), u0: 'guest' });
+
+    expect(activity.events({ category: 'audit' })).toEqual([]);
+  });
+
+  it('lists only a task’s activity as timeline rows', async () => {
+    const activity = await loaded();
+
+    const rows = activity.entityRows('task', 'NS-142');
+
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows.every((row) => row.kind === 'task')).toBe(true);
+    expect(rows.at(-1)).toMatchObject({ verb: 'created', action: 'task.created' });
   });
 });

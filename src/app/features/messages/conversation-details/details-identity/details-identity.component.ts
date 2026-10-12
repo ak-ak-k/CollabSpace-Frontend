@@ -9,6 +9,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { ConnectionGuard } from '../../../../core/services/connection-guard.service';
 import { CountPipe } from '../../../../shared/pipes/count.pipe';
 import { AvatarComponent } from '../../../../shared/ui/avatar/avatar.component';
 import { ButtonComponent } from '../../../../shared/ui/button/button.component';
@@ -37,6 +38,7 @@ export const GROUP_NAME_MAX_LENGTH = 60;
 })
 export class DetailsIdentityComponent {
   private readonly membership = inject(MembershipActions);
+  private readonly connection = inject(ConnectionGuard);
   private readonly injector = inject(Injector);
 
   readonly view = input.required<ConversationView>();
@@ -63,8 +65,12 @@ export class DetailsIdentityComponent {
   protected saveRename(event: Event): void {
     event.preventDefault();
     const name = this.draftName().trim();
+    const renamed = name !== '' && name !== this.view().title;
+    if (renamed && !this.connection.allows('renameGroup')) {
+      return;
+    }
     this.renaming.set(false);
-    if (name && name !== this.view().title) {
+    if (renamed) {
       void this.membership.renameGroup(this.view().id, name);
     }
   }

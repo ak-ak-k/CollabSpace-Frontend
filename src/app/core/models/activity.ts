@@ -1,4 +1,6 @@
 import { IconName } from '../../shared/ui/icon/icon-registry';
+import { ActivityAction } from './activity-action';
+import { WorkspaceRole } from './user';
 import { WorkspaceScoped } from './workspace';
 
 export type TeamActivityKind =
@@ -7,6 +9,7 @@ export type TeamActivityKind =
 export type WorkspaceActivityKind =
   | 'invite'
   | 'join'
+  | 'leave'
   | 'channel'
   | 'team'
   | 'role'
@@ -27,6 +30,10 @@ export type ActivityEntityType = 'task' | 'file' | 'team' | 'channel' | 'member'
 
 export type ActivityGroup = 'tasks' | 'files' | 'teams' | 'members';
 
+export type ActivityOutcome = 'succeeded' | 'pending' | 'failed';
+
+export type ActivityPrivacy = 'Private' | 'Public';
+
 export interface ActivityEntity {
   readonly type: ActivityEntityType;
   readonly id: string;
@@ -35,6 +42,16 @@ export interface ActivityEntity {
 export interface ActivityChange {
   readonly from: string;
   readonly to: string;
+}
+
+export interface ActivityMeta {
+  readonly role?: WorkspaceRole;
+  readonly team?: string | null;
+  readonly count?: number;
+  readonly privacy?: ActivityPrivacy;
+  readonly deleteOn?: string;
+  readonly setting?: string;
+  readonly permission?: string;
 }
 
 export interface ActivityEvent extends WorkspaceScoped {
@@ -49,6 +66,10 @@ export interface ActivityEvent extends WorkspaceScoped {
   readonly entity: ActivityEntity | null;
   readonly teamId: string | null;
   readonly change: ActivityChange | null;
+  readonly action: ActivityAction;
+  readonly meta: ActivityMeta | null;
+  readonly outcome: ActivityOutcome;
+  readonly audit: boolean;
 }
 
 export interface ActivityEntry {
@@ -60,7 +81,13 @@ export interface ActivityEntry {
   readonly entity?: ActivityEntity | null;
   readonly teamId?: string | null;
   readonly change?: ActivityChange | null;
+  readonly action?: ActivityAction;
+  readonly meta?: ActivityMeta | null;
+  readonly outcome?: ActivityOutcome;
+  readonly audit?: boolean;
 }
+
+export type ActivityRecordFields = Pick<ActivityEvent, 'action' | 'meta' | 'outcome' | 'audit'>;
 
 export const AUDIT_KINDS: ReadonlySet<ActivityKind> = new Set<ActivityKind>([
   'invite',
@@ -90,6 +117,7 @@ export const ACTIVITY_ICONS: Record<ActivityKind, IconName> = {
   hash: 'hash',
   invite: 'mail-plus',
   join: 'user-plus',
+  leave: 'user-minus',
   channel: 'hash',
   team: 'users',
   role: 'shield-check',
@@ -114,8 +142,64 @@ export const ACTIVITY_GROUPS: Partial<Record<ActivityKind, ActivityGroup>> = {
   deploy: 'teams',
   zap: 'teams',
   join: 'members',
+  leave: 'members',
   workspace: 'members',
 };
+
+export const ACTIVITY_TYPE_LABELS: Record<ActivityGroup, string> = {
+  tasks: 'Task',
+  teams: 'Team',
+  files: 'File',
+  members: 'Member',
+};
+
+export const ACTIVITY_OUTCOME_LABELS: Record<ActivityOutcome, string> = {
+  succeeded: 'Succeeded',
+  pending: 'Pending sync',
+  failed: 'Failed',
+};
+
+const LEGACY_ACTIONS: Record<ActivityKind, ActivityAction> = {
+  code: 'integration.event',
+  pin: 'message.pinned',
+  file: 'file.updated',
+  task: 'task.updated',
+  deploy: 'integration.event',
+  comment: 'task.commented',
+  zap: 'integration.event',
+  hash: 'channel.created',
+  invite: 'invite.sent',
+  join: 'member.joined',
+  leave: 'member.left',
+  channel: 'channel.created',
+  team: 'team.updated',
+  role: 'member.role_changed',
+  integration: 'integration.connected',
+  security: 'security.setting_changed',
+  remove: 'member.removed',
+  workspace: 'workspace.updated',
+  archive: 'workspace.archived',
+  permission: 'role.permission_changed',
+  'workspace-settings': 'workspace.updated',
+  deletion: 'workspace.deletion_scheduled',
+};
+
+const TEAM_OBJECT_PREFIX = 'the ';
+
+export const legacyActionOf = (kind: ActivityKind, object: string): ActivityAction =>
+  kind === 'join' && object.startsWith(TEAM_OBJECT_PREFIX)
+    ? 'team.member_joined'
+    : LEGACY_ACTIONS[kind];
+
+export const settledRecordFields = (kind: ActivityKind, object: string): ActivityRecordFields => ({
+  action: legacyActionOf(kind, object),
+  meta: null,
+  outcome: 'succeeded',
+  audit: false,
+});
+
+export const isAuditEvent = (event: Pick<ActivityEvent, 'category' | 'audit'>): boolean =>
+  event.category === 'audit' || event.audit;
 
 export const activityIconOf = (kind: ActivityKind): IconName => ACTIVITY_ICONS[kind] ?? 'activity';
 

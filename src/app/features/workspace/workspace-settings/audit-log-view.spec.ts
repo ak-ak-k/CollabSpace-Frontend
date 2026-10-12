@@ -1,7 +1,9 @@
 import { ActivityEvent } from '../../../core/models/activity';
+import { activityRowOf } from '../../../core/state/activity-row';
 import {
   AUDIT_CATEGORY_CHIPS,
   auditActorOptionsOf,
+  auditCountLabel,
   auditEmptyCopyOf,
   auditRowOf,
   DEFAULT_AUDIT_FILTERS,
@@ -27,6 +29,10 @@ const auditEvent = (id: string, changes: Partial<ActivityEvent> = {}): ActivityE
   entity: null,
   teamId: null,
   change: null,
+  action: 'invite.sent',
+  meta: null,
+  outcome: 'succeeded',
+  audit: false,
   ...changes,
 });
 
@@ -49,6 +55,7 @@ describe('audit log view', () => {
       'Members',
       'Roles',
       'Permissions',
+      'Teams & channels',
       'Workspace',
       'Security & integrations',
     ]);
@@ -61,6 +68,7 @@ describe('audit log view', () => {
     expect(filter({})).toEqual(['invite', 'role', 'github', 'rename']);
     expect(filter({ category: 'security' })).toEqual(['github']);
     expect(filter({ category: 'workspace' })).toEqual(['rename']);
+    expect(filter({ category: 'teams' })).toEqual([]);
     expect(filter({ actorId: 'u4' })).toEqual(['role', 'github']);
     expect(filter({ range: '7' })).toEqual(['invite', 'role']);
     expect(filter({ range: '30', actorId: 'u4', category: 'members' })).toEqual([]);
@@ -74,32 +82,62 @@ describe('audit log view', () => {
     ]);
   });
 
-  it('builds a row with an en-GB time, category label, summary and readable change', () => {
+  it('builds a row with an en-GB time, category, target, meta and outcome', () => {
+    const lookup = {
+      viewerId: 'u0',
+      user: (userId: string) => (names[userId] ? { id: userId, name: names[userId] } : null),
+      team: () => null,
+    };
     const row = auditRowOf(
-      auditEvent('role', {
-        kind: 'role',
-        verb: 'made',
-        object: 'Nandini Rao an Admin',
-        occurredAt: new Date(2026, 9, 5, 14, 32).getTime(),
-        change: { from: 'Member', to: 'Admin' },
-      }),
-      'Kavya Reddy',
+      activityRowOf(
+        auditEvent('role', {
+          kind: 'role',
+          actorId: 'u4',
+          verb: 'made',
+          object: 'Nandini Rao an Admin',
+          route: '/workspace/members',
+          occurredAt: new Date(2026, 9, 5, 14, 32).getTime(),
+          change: { from: 'Member', to: 'Admin' },
+          meta: { role: 'member' },
+        }),
+        lookup,
+        NOW,
+      ),
     );
 
     expect(row).toMatchObject({
       when: '5 Oct 2026, 14:32',
       who: 'Kavya Reddy',
       category: 'Roles',
-      summary: 'made Nandini Rao an Admin',
-      change: { from: 'Member', to: 'Admin', label: 'Changed from Member to Admin' },
+      verb: 'made',
+      object: 'Nandini Rao an Admin',
+      route: '/workspace/members',
+      metaText: 'Role: Member',
+      change: { from: 'Member', to: 'Admin' },
+      outcomeLabel: 'Succeeded',
+      outcomeIcon: 'check',
     });
-    expect(
-      auditRowOf(auditEvent('logo', { verb: 'removed the logo', object: '' }), 'You'),
-    ).toMatchObject({
-      summary: 'removed the logo',
-      change: null,
+    const archived = auditRowOf(
+      activityRowOf(
+        auditEvent('team', { kind: 'team', category: 'activity', audit: true, outcome: 'failed' }),
+        lookup,
+        NOW,
+      ),
+    );
+    expect(archived).toMatchObject({
+      who: 'You',
+      category: 'Teams & channels',
+      outcomeLabel: 'Failed',
+      outcomeIcon: 'circle-alert',
     });
     expect(formatAuditTime(new Date(2026, 0, 9, 7, 5).getTime())).toBe('9 Jan 2026, 07:05');
+  });
+
+  it('counts entries, mentioning filters when they are on', () => {
+    expect(auditCountLabel(0, false)).toBe('');
+    expect(auditCountLabel(1, false)).toBe('1 entry');
+    expect(auditCountLabel(1, true)).toBe('1 entry matches these filters');
+    expect(auditCountLabel(12, true)).toBe('12 entries match these filters');
   });
 
   it('explains an empty log differently when filters are on', () => {

@@ -2,7 +2,9 @@ import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { Component, computed, inject, signal } from '@angular/core';
 import { form, FormField, FormRoot, maxLength, validate } from '@angular/forms/signals';
 import { Channel } from '../../../core/models/channel';
+import { ConnectionGuard } from '../../../core/services/connection-guard.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { ChannelSettingsState } from '../../../core/state/channel-settings.state';
 import { ChatState } from '../../../core/state/chat.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
@@ -52,8 +54,10 @@ export class EditChannelDialogComponent {
   private readonly dialogRef = inject<DialogRef<void>>(DialogRef);
   private readonly channel = inject<EditChannelDialogData>(DIALOG_DATA).channel;
   private readonly workspace = inject(WorkspaceState);
+  private readonly channelSettings = inject(ChannelSettingsState);
   private readonly chat = inject(ChatState);
   private readonly toasts = inject(ToastService);
+  private readonly connection = inject(ConnectionGuard);
 
   protected readonly nameMaxLength = CHANNEL_NAME_MAX_LENGTH;
   protected readonly descriptionMaxLength = CHANNEL_DESCRIPTION_MAX_LENGTH;
@@ -89,7 +93,11 @@ export class EditChannelDialogComponent {
     },
     {
       submission: {
-        action: async () => this.save(),
+        action: async () => {
+          if (this.connection.allowsSave()) {
+            await this.save();
+          }
+        },
         onInvalid: (submitted) => submitted().errorSummary()[0]?.fieldTree().focusBoundControl(),
       },
     },
@@ -101,7 +109,7 @@ export class EditChannelDialogComponent {
 
   private async save(): Promise<void> {
     const { name, description, privacy } = this.draft();
-    const updated = await this.workspace.updateChannel(this.channel.id, {
+    const updated = await this.channelSettings.update(this.channel.id, {
       name,
       description: description.trim(),
       isPrivate: privacy === 'private',

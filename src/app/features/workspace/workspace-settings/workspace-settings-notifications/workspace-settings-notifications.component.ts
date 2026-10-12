@@ -9,6 +9,7 @@ import {
 } from '../../../../shared/ui/radio/radio-group.component';
 import { SettingRowComponent } from '../../../settings/setting-row/setting-row.component';
 import { SettingSwitchComponent } from '../../../settings/setting-switch/setting-switch.component';
+import { preferenceControl } from '../preference-control';
 import { WorkspacePreferenceUpdates } from '../workspace-preference-updates.service';
 import { WorkspaceSettingsNoteComponent } from '../workspace-settings-note/workspace-settings-note.component';
 
@@ -62,24 +63,34 @@ export class WorkspaceSettingsNotificationsComponent {
   protected readonly notifyOptions = NOTIFY_OPTIONS;
   protected readonly digestOptions = DIGEST_OPTIONS;
   protected readonly groupName = createUniqueId('notify-default');
+  protected readonly notifyDefault = preferenceControl<string>(
+    () => this.preferences()?.notifyDefault ?? '',
+  );
+  protected readonly digest = preferenceControl<string>(() => this.preferences()?.digest ?? '');
+  protected readonly allowEveryone = preferenceControl(
+    () => this.preferences()?.allowEveryone ?? false,
+  );
 
   protected setNotifyDefault(option: NotifyOption): void {
+    this.notifyDefault.value.set(option.value);
     this.updates.set(
       { notifyDefault: option.value },
       `New members will be notified about: ${option.label.toLowerCase()}`,
+      this.notifyDefault.reset,
     );
   }
 
   protected setDigest(value: string): void {
     const digest = digestOf(value);
     const label = DIGEST_OPTIONS.find((option) => option.value === digest)?.label ?? '';
-    this.updates.set({ digest }, `Email digest: ${label.toLowerCase()}`);
+    this.updates.set({ digest }, `Email digest: ${label.toLowerCase()}`, this.digest.reset);
   }
 
   protected setAllowEveryone(allowEveryone: boolean): void {
     this.updates.set(
       { allowEveryone },
       allowEveryone ? 'Everyone can use @everyone' : 'Only admins can use @everyone',
+      this.allowEveryone.reset,
     );
   }
 }

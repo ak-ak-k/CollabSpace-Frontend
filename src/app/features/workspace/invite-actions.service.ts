@@ -1,5 +1,6 @@
 import { inject, Service } from '@angular/core';
 import { WorkspaceInvite } from '../../core/models/workspace-invite';
+import { ConnectionGuard } from '../../core/services/connection-guard.service';
 import { ToastService } from '../../core/services/toast.service';
 import { InviteState } from '../../core/state/invite.state';
 
@@ -7,13 +8,20 @@ import { InviteState } from '../../core/state/invite.state';
 export class InviteActions {
   private readonly invites = inject(InviteState);
   private readonly toasts = inject(ToastService);
+  private readonly connection = inject(ConnectionGuard);
 
   resend(invite: WorkspaceInvite): void {
+    if (!this.connection.allows('resendInvite')) {
+      return;
+    }
     void this.invites.resend(invite.id);
     this.toasts.show(`Invitation resent to ${invite.email}`, { icon: 'mail' });
   }
 
   revoke(invite: WorkspaceInvite): void {
+    if (!this.connection.allows('revokeInvite')) {
+      return;
+    }
     void this.invites.revoke(invite.id);
     this.toasts.show(`Invitation to ${invite.email} revoked`, {
       icon: 'x',

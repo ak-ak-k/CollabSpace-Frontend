@@ -2,6 +2,7 @@ import { DOCUMENT, inject, Injectable } from '@angular/core';
 import { conversationRoute, messageRoute, threadRoute } from '../../../core/models/conversation';
 import { Message } from '../../../core/models/message';
 import { AttachmentView } from '../../../core/models/thread';
+import { ConnectionGuard } from '../../../core/services/connection-guard.service';
 import { DialogService } from '../../../core/services/dialog.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { ChatMessagesState } from '../../../core/state/chat-messages.state';
@@ -21,6 +22,7 @@ export class ConversationActions {
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
   private readonly document = inject(DOCUMENT);
+  private readonly connection = inject(ConnectionGuard);
 
   async copyLink(conversationId: string): Promise<void> {
     const conversation = this.chat.conversation(conversationId);
@@ -46,6 +48,9 @@ export class ConversationActions {
   }
 
   async togglePin(conversationId: string, messageId: string): Promise<void> {
+    if (!this.connection.allows('pin')) {
+      return;
+    }
     const pinned = await this.messages.togglePin(conversationId, messageId);
     this.toasts.show(pinned ? 'Message pinned' : 'Message unpinned', {
       icon: pinned ? 'pin' : 'pin-off',
@@ -76,11 +81,15 @@ export class ConversationActions {
   }
 
   async remove(conversationId: string, messageId: string): Promise<boolean> {
+    if (!this.connection.allows('remove')) {
+      return false;
+    }
     const confirmed = await this.dialogs.confirm({
       title: 'Delete message?',
       body: 'This removes the message for everyone in the conversation. You can undo right after.',
       confirmLabel: 'Delete',
       icon: 'trash-2',
+      canConfirm: this.connection.recheck('remove'),
     });
     if (!confirmed) {
       return false;
@@ -96,12 +105,19 @@ export class ConversationActions {
     return true;
   }
 
+  allowsEdit(): boolean {
+    return this.connection.allows('edit');
+  }
+
   async saveEdit(conversationId: string, messageId: string, text: string): Promise<void> {
     await this.messages.edit(conversationId, messageId, text);
     this.toasts.show('Message edited', { icon: 'pencil' });
   }
 
   react(conversationId: string, messageId: string, emoji: string): void {
+    if (!this.connection.allows('react')) {
+      return;
+    }
     void this.messages.react(conversationId, messageId, emoji);
   }
 

@@ -1,0 +1,55 @@
+<div class="activity">
+  <header class="activity__header">
+    <span class="caps-label">{{ kicker() }}</span>
+    <h1 class="activity__title">Activity</h1>
+    <p class="activity__subtitle">What’s been happening across your teams, tasks and files.</p>
+  </header>
+
+  @if (offline()) {
+    <app-offline-note>
+      You’re offline — showing activity loaded before you went offline. Newer activity appears when
+      you reconnect.
+    </app-offline-note>
+  }
+
+  <app-activity-filters
+    [(filters)]="filters"
+    [teamOptions]="teamOptions()"
+    [personOptions]="personOptions()"
+  />
+
+  <p class="activity__count" aria-live="polite">{{ countLabel() }}</p>
+
+  @switch (view()) {
+    @case ('loading') {
+      <app-skeleton layout="list" [rows]="8" compact label="Loading activity" />
+    }
+    @case ('error') {
+      <app-empty-state
+        kind="error"
+        heading="Couldn’t load activity"
+        message="Try again in a moment."
+        actionLabel="Retry"
+        (action)="retry()"
+      />
+    }
+    @case ('empty') {
+      <app-empty-state
+        icon="activity"
+        actionIcon="x"
+        [heading]="emptyCopy().heading"
+        [message]="emptyCopy().message"
+        [actionLabel]="emptyCopy().actionLabel"
+        (action)="clearFilters()"
+      />
+    }
+    @default {
+      <app-activity-feed [items]="rows()" grouped showType label="Activity" idPrefix="act" />
+      @if (hasMore()) {
+        <button appButton type="button" size="lg" class="activity__more" (click)="loadMore()">
+          Load more
+        </button>
+      }
+    }
+  }
+</div>

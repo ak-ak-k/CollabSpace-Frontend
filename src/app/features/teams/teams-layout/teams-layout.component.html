@@ -1,8 +1,12 @@
-<div class="teams">
-  @if (showSidebar()) {
-    <app-teams-sidebar [teamId]="teamId()" [channelId]="channelId()" />
-  }
-  <div class="teams__main">
-    <router-outlet />
+@if (block(); as blocked) {
+  <app-route-block [block]="blocked" />
+} @else {
+  <div class="teams">
+    @if (showSidebar()) {
+      <app-teams-sidebar [teamId]="teamId()" [channelId]="channelId()" />
+    }
+    <div class="teams__main">
+      <router-outlet />
+    </div>
   </div>
-</div>
+}

@@ -2,6 +2,7 @@ import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { Component, computed, inject, signal } from '@angular/core';
 import { WorkspaceRole } from '../../../core/models/user';
 import { WORKSPACE_ROLE_DETAILS } from '../../../core/models/workspace-role';
+import { ConnectionGuard } from '../../../core/services/connection-guard.service';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
@@ -33,6 +34,7 @@ export class ChangeRoleDialogComponent {
   private readonly dialogRef = inject<DialogRef<WorkspaceRole>>(DialogRef);
   private readonly data = inject<ChangeRoleDialogData>(DIALOG_DATA);
   private readonly workspace = inject(WorkspaceState);
+  private readonly connection = inject(ConnectionGuard);
 
   protected readonly idPrefix = createOverlayId('change-role');
   protected readonly member = computed(() => this.workspace.user(this.data.userId));
@@ -71,7 +73,7 @@ export class ChangeRoleDialogComponent {
 
   protected save(event: Event): void {
     event.preventDefault();
-    if (!this.unchanged()) {
+    if (!this.unchanged() && this.connection.allows('setRole')) {
       this.dialogRef.close(this.choice());
     }
   }

@@ -8,6 +8,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { ConnectionGuard } from '../../../core/services/connection-guard.service';
 import { joinIds } from '../../../shared/ui/input/field/unique-id';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { FieldErrorComponent } from '../../../shared/ui/input/field-error/field-error.component';
@@ -28,6 +29,7 @@ export interface FileRenameData {
 export class FileRenameDialogComponent {
   private readonly dialogRef = inject<DialogRef<string>>(DialogRef);
   private readonly parts = splitFileName(inject<FileRenameData>(DIALOG_DATA).name);
+  private readonly connection = inject(ConnectionGuard);
   private readonly control = viewChild.required<ElementRef<HTMLInputElement>>('control');
 
   protected readonly formId = createOverlayId('file-rename-form');
@@ -56,6 +58,9 @@ export class FileRenameDialogComponent {
     if (this.error()) {
       this.tried.set(true);
       this.control().nativeElement.focus();
+      return;
+    }
+    if (!this.connection.allows('renameFile')) {
       return;
     }
     this.dialogRef.close(renamedFileName(this.base(), this.extension));

@@ -1,4 +1,4 @@
-@if (preferences(); as settings) {
+@if (preferences()) {
   <ul class="security-rows">
     <li
       appSettingSwitch
@@ -31,7 +31,7 @@
         label="Session length"
         hideLabel
         [options]="sessionOptions"
-        [value]="settings.sessionLength"
+        [(value)]="sessionLength.value"
         (valueChange)="setSessionLength($event)"
       />
     </li>

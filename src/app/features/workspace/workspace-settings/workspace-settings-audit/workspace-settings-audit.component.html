@@ -1,3 +1,10 @@
+@if (offline()) {
+  <app-offline-note>
+    You’re offline, so this log may be incomplete. It only shows entries loaded before you went
+    offline — the full record is kept on the server and appears again when you reconnect.
+  </app-offline-note>
+}
+
 @switch (status()) {
   @case ('loading') {
     <app-skeleton layout="table" [rows]="6" compact label="Loading the audit log" />
@@ -16,6 +23,8 @@
   @default {
     <app-workspace-audit-filters [(filters)]="filters" [actorOptions]="actorOptions()" />
 
+    <p class="audit__count" aria-live="polite">{{ countLabel() }}</p>
+
     @if (rows().length === 0) {
       <app-empty-state
         compact
@@ -30,17 +39,36 @@
           <li #entry class="audit-card" tabindex="-1">
             <span class="audit-card__meta">
               <span class="audit__category">{{ row.category }}</span>
-              <time class="audit-card__time" [attr.datetime]="row.iso">{{ row.when }}</time>
+              <time class="audit-card__time" [attr.datetime]="row.iso" [attr.title]="row.when">{{
+                row.when
+              }}</time>
             </span>
             <span class="audit-card__summary">
-              <strong class="audit__strong">{{ row.who }}</strong> {{ row.summary }}
+              <strong class="audit__strong">{{ row.who }}</strong> {{ row.verb }}
+              @if (row.route) {
+                <a class="audit__object" [routerLink]="linkTo(row.route)">{{ row.object }}</a>
+              } @else {
+                <span class="audit__object">{{ row.object }}</span>
+              }
             </span>
             @if (row.change; as change) {
               <span class="audit-card__change">
-                <span class="visually-hidden">{{ change.label }}</span>
-                <span aria-hidden="true">
-                  {{ change.from }} → <strong class="audit__strong">{{ change.to }}</strong>
-                </span>
+                <span class="visually-hidden">Changed from </span>{{ change.from
+                }}<span aria-hidden="true"> → </span><span class="visually-hidden"> to </span
+                ><strong class="audit__strong">{{ change.to }}</strong>
+              </span>
+            }
+            @if (row.metaText) {
+              <span class="audit__meta">{{ row.metaText }}</span>
+            }
+            @if (row.outcome !== 'succeeded') {
+              <span
+                class="audit__outcome"
+                [class.audit__outcome--pending]="row.outcome === 'pending'"
+                [class.audit__outcome--failed]="row.outcome === 'failed'"
+              >
+                <app-icon [name]="row.outcomeIcon" [size]="13" />
+                {{ row.outcomeLabel }}
               </span>
             }
           </li>
@@ -58,31 +86,49 @@
             <tr>
               <th scope="col" class="audit-table__when">When</th>
               <th scope="col" class="audit-table__who">Changed by</th>
-              <th scope="col">Event</th>
+              <th scope="col">Action and target</th>
               <th scope="col" class="audit-table__change">Change</th>
+              <th scope="col" class="audit-table__outcome">Outcome</th>
             </tr>
           </thead>
           <tbody>
             @for (row of rows(); track row.id) {
               <tr #entry class="audit-table__row" tabindex="-1">
                 <td class="audit-table__time">
-                  <time [attr.datetime]="row.iso">{{ row.when }}</time>
+                  <time [attr.datetime]="row.iso" [attr.title]="row.when">{{ row.when }}</time>
                 </td>
                 <td class="audit-table__actor">{{ row.who }}</td>
                 <td class="audit-table__event">
                   <span class="audit__category audit-table__category">{{ row.category }}</span>
-                  {{ row.summary }}
+                  {{ row.verb }}
+                  @if (row.route) {
+                    <a class="audit__object" [routerLink]="linkTo(row.route)">{{ row.object }}</a>
+                  } @else {
+                    <span class="audit__object">{{ row.object }}</span>
+                  }
+                  @if (row.metaText) {
+                    <span class="audit__meta audit-table__meta">{{ row.metaText }}</span>
+                  }
                 </td>
                 <td class="audit-table__value">
                   @if (row.change; as change) {
-                    <span class="visually-hidden">{{ change.label }}</span>
-                    <span aria-hidden="true">
-                      {{ change.from }} → <strong class="audit__strong">{{ change.to }}</strong>
-                    </span>
+                    <span class="visually-hidden">Changed from </span>{{ change.from
+                    }}<span aria-hidden="true"> → </span><span class="visually-hidden"> to </span
+                    ><strong class="audit__strong">{{ change.to }}</strong>
                   } @else {
                     <span class="audit-table__none" aria-hidden="true">—</span>
                     <span class="visually-hidden">No value change</span>
                   }
+                </td>
+                <td class="audit-table__value">
+                  <span
+                    class="audit__outcome"
+                    [class.audit__outcome--pending]="row.outcome === 'pending'"
+                    [class.audit__outcome--failed]="row.outcome === 'failed'"
+                  >
+                    <app-icon [name]="row.outcomeIcon" [size]="13" />
+                    {{ row.outcomeLabel }}
+                  </span>
                 </td>
               </tr>
             }
@@ -98,5 +144,6 @@
 }
 
 <p class="audit__note">
-  Entries are a permanent record. They can’t be edited or deleted, and they don’t appear in search.
+  Entries are a permanent record. They can’t be edited or deleted, undoing a change adds a new
+  entry, and entries don’t appear in search.
 </p>

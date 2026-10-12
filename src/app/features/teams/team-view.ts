@@ -1,10 +1,9 @@
-import { ActivityEvent, activityIconOf } from '../../core/models/activity';
 import { Channel } from '../../core/models/channel';
 import { FILE_TYPE_ICONS, FILE_TYPE_LABELS, FileItem } from '../../core/models/file-item';
 import { Message } from '../../core/models/message';
 import { Team } from '../../core/models/team';
 import { firstNameOf, User, userColorSeed } from '../../core/models/user';
-import { formatRelative, formatWhen } from '../../shared/pipes/time-format';
+import { formatWhen } from '../../shared/pipes/time-format';
 import { AvatarGroupMember } from '../../shared/ui/avatar-group/avatar-group.component';
 import { IconName } from '../../shared/ui/icon/icon-registry';
 
@@ -49,18 +48,6 @@ export interface TeamFileView {
   readonly name: string;
   readonly icon: IconName;
   readonly meta: string;
-}
-
-export interface TeamActivityItem {
-  readonly id: string;
-  readonly actorName: string;
-  readonly actorFirstName: string;
-  readonly seed: number;
-  readonly verb: string;
-  readonly object: string;
-  readonly icon: IconName;
-  readonly when: string;
-  readonly route: string;
 }
 
 const UNKNOWN_NAME = 'Someone';
@@ -143,18 +130,3 @@ export const teamFileView = (
 export const isTeamFile = (file: FileItem, team: Pick<Team, 'id' | 'channelIds'>): boolean =>
   file.teamId === team.id ||
   (file.source.type === 'message' && team.channelIds.includes(file.source.conversationId));
-
-export const teamActivityItem = (event: ActivityEvent, usersById: UsersById): TeamActivityItem => {
-  const actorName = nameOf(usersById, event.actorId);
-  return {
-    id: event.id,
-    actorName,
-    actorFirstName: firstNameOf(actorName),
-    seed: userColorSeed(event.actorId),
-    verb: event.verb,
-    object: event.object,
-    icon: activityIconOf(event.kind),
-    when: formatRelative(event.occurredAt),
-    route: event.route,
-  };
-};

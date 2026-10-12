@@ -1,3 +1,4 @@
+@use 'touch';
 @use '../../../settings/settings-section';
 
 :host {
@@ -17,6 +18,45 @@
 
 .audit__strong {
   font-weight: var(--font-weight-heavy);
+}
+
+.audit__count {
+  margin: var(--space-0);
+  color: var(--text-secondary);
+  font-size: var(--font-size-13);
+}
+
+.audit__object {
+  font-weight: var(--font-weight-semibold);
+}
+
+a.audit__object {
+  @include touch.on-touch {
+    position: relative;
+
+    @include touch.minimum-hit-area;
+  }
+}
+
+.audit__meta {
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+}
+
+.audit__outcome {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.audit__outcome--pending {
+  color: var(--text-primary);
+}
+
+.audit__outcome--failed {
+  color: var(--danger);
 }
 
 .audit__more {
@@ -45,6 +85,10 @@
   width: var(--workspace-settings-audit-change-width);
 }
 
+.audit-table__outcome {
+  width: var(--workspace-settings-audit-outcome-width);
+}
+
 .audit-table__row:focus-visible {
   outline-offset: calc(var(--border-width-rule) * -1);
 }
@@ -52,7 +96,6 @@
 .audit-table__time,
 .audit-table__actor {
   font-size: var(--font-size-13);
-  white-space: nowrap;
 }
 
 .audit-table__actor {
@@ -64,8 +107,13 @@
   overflow-wrap: anywhere;
 }
 
-.audit-table__category {
+.audit-table__category,
+.audit-table__meta {
   display: block;
+}
+
+.audit-table__meta {
+  margin-top: var(--space-0-5);
 }
 
 .audit-table__value {
@@ -113,4 +161,9 @@
 
 .audit-card__change {
   font-size: var(--font-size-13);
+  overflow-wrap: anywhere;
+}
+
+.audit-card .audit__outcome {
+  font-size: var(--font-size-12);
 }

@@ -13,8 +13,8 @@ import {
 import { canSeeFile, FileAccess } from '../models/file-source';
 import { ActivityLogState } from './activity-log.state';
 import { DataModeState } from './data-mode.state';
-import { fileActivityEntry, FileActivityVerb } from './file-activity';
-import { Loadable, settledStatus } from './loadable';
+import { fileActivityEntry, FileActivityVerb, fileAttachedEntry } from './file-activity';
+import { Loadable, loadingWhile, settledStatus } from './loadable';
 import { WorkspaceState } from './workspace.state';
 
 type FilePlacement = Pick<NewFile, 'source' | 'teamId' | 'location' | 'shared' | 'taskIds'>;
@@ -59,7 +59,10 @@ export class FileState {
       (file) => this.workspace.contains(file) && canSeeFile(file, access),
     );
   });
-  readonly status = settledStatus(this.loader.status, () => this.files().length === 0);
+  readonly status = settledStatus(
+    loadingWhile(this.loader.status, this.workspace.switching),
+    () => this.files().length === 0,
+  );
 
   constructor() {
     effect(() => {
@@ -144,14 +147,16 @@ export class FileState {
     return file;
   }
 
-  attachToTask(taskId: string, draft: TeamFileDraft): Promise<FileItem> {
-    return this.add(draft, {
+  async attachToTask(taskId: string, draft: TeamFileDraft): Promise<FileItem> {
+    const file = await this.add(draft, {
       source: { type: 'task', taskId },
       teamId: draft.teamId ?? null,
       location: taskId,
       shared: true,
       taskIds: [taskId],
     });
+    this.activity.record(fileAttachedEntry(file, taskId), file.workspaceId);
+    return file;
   }
 
   detachFromTask(fileId: string, taskId: string): void {

@@ -2,6 +2,7 @@ import { inject, Service } from '@angular/core';
 import { Router } from '@angular/router';
 import { Permission } from '../../core/models/permission';
 import { NewWorkspace } from '../../core/models/workspace';
+import { ConnectionGuard } from '../../core/services/connection-guard.service';
 import { DialogService } from '../../core/services/dialog.service';
 import { ToastService } from '../../core/services/toast.service';
 import { WorkspaceActivityState } from '../../core/state/workspace-activity.state';
@@ -31,6 +32,7 @@ export class WorkspaceActions {
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly connection = inject(ConnectionGuard);
 
   openInvite(teamId: string | null = null): void {
     if (!this.workspace.access().canInvite) {
@@ -44,14 +46,14 @@ export class WorkspaceActions {
   }
 
   openCreateTeam(): void {
-    if (this.blocked('teams.create', 'teams')) {
+    if (!this.connection.allows('createTeam') || this.blocked('teams.create', 'teams')) {
       return;
     }
     this.dialogs.open(CreateTeamDialogComponent, { size: 'md' });
   }
 
   openCreateChannel(teamId: string | null = null): void {
-    if (this.blocked('channels.create', 'channels')) {
+    if (!this.connection.allows('createChannel') || this.blocked('channels.create', 'channels')) {
       return;
     }
     const data: CreateChannelDialogData = { teamId };
@@ -65,13 +67,22 @@ export class WorkspaceActions {
   }
 
   openCreateWorkspace(): void {
+    if (!this.connection.allows('createWorkspace')) {
+      return;
+    }
     this.dialogs.open(CreateWorkspaceDialogComponent, { size: 'md' });
   }
 
   async createWorkspace(draft: NewWorkspace): Promise<void> {
     const created = await this.admin.createWorkspace(draft);
     this.activity.record(
-      { kind: 'workspace', verb: 'created', object: created.name, route: WORKSPACE_ROUTE },
+      {
+        kind: 'workspace',
+        verb: 'created',
+        object: created.name,
+        route: WORKSPACE_ROUTE,
+        action: 'workspace.created',
+      },
       created.id,
     );
     await this.router.navigateByUrl(WORKSPACE_ROUTE);

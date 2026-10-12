@@ -5,6 +5,7 @@ import { FileState } from '../../../core/state/file.state';
 import { TeamChannelsState } from '../../../core/state/team-channels.state';
 import { TaskState } from '../../../core/state/task.state';
 import { TeamMembershipState } from '../../../core/state/team-membership.state';
+import { ActivityRow } from '../../../core/state/activity-row';
 import { WorkspaceActivityState } from '../../../core/state/workspace-activity.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import { teamMemberView, TeamMemberView } from '../team-member-view';
@@ -13,8 +14,6 @@ import {
   channelRowView,
   ChannelRowView,
   isTeamFile,
-  teamActivityItem,
-  TeamActivityItem,
   teamFileView,
   TeamFileView,
 } from '../team-view';
@@ -31,7 +30,7 @@ export interface TeamDetailData {
   readonly members: Signal<readonly TeamMemberView[]>;
   readonly files: Signal<readonly TeamFileView[]>;
   readonly tasks: Signal<readonly TeamTaskView[]>;
-  readonly activity: Signal<readonly TeamActivityItem[]>;
+  readonly activity: Signal<readonly ActivityRow[]>;
   readonly lead: Signal<TeamMemberView | null>;
   readonly stats: Signal<readonly TeamStat[]>;
 }
@@ -93,11 +92,7 @@ export const injectTeamDetail = (teamId: () => string): TeamDetailData => {
       .map((task) => teamTaskView(task, workspace.user(task.assigneeId))),
   );
 
-  const activity = computed(() =>
-    activityState
-      .events({ category: 'activity', teamId: teamId() })
-      .map((event) => teamActivityItem(event, workspace.usersById())),
-  );
+  const activity = computed(() => activityState.rows({ category: 'activity', teamId: teamId() }));
 
   const lead = computed(() => members().find((member) => member.id === team()?.leadId) ?? null);
 

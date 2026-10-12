@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from '../../../../core/models/user';
 import { DialogService } from '../../../../core/services/dialog.service';
+import { ConnectionGuard } from '../../../../core/services/connection-guard.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { WorkspaceAdminState } from '../../../../core/state/workspace-admin.state';
 import { WorkspaceState } from '../../../../core/state/workspace.state';
@@ -25,6 +26,7 @@ export class WorkspaceTransferOwnershipComponent {
   private readonly admin = inject(WorkspaceAdminState);
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
+  private readonly connection = inject(ConnectionGuard);
   private readonly router = inject(Router);
 
   private readonly workspaceName = computed(() => this.workspace.currentWorkspace()?.name ?? '');
@@ -37,7 +39,11 @@ export class WorkspaceTransferOwnershipComponent {
 
   protected async transfer(): Promise<void> {
     const newOwner = this.workspace.user(this.newOwnerId());
-    if (!newOwner || !this.admin.canTransferTo(newOwner.id)) {
+    if (
+      !newOwner ||
+      !this.admin.canTransferTo(newOwner.id) ||
+      !this.connection.allows('transferOwnership')
+    ) {
       return;
     }
     const confirmed = await this.confirm(newOwner);
@@ -60,6 +66,7 @@ export class WorkspaceTransferOwnershipComponent {
       body: `${name} becomes the Owner of ${workspaceName}. You’ll become an Admin and lose Owner-only controls, like deleting the workspace.`,
       confirmLabel: 'Transfer ownership',
       confirmText: workspaceName,
+      canConfirm: this.connection.recheck('transferOwnership'),
     });
   }
 }

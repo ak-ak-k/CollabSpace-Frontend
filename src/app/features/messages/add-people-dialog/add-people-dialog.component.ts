@@ -1,6 +1,7 @@
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { Component, computed, inject, signal } from '@angular/core';
 import { form, FormField, FormRoot, validate } from '@angular/forms/signals';
+import { ConnectionGuard } from '../../../core/services/connection-guard.service';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
@@ -36,6 +37,7 @@ interface PeopleDraft {
 export class AddPeopleDialogComponent {
   private readonly dialogRef = inject<DialogRef<AddPeopleDialogResult>>(DialogRef);
   private readonly workspace = inject(WorkspaceState);
+  private readonly connection = inject(ConnectionGuard);
   protected readonly data = inject<AddPeopleDialogData>(DIALOG_DATA);
 
   protected readonly people = computed(() => {
@@ -61,11 +63,17 @@ export class AddPeopleDialogComponent {
     },
     {
       submission: {
-        action: async () => this.dialogRef.close(this.draft().memberIds),
+        action: async () => this.finish(),
         onInvalid: (submitted) => submitted().errorSummary()[0]?.fieldTree().focusBoundControl(),
       },
     },
   );
+
+  private finish(): void {
+    if (this.connection.allowsSave()) {
+      this.dialogRef.close(this.draft().memberIds);
+    }
+  }
 
   protected cancel(): void {
     this.dialogRef.close([]);

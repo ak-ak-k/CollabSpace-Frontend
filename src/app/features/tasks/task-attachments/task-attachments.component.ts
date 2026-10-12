@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { FILE_TYPE_ICONS, FileItem, fileTypeOf } from '../../../core/models/file-item';
 import { Task } from '../../../core/models/task';
 import { firstNameOf } from '../../../core/models/user';
+import { ConnectionGuard } from '../../../core/services/connection-guard.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { FileState } from '../../../core/state/file.state';
 import { TaskState } from '../../../core/state/task.state';
@@ -35,6 +36,7 @@ export class TaskAttachmentsComponent {
   private readonly tasks = inject(TaskState);
   private readonly workspace = inject(WorkspaceState);
   private readonly toasts = inject(ToastService);
+  private readonly connection = inject(ConnectionGuard);
 
   readonly task = input.required<Task>();
 
@@ -50,11 +52,17 @@ export class TaskAttachmentsComponent {
     })),
   );
 
+  protected pick(picker: HTMLInputElement): void {
+    if (this.connection.allows('attachFiles')) {
+      picker.click();
+    }
+  }
+
   protected async attach(picker: HTMLInputElement): Promise<void> {
     const picked = [...(picker.files ?? [])];
     picker.value = '';
     const task = this.task();
-    if (picked.length === 0) {
+    if (picked.length === 0 || !this.connection.allows('attachFiles')) {
       return;
     }
     await Promise.all(
@@ -68,7 +76,6 @@ export class TaskAttachmentsComponent {
         }),
       ),
     );
-    this.tasks.markPendingWhileOffline(task.id);
     const what = picked.length === 1 ? picked[0].name : `${picked.length} files`;
     this.toasts.show(`${what} attached — also saved to Files`, { icon: 'paperclip' });
   }

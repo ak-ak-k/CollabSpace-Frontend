@@ -63,6 +63,21 @@ describe('ConfirmDialogComponent', () => {
     expect(close.mock.calls).toEqual([[false], [true]]);
   });
 
+  it('stays open when the confirm is no longer allowed', async () => {
+    let allowed = false;
+    const host = await render(
+      resolveConfirmData({ title: 'Remove?', body: 'Gone.', canConfirm: () => allowed }),
+    );
+    const confirm = Array.from(host.querySelectorAll('button')).at(-1) as HTMLButtonElement;
+
+    confirm.click();
+    expect(close).not.toHaveBeenCalled();
+
+    allowed = true;
+    confirm.click();
+    expect(close).toHaveBeenCalledWith(true);
+  });
+
   it('keeps the confirm button disabled until the exact text is typed', async () => {
     const host = await render(
       resolveConfirmData({ title: 'Delete Acme?', body: 'Gone.', confirmText: 'Acme' }),

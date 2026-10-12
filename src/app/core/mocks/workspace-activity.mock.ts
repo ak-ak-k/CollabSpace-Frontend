@@ -2,6 +2,7 @@ import {
   ActivityChange,
   ActivityEvent,
   activityCategoryOf,
+  settledRecordFields,
   WorkspaceActivityKind,
 } from '../models/activity';
 import { MINUTES_PER_DAY, minutesAgo } from './mock-clock';
@@ -138,6 +139,7 @@ const toEvent = ([
   entity: null,
   teamId: null,
   change: change ?? null,
+  ...settledRecordFields(kind, object),
 });
 
 export const MOCK_WORKSPACE_ACTIVITY: readonly ActivityEvent[] = ACTIVITY_SEEDS.map(toEvent);

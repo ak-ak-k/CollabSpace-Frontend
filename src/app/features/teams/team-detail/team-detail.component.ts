@@ -110,8 +110,4 @@ export class TeamDetailComponent {
   protected reload(): void {
     void this.workspace.reload();
   }
-
-  protected backToTeams(): void {
-    void this.router.navigate(['/teams']);
-  }
 }

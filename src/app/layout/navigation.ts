@@ -11,6 +11,14 @@ export interface NavigationItem {
   readonly badge?: NavigationBadge;
 }
 
+const ACTIVITY_NAVIGATION: NavigationItem = {
+  id: 'activity',
+  label: 'Activity',
+  accessibleLabel: 'Activity',
+  icon: 'activity',
+  route: '/activity',
+};
+
 export const PRIMARY_NAVIGATION: readonly NavigationItem[] = [
   { id: 'home', label: 'Home', accessibleLabel: 'Home', icon: 'house', route: '/home' },
   {
@@ -23,6 +31,7 @@ export const PRIMARY_NAVIGATION: readonly NavigationItem[] = [
   },
   { id: 'teams', label: 'Teams', accessibleLabel: 'Teams', icon: 'users', route: '/teams' },
   { id: 'people', label: 'People', accessibleLabel: 'People', icon: 'contact', route: '/people' },
+  ACTIVITY_NAVIGATION,
   {
     id: 'tasks',
     label: 'Tasks',
@@ -56,6 +65,7 @@ export const DRAWER_NAVIGATION: readonly NavigationItem[] = [
     route: '/workspace',
   },
   { id: 'people', label: 'People', accessibleLabel: 'People', icon: 'contact', route: '/people' },
+  ACTIVITY_NAVIGATION,
   {
     id: 'notifications',
     label: 'Notifications',
@@ -78,6 +88,7 @@ export const DRAWER_NAVIGATION: readonly NavigationItem[] = [
 export const MORE_SECTION_ROUTES: readonly string[] = [
   '/workspace',
   '/people',
+  '/activity',
   '/files',
   '/notifications',
   '/profile',

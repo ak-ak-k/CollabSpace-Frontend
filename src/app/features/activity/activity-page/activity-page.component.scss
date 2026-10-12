@@ -1,0 +1,41 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--background);
+}
+
+.activity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: var(--activity-page-max-width);
+  padding: var(--activity-page-padding);
+}
+
+.activity__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.activity__title {
+  margin: var(--space-0);
+  font-size: var(--font-size-display-sm);
+}
+
+.activity__subtitle {
+  margin: var(--space-0);
+  color: var(--text-secondary);
+  font-size: var(--font-size-15);
+}
+
+.activity__count {
+  margin: var(--space-0);
+  color: var(--text-secondary);
+  font-size: var(--font-size-13);
+}
+
+.activity__more {
+  align-self: flex-start;
+}

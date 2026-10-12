@@ -5,6 +5,7 @@ import {
   Message,
   Reaction,
 } from '../models/message';
+import { isWaitingToSync } from './pending-work';
 
 export type Threads = Readonly<Record<string, readonly Message[]>>;
 
@@ -68,16 +69,18 @@ export const togglePinned = (
     pinnedAt: message.pinned ? null : Date.now(),
   }));
 
+const withDelivery = (message: Message, deliveryState: DeliveryState): Message =>
+  message.syncFailed
+    ? { ...message, deliveryState, syncFailed: false }
+    : { ...message, deliveryState };
+
 export const setDeliveryState = (
   threads: Threads,
   conversationId: string,
   messageId: string,
   state: DeliveryState,
 ): Threads =>
-  updateMessage(threads, conversationId, messageId, (message) => ({
-    ...message,
-    deliveryState: state,
-  }));
+  updateMessage(threads, conversationId, messageId, (message) => withDelivery(message, state));
 
 const withoutEmpty = (reactions: readonly Reaction[]): Reaction[] =>
   reactions.filter((reaction) => reaction.userIds.length > 0);
@@ -128,17 +131,25 @@ export const advanceDelivery = (
     ),
   );
 
-export const releaseQueued = (threads: Threads): Threads =>
+const mapEveryMessage = (threads: Threads, change: (message: Message) => Message): Threads =>
   Object.fromEntries(
-    Object.entries(threads).map(([conversationId, thread]) => [
-      conversationId,
-      thread.map((message) =>
-        message.deliveryState === 'queued'
-          ? { ...message, deliveryState: 'sent' as const }
-          : message,
-      ),
-    ]),
+    Object.entries(threads).map(([conversationId, thread]) => [conversationId, thread.map(change)]),
   );
+
+export const releaseQueued = (threads: Threads): Threads =>
+  mapEveryMessage(threads, (message) =>
+    isWaitingToSync(message) ? withDelivery(message, 'sent') : message,
+  );
+
+export const failQueued = (threads: Threads): Threads =>
+  mapEveryMessage(threads, (message) =>
+    message.deliveryState === 'queued'
+      ? { ...message, deliveryState: 'failed', syncFailed: true }
+      : message,
+  );
+
+export const waitingMessagesOf = (threads: Threads): Message[] =>
+  Object.values(threads).flatMap((thread) => thread.filter(isWaitingToSync));
 
 export const firstUnreadId = (thread: readonly Message[], unreadCount: number): string | null =>
   unreadCount > 0 ? (thread[thread.length - unreadCount]?.id ?? null) : null;

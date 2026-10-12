@@ -1,4 +1,5 @@
 import { Component, computed, ElementRef, inject, viewChild } from '@angular/core';
+import { ConnectionGuard } from '../../../../core/services/connection-guard.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { WorkspaceAdminState } from '../../../../core/state/workspace-admin.state';
 import { WorkspaceState } from '../../../../core/state/workspace.state';
@@ -24,6 +25,7 @@ export class WorkspaceLogoFieldComponent {
   private readonly workspace = inject(WorkspaceState);
   private readonly admin = inject(WorkspaceAdminState);
   private readonly toasts = inject(ToastService);
+  private readonly connection = inject(ConnectionGuard);
 
   private readonly fileInput = viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
 
@@ -32,7 +34,9 @@ export class WorkspaceLogoFieldComponent {
   protected readonly pickLabel = computed(() => (this.logoUrl() ? 'Replace logo' : 'Upload logo'));
 
   protected pick(): void {
-    this.fileInput().nativeElement.click();
+    if (this.connection.allows('setWorkspaceLogo')) {
+      this.fileInput().nativeElement.click();
+    }
   }
 
   protected async useFile(input: HTMLInputElement): Promise<void> {
@@ -57,6 +61,9 @@ export class WorkspaceLogoFieldComponent {
   }
 
   private apply(logoUrl: string | null): void {
+    if (!this.connection.allows('setWorkspaceLogo')) {
+      return;
+    }
     const previous = this.logoUrl();
     void this.admin.setLogo(logoUrl);
     this.toasts.show(logoUrl ? 'Logo updated' : 'Logo removed', {

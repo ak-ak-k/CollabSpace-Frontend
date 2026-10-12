@@ -1,4 +1,4 @@
-import { ActivityEvent, TeamActivityKind } from '../models/activity';
+import { ActivityEvent, settledRecordFields, TeamActivityKind } from '../models/activity';
 import { minutesAgo } from './mock-clock';
 
 interface TeamActivitySeed {
@@ -123,6 +123,7 @@ const toTeamEvent = (seed: TeamActivitySeed): ActivityEvent => ({
   category: 'activity',
   entity: null,
   change: null,
+  ...settledRecordFields(seed.kind, seed.object),
 });
 
 export const MOCK_TEAM_ACTIVITY: readonly ActivityEvent[] = TEAM_ACTIVITY_SEEDS.map(toTeamEvent);

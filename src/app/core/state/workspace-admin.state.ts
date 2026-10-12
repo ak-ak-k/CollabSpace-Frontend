@@ -28,13 +28,13 @@ import {
   memberRestoredEntry,
   ownershipTransferEntry,
   permissionChangeEntry,
-  preferenceEntries,
   roleChangeEntry,
   workspaceArchiveEntry,
   workspaceDeletionEntry,
   workspaceDetailsEntry,
   workspaceLogoEntry,
 } from './workspace-audit';
+import { preferenceEntries } from './workspace-preference-audit';
 import { WorkspaceState } from './workspace.state';
 
 const UNKNOWN_PERSON = 'Someone';
@@ -90,14 +90,16 @@ export class WorkspaceAdminState {
 
   scheduleDeletion(scheduled: boolean): Promise<void> {
     const deleteAt = scheduled ? Date.now() + DELETION_GRACE_DAYS * MILLISECONDS_PER_DAY : null;
-    this.activity.record(workspaceDeletionEntry(scheduled));
+    this.activity.record(workspaceDeletionEntry(deleteAt));
     return this.patch({ deleteAt });
   }
 
   async updatePreferences(changes: Partial<WorkspacePreferences>): Promise<void> {
     const workspaceId = this.workspace.currentWorkspaceId();
     const current = this.workspace.preferences();
-    preferenceEntries(current, changes).forEach((entry) => this.activity.record(entry));
+    preferenceEntries(current, changes, (channelId) => this.channelNameOf(channelId)).forEach(
+      (entry) => this.activity.record(entry),
+    );
     if (current) {
       this.workspace.putPreferences(workspaceId, { ...current, ...changes });
     }
@@ -158,7 +160,9 @@ export class WorkspaceAdminState {
       workspaceId,
       withTransferredOwnership(roster, userId, CURRENT_USER_ID),
     );
-    this.activity.record(ownershipTransferEntry(this.memberOf(userId)));
+    this.activity.record(
+      ownershipTransferEntry(this.memberOf(userId), this.memberOf(CURRENT_USER_ID).name),
+    );
     await Promise.all([
       this.data.transferOwnership(workspaceId, userId, CURRENT_USER_ID),
       this.patch({ ownerId: userId }),
@@ -184,7 +188,7 @@ export class WorkspaceAdminState {
       workspaceId,
       Object.fromEntries(Object.entries(roster).filter(([memberId]) => memberId !== userId)),
     );
-    this.activity.record(memberRemovedEntry(this.memberOf(userId)));
+    this.activity.record(memberRemovedEntry(this.memberOf(userId), role));
     await this.data.removeMember(workspaceId, userId);
     return role;
   }
@@ -196,7 +200,7 @@ export class WorkspaceAdminState {
   ): Promise<void> {
     const roster = this.workspace.rosters()[workspaceId] ?? {};
     this.workspace.putRoster(workspaceId, { ...roster, [userId]: role });
-    this.activity.record(memberRestoredEntry(this.memberOf(userId)), workspaceId);
+    this.activity.record(memberRestoredEntry(this.memberOf(userId), role), workspaceId);
     await this.data.setRole(workspaceId, userId, role);
   }
 
@@ -219,6 +223,10 @@ export class WorkspaceAdminState {
       this.workspace.putPreferences(workspaceId, { ...current, whoCanInvite });
     }
     await this.data.updatePreferences(workspaceId, { whoCanInvite });
+  }
+
+  private channelNameOf(channelId: string): string | null {
+    return this.workspace.channels().find((channel) => channel.id === channelId)?.name ?? null;
   }
 
   private memberOf(userId: string): Pick<User, 'id' | 'name'> {

@@ -48,17 +48,22 @@
     (picked)="pickFilter($event)"
   />
 
-  <div class="panel__body" #body>
+  <div class="panel__body" #body role="region" aria-label="Search results" tabindex="0">
     @if (offline()) {
       <p class="panel__offline" role="status">
-        <app-icon name="cloud-off" [size]="14" />
-        You’re offline — showing results from data already on this device.
+        <app-icon class="panel__offline-icon" name="cloud-off" [size]="14" />
+        <span>
+          <strong class="panel__offline-title">Offline — local results only.</strong>
+          Results come from what’s already loaded on this device. Older messages and files on the
+          server can’t be searched until you reconnect.
+        </span>
       </p>
     }
     <app-search-status
       [status]="session.status()"
       [term]="session.term()"
       [total]="session.total()"
+      [local]="offline()"
       (retry)="retry()"
     />
     @if (hasOptions()) {

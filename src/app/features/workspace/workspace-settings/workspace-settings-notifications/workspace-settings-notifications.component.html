@@ -5,20 +5,20 @@
   >.
 </app-workspace-settings-note>
 
-@if (preferences(); as settings) {
+@if (preferences()) {
   <fieldset class="notify">
     <legend class="notify__legend">Notify new members about</legend>
     @for (option of notifyOptions; track option.value) {
       <label
         class="notify__option"
-        [class.notify__option--selected]="option.value === settings.notifyDefault"
+        [class.notify__option--selected]="option.value === notifyDefault.value()"
       >
         <input
           class="notify__radio"
           type="radio"
           [name]="groupName"
           [value]="option.value"
-          [checked]="option.value === settings.notifyDefault"
+          [checked]="option.value === notifyDefault.value()"
           (change)="setNotifyDefault(option)"
         />
         <span class="notify__text">
@@ -40,7 +40,7 @@
         label="Email digest"
         hideLabel
         [options]="digestOptions"
-        [value]="settings.digest"
+        [(value)]="digest.value"
         (valueChange)="setDigest($event)"
       />
     </li>
@@ -48,7 +48,7 @@
       appSettingSwitch
       label="Allow @everyone and @here"
       description="When off, only owners and admins can notify a whole channel at once."
-      [checked]="settings.allowEveryone"
+      [(checked)]="allowEveryone.value"
       (checkedChange)="setAllowEveryone($event)"
     ></li>
   </ul>

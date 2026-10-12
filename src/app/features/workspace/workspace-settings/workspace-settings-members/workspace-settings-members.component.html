@@ -5,7 +5,7 @@
         label="Who can invite people"
         hideLabel
         [options]="policyOptions"
-        [value]="settings.whoCanInvite"
+        [(value)]="invitePolicy.value"
         (valueChange)="setInvitePolicy($event)"
       />
     </li>
@@ -19,7 +19,7 @@
         label="Default role for invitations"
         hideLabel
         [options]="roleOptions"
-        [value]="settings.defaultRole"
+        [(value)]="defaultRole.value"
         (valueChange)="setDefaultRole($event)"
       />
     </li>
@@ -27,7 +27,7 @@
       appSettingSwitch
       label="Only allow approved email domains"
       description="Invitations to other domains will be blocked."
-      [checked]="settings.restrictDomains"
+      [(checked)]="restricted.value"
       (checkedChange)="setRestricted($event)"
     ></li>
     @if (settings.restrictDomains) {

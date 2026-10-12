@@ -1,9 +1,11 @@
 import { computed, effect, inject, Service, signal, untracked } from '@angular/core';
 import { InvitesData } from '../data/invites.data';
 import { CURRENT_USER_ID } from '../mocks/users.mock';
+import { MemberActivityAction } from '../models/activity-action';
 import { WorkspaceRole } from '../models/user';
 import { WorkspaceInvite } from '../models/workspace-invite';
 import { ActivityLogState } from './activity-log.state';
+import { pendingOfKind, unsettledOfKind } from './activity-outcome';
 import { DataModeState } from './data-mode.state';
 import { Loadable, settledStatus } from './loadable';
 import { WorkspaceState } from './workspace.state';
@@ -22,6 +24,12 @@ export interface InviteOutcome {
 
 type InviteAuditVerb =
   'resent the invitation to' | 'revoked the invitation to' | 'restored the invitation to';
+
+const INVITE_ACTIONS: Record<InviteAuditVerb, MemberActivityAction> = {
+  'resent the invitation to': 'invite.resent',
+  'revoked the invitation to': 'invite.revoked',
+  'restored the invitation to': 'invite.restored',
+};
 
 const INVITED_ROUTE = '/workspace/members/invited';
 
@@ -51,6 +59,7 @@ export class InviteState {
   );
   readonly status = settledStatus(this.loader.status, () => this.invites().length === 0);
   readonly pendingCount = computed(() => this.invites().length);
+  readonly queuedCount = computed(() => this.allInvites().filter((invite) => invite.queued).length);
 
   constructor() {
     effect(() => {
@@ -114,15 +123,27 @@ export class InviteState {
 
   async flushQueued(): Promise<number> {
     const queued = this.allInvites().filter((invite) => invite.queued);
+    this.activity.setOutcome(unsettledOfKind('invite'), 'succeeded');
     if (queued.length > 0) {
       await this.save(queued.map((invite) => ({ ...invite, queued: false })));
     }
     return queued.length;
   }
 
+  failQueued(): number {
+    return this.activity.setOutcome(pendingOfKind('invite'), 'failed');
+  }
+
   private log(verb: InviteAuditVerb, invite: WorkspaceInvite): void {
     this.activity.record(
-      { kind: 'invite', verb, object: invite.email, route: INVITED_ROUTE },
+      {
+        kind: 'invite',
+        verb,
+        object: invite.email,
+        route: INVITED_ROUTE,
+        action: INVITE_ACTIONS[verb],
+        meta: { role: invite.role },
+      },
       invite.workspaceId,
     );
   }

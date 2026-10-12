@@ -2,6 +2,7 @@ import { DialogRef } from '@angular/cdk/dialog';
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { form, FormField, FormRoot, maxLength, required, validate } from '@angular/forms/signals';
+import { ConnectionGuard } from '../../../core/services/connection-guard.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { ChatState } from '../../../core/state/chat.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
@@ -48,6 +49,7 @@ export class NewGroupDialogComponent {
   private readonly workspace = inject(WorkspaceState);
   private readonly router = inject(Router);
   private readonly toasts = inject(ToastService);
+  private readonly connection = inject(ConnectionGuard);
 
   protected readonly nameMaxLength = GROUP_NAME_MAX_LENGTH;
   protected readonly people = computed(() =>
@@ -68,7 +70,11 @@ export class NewGroupDialogComponent {
     },
     {
       submission: {
-        action: async () => this.createGroup(),
+        action: async () => {
+          if (this.connection.allowsSave()) {
+            await this.createGroup();
+          }
+        },
         onInvalid: (submitted) => submitted().errorSummary()[0]?.fieldTree().focusBoundControl(),
       },
     },

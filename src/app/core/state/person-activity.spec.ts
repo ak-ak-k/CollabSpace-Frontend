@@ -16,6 +16,10 @@ const fileEvent = (id: string, actorId: string, occurredAt: number): ActivityEve
   entity: null,
   teamId: 't1',
   change: null,
+  action: 'file.uploaded',
+  meta: null,
+  outcome: 'succeeded',
+  audit: false,
 });
 
 const joinEvent: ActivityEvent = {
