@@ -27,6 +27,8 @@ type DismissTimer = ReturnType<typeof setTimeout>;
 export class ToastService {
   private readonly visibleToasts = signal<readonly Toast[]>([]);
   private readonly dismissTimers = new Map<string, DismissTimer>();
+  private readonly durations = new Map<string, number>();
+  private readonly holds = new Map<string, number>();
   private lastSequence = 0;
 
   readonly toasts: Signal<readonly Toast[]> = this.visibleToasts.asReadonly();
@@ -36,13 +38,37 @@ export class ToastService {
     this.visibleToasts.update((toasts) => [...toasts, toast]);
     this.dismissOverflow();
     if (!options.persistent) {
-      this.scheduleDismiss(toast.id, options.duration ?? DEFAULT_TOAST_DURATION_MS);
+      const duration = options.duration ?? DEFAULT_TOAST_DURATION_MS;
+      this.durations.set(toast.id, duration);
+      this.scheduleDismiss(toast.id, duration);
     }
     return toast.id;
   }
 
+  hold(id: string): void {
+    if (!this.durations.has(id)) {
+      return;
+    }
+    this.holds.set(id, (this.holds.get(id) ?? 0) + 1);
+    this.clearDismissTimer(id);
+  }
+
+  release(id: string): void {
+    const duration = this.durations.get(id);
+    if (duration === undefined) {
+      return;
+    }
+    const remainingHolds = Math.max((this.holds.get(id) ?? 0) - 1, 0);
+    this.holds.set(id, remainingHolds);
+    if (remainingHolds === 0 && !this.dismissTimers.has(id)) {
+      this.scheduleDismiss(id, duration);
+    }
+  }
+
   dismiss(id: string): void {
     this.clearDismissTimer(id);
+    this.durations.delete(id);
+    this.holds.delete(id);
     this.visibleToasts.update((toasts) => toasts.filter((toast) => toast.id !== id));
   }
 

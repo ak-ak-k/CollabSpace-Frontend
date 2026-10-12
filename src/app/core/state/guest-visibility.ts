@@ -8,12 +8,14 @@ export interface Viewer {
 
 type TeamRoster = Pick<Team, 'memberIds'>;
 
+type TeamVisibility = Pick<Team, 'memberIds' | 'isPrivate'>;
+
 type TeamPrivacy = Pick<Team, 'id' | 'memberIds' | 'isPrivate'>;
 
 export const isGuestViewer = (viewer: Viewer): boolean => viewer.role === 'guest';
 
-export const canSeeTeam = (team: TeamRoster, viewer: Viewer): boolean =>
-  !isGuestViewer(viewer) || team.memberIds.includes(viewer.userId);
+export const canSeeTeam = (team: TeamVisibility, viewer: Viewer): boolean =>
+  team.memberIds.includes(viewer.userId) || (!team.isPrivate && !isGuestViewer(viewer));
 
 export const readableTeamIdsOf = (
   teams: readonly TeamPrivacy[],

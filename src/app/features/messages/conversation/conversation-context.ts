@@ -116,11 +116,13 @@ export const injectDirectConversationBootstrap = (
   const workspace = inject(WorkspaceState);
   const partnerId = computed(() => {
     const userId = DIRECT_CONVERSATION_PATTERN.exec(conversationId())?.[1] ?? null;
-    return userId && workspace.user(userId) ? userId : null;
+    const reachable = workspace.memberDirectory().some((member) => member.id === userId);
+    return userId && reachable ? userId : null;
   });
   const pending = computed(
     () =>
       chat.status() === 'ready' &&
+      workspace.loadStatus() === 'ready' &&
       partnerId() !== null &&
       chat.conversation(conversationId()) === null,
   );

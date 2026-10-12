@@ -1,6 +1,7 @@
 import { computed, DestroyRef, inject, Service, signal } from '@angular/core';
 import { SearchData, SearchGroup } from '../../../core/data/search.data';
 import { SearchFilter, SearchService } from '../../../core/services/search.service';
+import { ChatState } from '../../../core/state/chat.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 
 export const SEARCH_DEBOUNCE_MS = 220;
@@ -12,6 +13,7 @@ export class SearchSession {
   private readonly data = inject(SearchData);
   private readonly initialFilter = inject(SearchService).filter();
   private readonly workspace = inject(WorkspaceState);
+  private readonly chat = inject(ChatState);
 
   private pendingTimer: ReturnType<typeof setTimeout> | null = null;
   private latestRequest = 0;
@@ -85,6 +87,7 @@ export class SearchSession {
           workspaceId: this.workspace.currentWorkspaceId(),
           memberIds: new Set(this.workspace.memberDirectory().map((member) => member.id)),
           teamIds: this.workspace.teamIds(),
+          hiddenConversationIds: this.chat.leftIds(),
         }),
         false,
       );

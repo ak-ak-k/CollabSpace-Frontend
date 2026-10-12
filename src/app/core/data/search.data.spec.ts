@@ -115,4 +115,18 @@ describe('SearchData', () => {
     expect(people[0]?.items.map((item) => item.id)).toEqual(['u2']);
     expect(tasks).toEqual([]);
   });
+
+  it('hides messages, channels and group files from conversations the viewer left', async () => {
+    const scope = { workspaceId: 'w1', memberIds: new Set<string>() };
+    const left = { ...scope, hiddenConversationIds: new Set(['g-launch', 'c-releases']) };
+
+    expect((await data.search('monochrome', 'messages', scope)).length).toBe(1);
+    expect(await data.search('monochrome', 'messages', left)).toEqual([]);
+    expect(
+      (await data.search('releases', 'channels', scope))[0].items.map((item) => item.id),
+    ).toContain('c-releases');
+    expect(
+      (await data.search('releases', 'channels', left))[0]?.items.map((item) => item.id) ?? [],
+    ).not.toContain('c-releases');
+  });
 });

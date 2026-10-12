@@ -33,6 +33,7 @@ export class FileState {
   private readonly activity = inject(ActivityLogState);
 
   private readonly allFiles = signal<readonly FileItem[]>([]);
+  private readonly formerNames = signal<ReadonlyMap<string, readonly string[]>>(new Map());
 
   private readonly loader = new Loadable<readonly FileItem[]>({
     fetch: () => this.data.getFiles(),
@@ -93,7 +94,10 @@ export class FileState {
   }
 
   fileForAttachment(conversationId: string, name: string): FileItem | null {
-    const named = this.files().filter((file) => file.name === name);
+    const formerNames = this.formerNames();
+    const named = this.files().filter(
+      (file) => file.name === name || (formerNames.get(file.id)?.includes(name) ?? false),
+    );
     const sharedHere = named.find(
       (file) => file.source.type === 'message' && file.source.conversationId === conversationId,
     );
@@ -110,6 +114,7 @@ export class FileState {
   rename(id: string, name: string): FileItem | null {
     const previous = this.file(id);
     if (previous) {
+      this.rememberFormerName(id, previous.name);
       this.change(id, { name, modifiedAt: Date.now() });
       this.log('renamed', { ...previous, name }, { from: previous.name, to: name });
     }
@@ -199,6 +204,13 @@ export class FileState {
     });
     this.allFiles.update((files) => [file, ...files]);
     return file;
+  }
+
+  private rememberFormerName(id: string, name: string): void {
+    this.formerNames.update((names) => {
+      const known = names.get(id) ?? [];
+      return known.includes(name) ? names : new Map(names).set(id, [...known, name]);
+    });
   }
 
   private log(verb: FileActivityVerb, file: FileItem, change?: ActivityChange): void {

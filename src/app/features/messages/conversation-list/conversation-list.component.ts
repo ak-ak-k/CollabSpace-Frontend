@@ -1,4 +1,12 @@
-import { booleanAttribute, Component, computed, inject, input, signal } from '@angular/core';
+import {
+  booleanAttribute,
+  Component,
+  computed,
+  DOCUMENT,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ConversationFilter } from '../../../core/models/conversation';
 import { ConnectionGuard } from '../../../core/services/connection-guard.service';
@@ -12,12 +20,13 @@ import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { SearchInputComponent } from '../../../shared/ui/search-input/search-input.component';
 import { SkeletonComponent } from '../../../shared/ui/skeleton/skeleton.component';
 import { TabItem, TabsComponent } from '../../../shared/ui/tabs/tabs.component';
+import { paletteShortcutFor } from '../../search/search-palette/platform-shortcut';
 import { NewGroupDialogComponent } from '../new-group-dialog/new-group-dialog.component';
 import {
   CONVERSATION_FILTERS,
-  FILTER_EMPTY_STATES,
   FILTER_LABELS,
   FilterEmptyState,
+  filterEmptyStateOf,
   isCountedFilter,
   matchesFilter,
   matchesQuery,
@@ -47,6 +56,9 @@ export class ConversationListComponent {
   private readonly dialogs = inject(DialogService);
   private readonly search = inject(SearchService);
   private readonly connection = inject(ConnectionGuard);
+  private readonly paletteShortcut = paletteShortcutFor(
+    inject(DOCUMENT).defaultView?.navigator.userAgent ?? '',
+  );
 
   readonly selectedId = input<string | null>(null);
   readonly savedOpen = input(false, { transform: booleanAttribute });
@@ -80,7 +92,9 @@ export class ConversationListComponent {
   protected readonly noMatch = computed(() => this.conversations().length === 0);
   protected readonly emptyState = computed<FilterEmptyState>(() => {
     const query = this.trimmedQuery();
-    return query ? searchEmptyState(query) : FILTER_EMPTY_STATES[this.filter()];
+    return query
+      ? searchEmptyState(query)
+      : filterEmptyStateOf(this.filter(), this.paletteShortcut);
   });
   protected readonly showSavedRow = computed(
     () => this.status() === 'ready' && this.filter() === 'all' && !this.trimmedQuery(),

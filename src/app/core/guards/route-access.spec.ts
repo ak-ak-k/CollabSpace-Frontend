@@ -1,4 +1,5 @@
 import {
+  canStartDirectConversation,
   channelBlockOf,
   conversationBlockOf,
   taskBlockOf,
@@ -86,6 +87,10 @@ describe('route access', () => {
       'Conversation not found',
     );
     expect(conversationBlockOf({ ...facts, inWorkspace: false })?.kind).toBe('not-found');
+    const guestReach = new Set(['u0', 'u8']);
+    expect(canStartDirectConversation('dm-u8', guestReach)).toBe(true);
+    expect(canStartDirectConversation('dm-u10', guestReach)).toBe(false);
+    expect(canStartDirectConversation('g-launch', guestReach)).toBe(false);
     expect(taskBlockOf({ taskId: 'NS-999', task: null, team: null, me: 'u0' })?.context.body).toBe(
       'NS-999 may have been deleted, or it belongs to a team you can’t see.',
     );

@@ -46,22 +46,15 @@ describe('WorkspaceAdminState', () => {
     expect(workspace.currentWorkspace()?.deleteAt).toBeNull();
   });
 
-  it('toggles a role permission, keeps who can invite in sync and audits it', async () => {
+  it('undoes an archive in the workspace it came from after a switch', async () => {
     const { workspace, admin } = await load();
-    const activity = TestBed.inject(ActivityLogState);
+    await admin.setArchived(true, 'w1');
+    workspace.switchWorkspace('w2');
 
-    expect(await admin.toggleRolePermission('member', 'members.invite')).toBe(true);
+    await admin.setArchived(false, 'w1');
 
-    expect(workspace.rolePermissions().member).not.toContain('members.invite');
-    expect(workspace.preferences()?.whoCanInvite).toBe('admins');
-    expect(activity.events()[0]).toMatchObject({
-      kind: 'permission',
-      verb: 'turned off “Invite people” for',
-      object: 'Members',
-      change: { from: 'Allowed', to: 'Not allowed' },
-    });
-    expect(await admin.toggleRolePermission('owner', 'tasks.create')).toBe(false);
-    expect(await admin.toggleRolePermission('member', 'roles.manage')).toBe(false);
+    expect(workspace.workspaces().find((item) => item.id === 'w1')?.archivedAt).toBeNull();
+    expect(workspace.isArchived()).toBe(false);
   });
 
   it('lets members invite when the workspace allows everyone to', async () => {

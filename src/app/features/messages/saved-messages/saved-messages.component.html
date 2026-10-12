@@ -7,7 +7,7 @@
       </a>
     }
     <header class="saved__header">
-      <h1 class="saved__title">Saved messages</h1>
+      <h1 class="saved__title" tabindex="-1" #title>Saved messages</h1>
       <p class="saved__lede">Only you can see what you’ve saved. {{ countLabel() }}</p>
     </header>
 
@@ -52,6 +52,7 @@
                       variant="ghost"
                       size="sm"
                       [attr.aria-label]="row.removeLabel"
+                      [attr.data-saved-id]="row.id"
                       (click)="remove(row)"
                     >
                       <app-icon name="bookmark-x" [size]="15" />

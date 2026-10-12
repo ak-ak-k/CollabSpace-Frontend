@@ -54,6 +54,7 @@ export interface DrawerOptions<Data> {
   readonly side?: DrawerSide;
   readonly size?: OverlaySize;
   readonly ariaLabel?: string;
+  readonly closeOnNavigation?: boolean;
 }
 
 const DEFAULT_SIZE: OverlaySize = 'md';
@@ -106,6 +107,7 @@ export class DialogService {
       positionStrategy: this.edgePosition(side),
       data: options.data,
       ariaLabel: options.ariaLabel,
+      closeOnNavigation: options.closeOnNavigation ?? true,
     });
   }
 

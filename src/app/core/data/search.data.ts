@@ -1,14 +1,19 @@
 import { inject, Service } from '@angular/core';
-import { IconName } from '../../shared/ui/icon/icon-registry';
 import { MOCK_CHANNELS } from '../mocks/channels.mock';
 import { MOCK_FILES } from '../mocks/files.mock';
 import { MOCK_TASKS } from '../mocks/tasks.mock';
 import { MOCK_TEAMS } from '../mocks/teams.mock';
 import { CURRENT_USER_ID, MOCK_USERS } from '../mocks/users.mock';
-import { FILE_TYPE_LABELS } from '../models/file-item';
+import { FILE_TYPE_LABELS, FileItem } from '../models/file-item';
 import { canSeeFile, sourceLabelOf } from '../models/file-source';
-import { PresenceStatus } from '../models/user';
 import type { SearchFilter } from '../services/search.service';
+import {
+  SearchGroup,
+  SearchGroupDefinition,
+  SearchGroupKey,
+  SearchResult,
+  SearchScope,
+} from '../models/search-result';
 import { MockRequest } from './mock-request';
 import {
   canSeeChannel,
@@ -24,64 +29,18 @@ import {
 import { toChannel, toFile, toMessage, toPerson, toTask, toTeam } from './search-results';
 
 export { highlight } from './search-results';
-
-export type SearchGroupKey = Exclude<SearchFilter, 'all'>;
-
-export interface SearchHighlight {
-  readonly before: string;
-  readonly match: string;
-  readonly after: string;
-}
-
-export interface SearchTarget {
-  readonly path: string;
-  readonly queryParams?: Readonly<Record<string, string>>;
-}
-
-interface SearchResultBase {
-  readonly id: string;
-  readonly title: SearchHighlight;
-  readonly subtitle: string;
-  readonly target: SearchTarget;
-}
-
-export interface PersonSearchResult extends SearchResultBase {
-  readonly kind: 'person';
-  readonly name: string;
-  readonly colorSeed: number;
-  readonly status: PresenceStatus;
-}
-
-export interface TeamSearchResult extends SearchResultBase {
-  readonly kind: 'team';
-  readonly name: string;
-  readonly code: string;
-}
-
-export interface IconSearchResult extends SearchResultBase {
-  readonly kind: 'message' | 'channel' | 'task' | 'file';
-  readonly icon: IconName;
-}
-
-export type SearchResult = PersonSearchResult | TeamSearchResult | IconSearchResult;
-
-export interface SearchGroupDefinition {
-  readonly key: SearchGroupKey;
-  readonly label: string;
-  readonly icon: IconName;
-}
-
-export interface SearchGroup extends SearchGroupDefinition {
-  readonly total: number;
-  readonly items: readonly SearchResult[];
-  readonly hasMore: boolean;
-}
-
-export interface SearchScope {
-  readonly workspaceId: string;
-  readonly memberIds: ReadonlySet<string>;
-  readonly teamIds?: ReadonlySet<string>;
-}
+export type {
+  IconSearchResult,
+  PersonSearchResult,
+  SearchGroup,
+  SearchGroupDefinition,
+  SearchGroupKey,
+  SearchHighlight,
+  SearchResult,
+  SearchScope,
+  SearchTarget,
+  TeamSearchResult,
+} from '../models/search-result';
 
 export const SEARCH_GROUPS: readonly SearchGroupDefinition[] = [
   { key: 'people', label: 'People', icon: 'user' },
@@ -140,8 +99,17 @@ const findersFor = (scope?: SearchScope): Record<SearchGroupKey, Finder> => {
   const inScope = (workspaceId: string | undefined) => !scope || workspaceId === scope.workspaceId;
   const teamInScope = (teamId: string) =>
     inScope(teamWorkspaces.get(teamId)) && (!scope?.teamIds || scope.teamIds.has(teamId));
+  const stillJoined = (conversationId: string) =>
+    !scope?.hiddenConversationIds?.has(conversationId);
+  const inLeftGroup = (file: FileItem) =>
+    file.source.type === 'message' &&
+    conversationOf(file.source.conversationId)?.type === 'group' &&
+    !stillJoined(file.source.conversationId);
   const conversationInScope = (conversationId: string) => {
     const conversation = conversationOf(conversationId);
+    if (!stillJoined(conversationId)) {
+      return false;
+    }
     return conversation?.type === 'channel'
       ? teamInScope(conversation.teamId)
       : inScope(conversation?.workspaceId);
@@ -162,7 +130,10 @@ const findersFor = (scope?: SearchScope): Record<SearchGroupKey, Finder> => {
       toMessage,
     ),
     channels: finder(
-      MOCK_CHANNELS.filter((channel) => teamInScope(channel.teamId) && canSeeChannel(channel)),
+      MOCK_CHANNELS.filter(
+        (channel) =>
+          teamInScope(channel.teamId) && stillJoined(channel.id) && canSeeChannel(channel),
+      ),
       (channel) => [channel.name, channel.description, teamOf(channel.teamId)?.name ?? ''],
       toChannel,
     ),
@@ -184,7 +155,9 @@ const findersFor = (scope?: SearchScope): Record<SearchGroupKey, Finder> => {
       toTask,
     ),
     files: finder(
-      MOCK_FILES.filter((file) => inScope(file.workspaceId) && canSeeFile(file, FILE_ACCESS)),
+      MOCK_FILES.filter(
+        (file) => inScope(file.workspaceId) && !inLeftGroup(file) && canSeeFile(file, FILE_ACCESS),
+      ),
       (file) => [
         file.name,
         FILE_TYPE_LABELS[file.type],

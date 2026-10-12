@@ -80,6 +80,7 @@ describe('dashboard view', () => {
   it('writes singular and plural captions', () => {
     const stats = toStats({
       joinedTeams: [team('frontend', 200)],
+      workspaceTeams: [team('frontend', 200), team('design', 400)],
       unreadMessages: 1,
       unreadConversations: 1,
       openTasks: [toUpcomingTask(task('NS-1', -2), null)],
@@ -103,7 +104,7 @@ describe('dashboard view', () => {
     });
 
     expect(stats.map((stat) => stat.caption)).toEqual([
-      'frontend is the most active',
+      'design is the most active',
       'Across 1 conversation',
       '1 overdue · 0 due today',
       'of 12 in Northstar Labs',
@@ -114,6 +115,7 @@ describe('dashboard view', () => {
   it('describes an empty workspace differently from missing data', () => {
     const inputs = {
       joinedTeams: [],
+      workspaceTeams: [],
       unreadMessages: 0,
       unreadConversations: 0,
       openTasks: [],

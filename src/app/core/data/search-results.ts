@@ -11,7 +11,7 @@ import { Team } from '../models/team';
 import { firstNameOf, User, userColorSeed } from '../models/user';
 import { channelConversation } from './chat-store';
 import { conversationOf, FILE_LOOKUP, teamOf, userNameOf } from './search-context';
-import type { SearchHighlight, SearchResult } from './search.data';
+import type { SearchHighlight, SearchResult } from '../models/search-result';
 
 const SNIPPET_LEAD_LENGTH = 36;
 const SNIPPET_TAIL_LENGTH = 70;

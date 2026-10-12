@@ -1,13 +1,6 @@
 import { inject, Service } from '@angular/core';
 import { WorkspaceData, workspaceCodeOf } from '../data/workspace.data';
 import { CURRENT_USER_ID } from '../mocks/users.mock';
-import {
-  isLockedPermission,
-  Permission,
-  RolePermissions,
-  withInvitePolicy,
-  withPermission,
-} from '../models/permission';
 import { User, WorkspaceRole } from '../models/user';
 import {
   NewWorkspace,
@@ -27,13 +20,13 @@ import {
   memberRemovedEntry,
   memberRestoredEntry,
   ownershipTransferEntry,
-  permissionChangeEntry,
   roleChangeEntry,
   workspaceArchiveEntry,
   workspaceDeletionEntry,
   workspaceDetailsEntry,
   workspaceLogoEntry,
 } from './workspace-audit';
+import { RolePermissionAdminState } from './role-permission-admin.state';
 import { preferenceEntries } from './workspace-preference-audit';
 import { WorkspaceState } from './workspace.state';
 
@@ -47,6 +40,7 @@ export class WorkspaceAdminState {
   private readonly workspace = inject(WorkspaceState);
   private readonly data = inject(WorkspaceData);
   private readonly activity = inject(ActivityLogState);
+  private readonly rolePermissions = inject(RolePermissionAdminState);
 
   isSlugTaken(slug: string): boolean {
     const currentId = this.workspace.currentWorkspaceId();
@@ -78,20 +72,20 @@ export class WorkspaceAdminState {
     return this.patch(changes);
   }
 
-  setLogo(logoUrl: string | null): Promise<void> {
-    this.activity.record(workspaceLogoEntry(logoUrl));
-    return this.patch({ logoUrl });
+  setLogo(logoUrl: string | null, workspaceId = this.currentId()): Promise<void> {
+    this.activity.record(workspaceLogoEntry(logoUrl), workspaceId);
+    return this.patch({ logoUrl }, workspaceId);
   }
 
-  setArchived(archived: boolean): Promise<void> {
-    this.activity.record(workspaceArchiveEntry(archived));
-    return this.patch({ archivedAt: archived ? Date.now() : null });
+  setArchived(archived: boolean, workspaceId = this.currentId()): Promise<void> {
+    this.activity.record(workspaceArchiveEntry(archived), workspaceId);
+    return this.patch({ archivedAt: archived ? Date.now() : null }, workspaceId);
   }
 
-  scheduleDeletion(scheduled: boolean): Promise<void> {
+  scheduleDeletion(scheduled: boolean, workspaceId = this.currentId()): Promise<void> {
     const deleteAt = scheduled ? Date.now() + DELETION_GRACE_DAYS * MILLISECONDS_PER_DAY : null;
-    this.activity.record(workspaceDeletionEntry(deleteAt));
-    return this.patch({ deleteAt });
+    this.activity.record(workspaceDeletionEntry(deleteAt), workspaceId);
+    return this.patch({ deleteAt }, workspaceId);
   }
 
   async updatePreferences(changes: Partial<WorkspacePreferences>): Promise<void> {
@@ -105,32 +99,13 @@ export class WorkspaceAdminState {
     }
     const invitePolicy = changes.whoCanInvite;
     const permissionsSaved = invitePolicy
-      ? this.saveRolePermissions(withInvitePolicy(this.workspace.rolePermissions(), invitePolicy))
+      ? this.rolePermissions.applyInvitePolicy(invitePolicy, workspaceId)
       : Promise.resolve();
     const [saved] = await Promise.all([
       this.data.updatePreferences(workspaceId, changes),
       permissionsSaved,
     ]);
     this.workspace.putPreferences(workspaceId, saved);
-  }
-
-  async toggleRolePermission(role: WorkspaceRole, permission: Permission): Promise<boolean> {
-    if (role === 'owner' || isLockedPermission(role, permission)) {
-      return false;
-    }
-    if (!this.workspace.can('roles.manage')) {
-      return false;
-    }
-    const current = this.workspace.rolePermissions();
-    const allowed = !current[role].includes(permission);
-    this.activity.record(permissionChangeEntry(permission, role, allowed));
-    const saved = this.saveRolePermissions({
-      ...current,
-      [role]: withPermission(current[role], permission, allowed),
-    });
-    const syncsInvites = role === 'member' && permission === 'members.invite';
-    await Promise.all([saved, syncsInvites ? this.syncInvitePolicy(allowed) : null]);
-    return true;
   }
 
   async setRole(userId: string, role: WorkspaceRole): Promise<boolean> {
@@ -209,20 +184,8 @@ export class WorkspaceAdminState {
     return this.workspace.can('members.manage') && !ownerOnly;
   }
 
-  private async saveRolePermissions(rolePermissions: RolePermissions): Promise<void> {
-    const workspaceId = this.workspace.currentWorkspaceId();
-    this.workspace.putRolePermissions(workspaceId, rolePermissions);
-    await this.data.updateRolePermissions(workspaceId, rolePermissions);
-  }
-
-  private async syncInvitePolicy(membersMayInvite: boolean): Promise<void> {
-    const workspaceId = this.workspace.currentWorkspaceId();
-    const current = this.workspace.preferences();
-    const whoCanInvite = membersMayInvite ? 'everyone' : 'admins';
-    if (current) {
-      this.workspace.putPreferences(workspaceId, { ...current, whoCanInvite });
-    }
-    await this.data.updatePreferences(workspaceId, { whoCanInvite });
+  private currentId(): string {
+    return this.workspace.currentWorkspaceId();
   }
 
   private channelNameOf(channelId: string): string | null {
@@ -233,13 +196,13 @@ export class WorkspaceAdminState {
     return { id: userId, name: this.workspace.user(userId)?.name ?? UNKNOWN_PERSON };
   }
 
-  private async patch(patch: WorkspacePatch): Promise<void> {
-    const current = this.workspace.currentWorkspace();
-    if (!current) {
+  private async patch(patch: WorkspacePatch, workspaceId = this.currentId()): Promise<void> {
+    const target = this.workspace.workspaces().find((workspace) => workspace.id === workspaceId);
+    if (!target) {
       return;
     }
     const code = patch.name ? { code: workspaceCodeOf(patch.name) } : {};
-    this.workspace.putWorkspace({ ...current, ...patch, ...code });
-    this.workspace.putWorkspace(await this.data.patchWorkspace(current.id, patch));
+    this.workspace.putWorkspace({ ...target, ...patch, ...code });
+    this.workspace.putWorkspace(await this.data.patchWorkspace(target.id, patch));
   }
 }

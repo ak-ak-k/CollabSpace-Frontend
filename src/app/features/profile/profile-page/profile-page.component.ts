@@ -8,12 +8,13 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { form, maxLength, required, submit } from '@angular/forms/signals';
+import { form, maxLength, required, submit, validate } from '@angular/forms/signals';
 import { ToastService } from '../../../core/services/toast.service';
 import { PreferencesState } from '../../../core/state/preferences.state';
 import { WorkspaceState } from '../../../core/state/workspace.state';
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 import { SkeletonComponent } from '../../../shared/ui/skeleton/skeleton.component';
+import { blankTextError } from '../../settings/settings-forms';
 import { PersonProfileComponent } from '../person-profile/person-profile.component';
 import { ProfileAboutComponent } from '../profile-about/profile-about.component';
 import { ProfileDetailsComponent } from '../profile-details/profile-details.component';
@@ -29,6 +30,8 @@ import {
   profileTeams,
   timeZoneOf,
 } from '../profile-view';
+
+const NAME_REQUIRED_MESSAGE = 'Name can’t be empty';
 
 const EMPTY_DRAFT: ProfileDraft = {
   name: '',
@@ -77,7 +80,8 @@ export class ProfilePageComponent {
   protected readonly profileForm = form(
     this.draft,
     (path) => {
-      required(path.name, { message: 'Name can’t be empty' });
+      required(path.name, { message: NAME_REQUIRED_MESSAGE });
+      validate(path.name, ({ value }) => blankTextError(value(), NAME_REQUIRED_MESSAGE));
       maxLength(path.bio, BIO_MAX_LENGTH);
     },
     {

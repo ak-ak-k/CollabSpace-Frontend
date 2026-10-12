@@ -1,5 +1,12 @@
 @for (toast of toasts(); track toast.id) {
-  <div class="toast" role="status">
+  <div
+    class="toast"
+    role="status"
+    (mouseenter)="toastService.hold(toast.id)"
+    (mouseleave)="toastService.release(toast.id)"
+    (focusin)="toastService.hold(toast.id)"
+    (focusout)="toastService.release(toast.id)"
+  >
     <app-icon [name]="toast.icon" [size]="18" />
     <span class="toast__message">{{ toast.message }}</span>
     @if (toast.actionLabel) {

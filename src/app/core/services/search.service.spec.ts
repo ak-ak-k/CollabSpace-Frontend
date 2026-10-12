@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { AUTH_STORAGE_KEY, AuthState } from '../state/auth.state';
 import {
   DEFAULT_RECENT_SEARCHES,
   RECENT_SEARCH_LIMIT,
@@ -11,8 +12,11 @@ describe('SearchService', () => {
 
   beforeEach(() => {
     localStorage.removeItem(RECENT_SEARCHES_STORAGE_KEY);
+    localStorage.removeItem(AUTH_STORAGE_KEY);
     service = TestBed.inject(SearchService);
   });
+
+  afterEach(() => localStorage.removeItem(AUTH_STORAGE_KEY));
 
   it('opens with the requested filter', () => {
     service.open('people');
@@ -73,5 +77,25 @@ describe('SearchService', () => {
 
     expect(service.recentSearches()).toEqual([]);
     expect(localStorage.getItem(RECENT_SEARCHES_STORAGE_KEY)).toBe('[]');
+  });
+
+  it('forgets recent searches and closes when the user signs out', () => {
+    service.addRecent('salary review');
+    service.open();
+    TestBed.tick();
+
+    TestBed.inject(AuthState).logout();
+    TestBed.tick();
+
+    expect(service.recentSearches()).toEqual([]);
+    expect(service.isOpen()).toBe(false);
+    expect(localStorage.getItem(RECENT_SEARCHES_STORAGE_KEY)).toBe('[]');
+  });
+
+  it('keeps recent searches while the user stays signed in', () => {
+    service.addRecent('salary review');
+    TestBed.tick();
+
+    expect(service.recentSearches()[0]).toBe('salary review');
   });
 });

@@ -45,6 +45,7 @@ export interface ActivityView {
 
 export interface StatInputs {
   readonly joinedTeams: readonly Team[];
+  readonly workspaceTeams: readonly Team[];
   readonly unreadMessages: number;
   readonly unreadConversations: number;
   readonly openTasks: readonly UpcomingTaskView[];
@@ -141,7 +142,7 @@ export const toStats = (inputs: StatInputs): DashboardStat[] => [
     label: 'Active teams',
     icon: 'users',
     value: inputs.joinedTeams.length,
-    caption: busiestTeamCaption(inputs.joinedTeams, inputs.dataEmpty),
+    caption: busiestTeamCaption(inputs.workspaceTeams, inputs.dataEmpty),
     link: '/teams',
     tone: 'default',
   },

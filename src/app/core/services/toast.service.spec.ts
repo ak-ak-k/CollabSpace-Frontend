@@ -38,6 +38,23 @@ describe('ToastService', () => {
     expect(service.toasts().length).toBe(0);
   });
 
+  it('keeps a held toast until every hold is released', () => {
+    const id = service.show('File deleted', { actionLabel: 'Undo', onAction: vi.fn() });
+
+    service.hold(id);
+    service.hold(id);
+    vi.advanceTimersByTime(DEFAULT_TOAST_DURATION_MS * 2);
+    expect(service.toasts().length).toBe(1);
+
+    service.release(id);
+    vi.advanceTimersByTime(DEFAULT_TOAST_DURATION_MS);
+    expect(service.toasts().length).toBe(1);
+
+    service.release(id);
+    vi.advanceTimersByTime(DEFAULT_TOAST_DURATION_MS);
+    expect(service.toasts().length).toBe(0);
+  });
+
   it('dismisses on request and clears the pending timer', () => {
     const id = service.show('Saved');
 

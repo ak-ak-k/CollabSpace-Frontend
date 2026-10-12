@@ -60,6 +60,7 @@ export class WorkspaceSettingsDangerComponent {
       return;
     }
     const name = this.name();
+    const workspaceId = this.workspace.currentWorkspaceId();
     const confirmed = await this.dialogs.confirm({
       tone: 'neutral',
       icon: 'archive',
@@ -71,11 +72,11 @@ export class WorkspaceSettingsDangerComponent {
     if (!confirmed) {
       return;
     }
-    void this.admin.setArchived(true);
+    void this.admin.setArchived(true, workspaceId);
     this.toasts.show(`${name} archived — it’s now read-only`, {
       icon: 'archive',
       actionLabel: 'Undo',
-      onAction: () => void this.admin.setArchived(false),
+      onAction: () => void this.admin.setArchived(false, workspaceId),
     });
   }
 
@@ -92,6 +93,7 @@ export class WorkspaceSettingsDangerComponent {
       return;
     }
     const name = this.name();
+    const workspaceId = this.workspace.currentWorkspaceId();
     const confirmed = await this.dialogs.confirm({
       icon: 'trash-2',
       title: `Delete ${name}?`,
@@ -103,11 +105,11 @@ export class WorkspaceSettingsDangerComponent {
     if (!confirmed) {
       return;
     }
-    void this.admin.scheduleDeletion(true);
+    void this.admin.scheduleDeletion(true, workspaceId);
     this.toasts.show(`Deletion scheduled — ${name} will be deleted in 14 days`, {
       icon: 'trash-2',
       actionLabel: 'Undo',
-      onAction: () => void this.admin.scheduleDeletion(false),
+      onAction: () => void this.admin.scheduleDeletion(false, workspaceId),
     });
   }
 

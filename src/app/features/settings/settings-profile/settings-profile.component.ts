@@ -1,5 +1,5 @@
 import { Component, computed, inject, linkedSignal } from '@angular/core';
-import { form, FormField, FormRoot, required } from '@angular/forms/signals';
+import { form, FormField, FormRoot, required, validate } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { userColorSeed } from '../../../core/models/user';
 import { ToastService } from '../../../core/services/toast.service';
@@ -10,7 +10,9 @@ import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { CardComponent } from '../../../shared/ui/card/card.component';
 import { IconComponent } from '../../../shared/ui/icon/icon.component';
 import { InputComponent } from '../../../shared/ui/input/input.component';
-import { focusFirstInvalid } from '../settings-forms';
+import { blankTextError, focusFirstInvalid } from '../settings-forms';
+
+const DISPLAY_NAME_MESSAGE = 'Enter a display name.';
 
 interface ProfileDraft {
   readonly displayName: string;
@@ -50,7 +52,8 @@ export class SettingsProfileComponent {
   protected readonly profileForm = form(
     this.draft,
     (path) => {
-      required(path.displayName, { message: 'Enter a display name.' });
+      required(path.displayName, { message: DISPLAY_NAME_MESSAGE });
+      validate(path.displayName, ({ value }) => blankTextError(value(), DISPLAY_NAME_MESSAGE));
     },
     {
       submission: {

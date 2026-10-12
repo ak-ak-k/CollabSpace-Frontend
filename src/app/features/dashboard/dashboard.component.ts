@@ -69,7 +69,7 @@ export class DashboardComponent {
 
   protected readonly workspaceStatus = this.workspace.status;
   protected readonly conversationStatus = computed(() =>
-    firstUnsettled([this.workspace.status(), this.chat.inboxStatus()]),
+    firstUnsettled([this.workspace.loadStatus(), this.chat.inboxStatus()]),
   );
   protected readonly overallStatus = computed(() =>
     firstUnsettled([
@@ -101,6 +101,7 @@ export class DashboardComponent {
   );
   protected readonly dueToday = computed(() => tasksDueToday(this.openTasks()));
   protected readonly teams = computed(() => toTeamActivity(this.workspace.teams()));
+  private readonly visibleMembers = this.workspace.memberDirectory;
   protected readonly activity = computed(() =>
     toActivity(this.activityState.events({ category: 'activity' }), (userId) =>
       this.workspace.user(userId),
@@ -108,18 +109,19 @@ export class DashboardComponent {
   );
   protected readonly activityStatus = computed(() =>
     emptyWhenNone(
-      firstUnsettled([this.workspace.status(), this.activityState.status()]),
+      firstUnsettled([this.workspace.loadStatus(), this.activityState.status()]),
       this.activity().length,
     ),
   );
   protected readonly stats = computed(() =>
     toStats({
       joinedTeams: this.workspace.joinedTeams(),
+      workspaceTeams: this.workspace.teams(),
       unreadMessages: this.chat.unreadTotal(),
       unreadConversations: this.chat.unreadConversationCount(),
       openTasks: this.openTasks(),
-      onlineMembers: this.workspace.onlineUserCount(),
-      knownMembers: this.workspace.members().length,
+      onlineMembers: this.visibleMembers().filter((member) => member.status === 'online').length,
+      knownMembers: this.visibleMembers().length,
       workspace: this.workspace.currentWorkspace(),
       dataEmpty: this.overallStatus() === 'empty',
     }),

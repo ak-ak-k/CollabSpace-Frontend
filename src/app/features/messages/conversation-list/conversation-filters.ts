@@ -37,7 +37,7 @@ const COUNTED_FILTERS: ReadonlySet<ConversationFilter> = new Set<ConversationFil
 
 export const isCountedFilter = (filter: ConversationFilter): boolean => COUNTED_FILTERS.has(filter);
 
-export const FILTER_EMPTY_STATES: Record<ConversationFilter, FilterEmptyState> = {
+const FILTER_EMPTY_STATES: Record<ConversationFilter, FilterEmptyState> = {
   all: {
     icon: 'messages-square',
     heading: 'No conversations yet',
@@ -51,7 +51,7 @@ export const FILTER_EMPTY_STATES: Record<ConversationFilter, FilterEmptyState> =
   direct: {
     icon: 'user',
     heading: 'No direct messages',
-    message: 'Message someone from People or ⌘K.',
+    message: 'Message someone from People or search.',
   },
   groups: {
     icon: 'users',
@@ -69,6 +69,17 @@ export const FILTER_EMPTY_STATES: Record<ConversationFilter, FilterEmptyState> =
     message: 'Add a conversation to favourites from its menu to keep it at the top.',
   },
 };
+
+export const filterEmptyStateOf = (
+  filter: ConversationFilter,
+  paletteShortcut: string,
+): FilterEmptyState =>
+  filter === 'direct'
+    ? {
+        ...FILTER_EMPTY_STATES.direct,
+        message: `Message someone from People or ${paletteShortcut}.`,
+      }
+    : FILTER_EMPTY_STATES[filter];
 
 export const searchEmptyState = (query: string): FilterEmptyState => ({
   icon: 'search',

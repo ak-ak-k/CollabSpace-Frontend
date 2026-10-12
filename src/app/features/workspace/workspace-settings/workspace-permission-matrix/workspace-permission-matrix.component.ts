@@ -2,7 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { WORKSPACE_ROLE_DETAILS } from '../../../../core/models/workspace-role';
 import { ConnectionGuard } from '../../../../core/services/connection-guard.service';
 import { ToastService } from '../../../../core/services/toast.service';
-import { WorkspaceAdminState } from '../../../../core/state/workspace-admin.state';
+import { RolePermissionAdminState } from '../../../../core/state/role-permission-admin.state';
 import { WorkspaceState } from '../../../../core/state/workspace.state';
 import { IconComponent } from '../../../../shared/ui/icon/icon.component';
 import { TableComponent } from '../../../../shared/ui/table/table.component';
@@ -21,7 +21,7 @@ import {
 })
 export class WorkspacePermissionMatrixComponent {
   private readonly workspace = inject(WorkspaceState);
-  private readonly admin = inject(WorkspaceAdminState);
+  private readonly rolePermissions = inject(RolePermissionAdminState);
   private readonly toasts = inject(ToastService);
   private readonly connection = inject(ConnectionGuard);
 
@@ -31,21 +31,26 @@ export class WorkspacePermissionMatrixComponent {
   );
 
   protected toggle(cell: PermissionCellView): void {
-    if (!cell.editable || !this.flip(cell)) {
+    const workspaceId = this.workspace.currentWorkspaceId();
+    if (!cell.editable || !this.apply(cell, !cell.allowed, workspaceId)) {
       return;
     }
     this.toasts.show(permissionToggleMessageOf(cell), {
       icon: 'shield-check',
       actionLabel: 'Undo',
-      onAction: () => this.flip(cell),
+      onAction: () => this.apply(cell, cell.allowed, workspaceId),
     });
   }
 
-  private flip({ role, permission }: PermissionCellView): boolean {
+  private apply(
+    { role, permission }: PermissionCellView,
+    allowed: boolean,
+    workspaceId: string,
+  ): boolean {
     if (!this.connection.allows('toggleRolePerm')) {
       return false;
     }
-    void this.admin.toggleRolePermission(role, permission);
+    void this.rolePermissions.set(role, permission, allowed, workspaceId);
     return true;
   }
 }

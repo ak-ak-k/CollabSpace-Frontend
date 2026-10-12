@@ -180,6 +180,16 @@ const outsideConversation = ({ conversation, inWorkspace, left, me }: Conversati
   !inWorkspace ||
   (conversation.type === 'group' && (left || !conversation.memberIds.includes(me)));
 
+const DIRECT_CONVERSATION = /^dm-(.+)$/;
+
+export const canStartDirectConversation = (
+  conversationId: string,
+  reachableMemberIds: ReadonlySet<string>,
+): boolean => {
+  const partnerId = DIRECT_CONVERSATION.exec(conversationId)?.[1];
+  return !!partnerId && reachableMemberIds.has(partnerId);
+};
+
 export const conversationBlockOf = (facts: ConversationAccessFacts): RouteBlock | null =>
   outsideConversation(facts)
     ? notFound(

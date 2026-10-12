@@ -1,13 +1,18 @@
 import { DialogRef } from '@angular/cdk/dialog';
 import {
+  afterNextRender,
   Component,
   computed,
   DestroyRef,
+  DOCUMENT,
   effect,
+  ElementRef,
   inject,
+  Injector,
   input,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { TaskStatus } from '../../../core/models/task';
 import { BreakpointService } from '../../../core/services/breakpoint.service';
@@ -71,8 +76,12 @@ export class TasksPageComponent {
     () => this.store.status() === 'empty' || !this.store.filtered(),
   );
 
+  private readonly document = inject(DOCUMENT);
+  private readonly injector = inject(Injector);
+  private readonly title = viewChild<ElementRef<HTMLElement>>('title');
   private drawer: DialogRef<void> | null = null;
   private drawerTaskId: string | null = null;
+  private destroyed = false;
 
   constructor() {
     effect(() => {
@@ -80,7 +89,10 @@ export class TasksPageComponent {
       const shown = taskId && this.tasks.task(taskId) && !this.block() ? taskId : null;
       untracked(() => this.syncDrawer(shown));
     });
-    inject(DestroyRef).onDestroy(() => this.dismissDrawer());
+    inject(DestroyRef).onDestroy(() => {
+      this.destroyed = true;
+      this.dismissDrawer();
+    });
   }
 
   protected newTask(status?: TaskStatus): void {
@@ -127,15 +139,30 @@ export class TasksPageComponent {
       data: { taskId },
       side: 'right',
       size: 'lg',
+      closeOnNavigation: false,
     });
     drawer.updateSize(DRAWER_WIDTH);
     this.drawer = drawer;
     drawer.closed.subscribe(() => {
+      if (this.destroyed) {
+        return;
+      }
       if (this.drawer === drawer) {
         this.drawer = null;
         this.drawerTaskId = null;
         this.actions.close();
       }
+      const recover = () => this.recoverFocus();
+      afterNextRender(recover, { injector: this.injector });
+      setTimeout(recover);
     });
+  }
+
+  private recoverFocus(): void {
+    const focused = this.document.activeElement;
+    if (this.destroyed || this.drawer || (focused && focused !== this.document.body)) {
+      return;
+    }
+    this.title()?.nativeElement.focus();
   }
 }

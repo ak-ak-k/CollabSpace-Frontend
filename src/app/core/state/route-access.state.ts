@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, map } from 'rxjs';
 import {
+  canStartDirectConversation,
   channelBlockOf,
   conversationBlockOf,
   taskBlockOf,
@@ -21,7 +22,6 @@ import { WorkspaceState } from './workspace.state';
 
 type TargetOf<Kind extends RouteTarget['kind']> = Extract<RouteTarget, { kind: Kind }>;
 
-const DIRECT_CONVERSATION = /^dm-(.+)$/;
 const FALLBACK_WORKSPACE_NAME = 'this workspace';
 
 const isSettled = (status: LoadStatus): boolean => status === 'ready' || status === 'empty';
@@ -63,6 +63,9 @@ export class RouteAccessState {
     () => this.workspace.currentWorkspace()?.name ?? FALLBACK_WORKSPACE_NAME,
   );
   private readonly workspaceSettled = computed(() => isSettled(this.workspace.loadStatus()));
+  private readonly reachableMemberIds = computed(
+    () => new Set(this.workspace.memberDirectory().map((member) => member.id)),
+  );
 
   private settings({ section }: TargetOf<'workspace-settings'>): RouteBlock | null {
     if (!this.workspaceSettled() || !this.workspace.accessKnown()) {
@@ -112,7 +115,7 @@ export class RouteAccessState {
       return null;
     }
     const conversation = this.chat.conversation(conversationId);
-    if (!conversation && this.opensDirectConversation(conversationId)) {
+    if (!conversation && canStartDirectConversation(conversationId, this.reachableMemberIds())) {
       return null;
     }
     return conversationBlockOf({
@@ -121,11 +124,6 @@ export class RouteAccessState {
       left: this.chat.hasLeft(conversationId),
       me: CURRENT_USER_ID,
     });
-  }
-
-  private opensDirectConversation(conversationId: string): boolean {
-    const partnerId = DIRECT_CONVERSATION.exec(conversationId)?.[1];
-    return !!partnerId && this.workspace.memberIds().has(partnerId);
   }
 
   private task({ taskId }: TargetOf<'task'>): RouteBlock | null {

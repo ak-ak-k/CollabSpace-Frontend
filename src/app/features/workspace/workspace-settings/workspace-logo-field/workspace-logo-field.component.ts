@@ -65,11 +65,12 @@ export class WorkspaceLogoFieldComponent {
       return;
     }
     const previous = this.logoUrl();
-    void this.admin.setLogo(logoUrl);
+    const workspaceId = this.workspace.currentWorkspaceId();
+    void this.admin.setLogo(logoUrl, workspaceId);
     this.toasts.show(logoUrl ? 'Logo updated' : 'Logo removed', {
       icon: 'image',
       actionLabel: previous ? 'Undo' : undefined,
-      onAction: previous ? () => void this.admin.setLogo(previous) : undefined,
+      onAction: previous ? () => void this.admin.setLogo(previous, workspaceId) : undefined,
     });
   }
 }

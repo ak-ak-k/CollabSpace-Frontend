@@ -13,7 +13,14 @@ const people = ['me', 'u1', 'u2', 'u3', 'u4'].map((id) => ({ id }));
 describe('guest visibility', () => {
   it('shows guests only the teams they belong to', () => {
     expect(teams.filter((team) => canSeeTeam(team, guest)).map((team) => team.id)).toEqual(['t1']);
-    expect(teams.filter((team) => canSeeTeam(team, member))).toHaveLength(3);
+  });
+
+  it('hides private teams from members who are not in them', () => {
+    expect(teams.filter((team) => canSeeTeam(team, member)).map((team) => team.id)).toEqual([
+      't1',
+      't2',
+    ]);
+    expect(canSeeTeam(teams[2], { userId: 'u4', role: 'member' })).toBe(true);
   });
 
   it('shows guests only themselves and their teammates', () => {

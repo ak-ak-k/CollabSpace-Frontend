@@ -5,7 +5,7 @@
     <div class="page__title-row">
       <div class="page__heading">
         <span class="page__kicker">{{ store.kicker() }}</span>
-        <h1 class="page__title">Tasks</h1>
+        <h1 class="page__title" tabindex="-1" #title>Tasks</h1>
       </div>
       @if (actions.canCreate()) {
         <button appButton type="button" variant="primary" (click)="newTask()">

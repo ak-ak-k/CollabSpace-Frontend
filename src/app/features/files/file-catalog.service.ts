@@ -91,7 +91,6 @@ export class FileCatalog {
         messages.some((message) =>
           message.attachments.some(
             (attachment) =>
-              attachment.name === file.name &&
               this.fileState.fileForAttachment(conversationId, attachment.name)?.id === file.id,
           ),
         ),

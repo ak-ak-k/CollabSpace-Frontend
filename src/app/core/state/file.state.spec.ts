@@ -69,6 +69,16 @@ describe('FileState', () => {
     expect(files.file('f1')?.modifiedAt).toBeGreaterThanOrEqual(previous?.modifiedAt ?? 0);
   });
 
+  it('keeps message attachments linked to a file after it is renamed', async () => {
+    const files = TestBed.inject(FileState);
+    await settle();
+
+    files.rename('f4', 'CHANGELOG-final.md');
+
+    expect(files.fileForAttachment('g-launch', 'CHANGELOG-2.4.md')?.id).toBe('f4');
+    expect(files.fileForAttachment('g-launch', 'CHANGELOG-final.md')?.id).toBe('f4');
+  });
+
   it('attaches files to tasks and finds files shared in conversations', async () => {
     const files = TestBed.inject(FileState);
     await settle();

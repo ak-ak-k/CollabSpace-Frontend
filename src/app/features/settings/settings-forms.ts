@@ -10,6 +10,9 @@ export const CURRENT_PASSWORD_MESSAGE = 'Enter your current password.';
 export const emailError = (email: string): ValidationError | undefined =>
   EMAIL_PATTERN.test(email.trim()) ? undefined : { kind: 'email', message: EMAIL_ERROR_MESSAGE };
 
+export const blankTextError = (text: string, message: string): ValidationError | undefined =>
+  text !== '' && !text.trim() ? { kind: 'blank', message } : undefined;
+
 export const mismatchError = (
   confirmation: string,
   password: string,

@@ -1,14 +1,15 @@
 @if (task(); as current) {
   <header class="drawer__header">
-    <span class="drawer__id">{{ current.id }}</span>
-    <app-tag>{{ statusLabel() }}</app-tag>
-    @if (current.pending) {
-      <app-tag tone="subtle">
-        <app-icon name="clock" [size]="11" />
-        Pending sync
-      </app-tag>
-    }
-    <span class="drawer__spacer"></span>
+    <div class="drawer__meta">
+      <span class="drawer__id">{{ current.id }}</span>
+      <app-tag>{{ statusLabel() }}</app-tag>
+      @if (current.pending) {
+        <app-tag tone="subtle">
+          <app-icon name="clock" [size]="11" />
+          Pending sync
+        </app-tag>
+      }
+    </div>
     <button
       appIconButton
       type="button"

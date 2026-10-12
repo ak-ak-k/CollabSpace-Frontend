@@ -1,4 +1,12 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  Injector,
+  viewChild,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BreakpointService } from '../../../core/services/breakpoint.service';
 import { ChatState } from '../../../core/state/chat.state';
@@ -28,6 +36,9 @@ export class SavedMessagesComponent {
   private readonly chat = inject(ChatState);
   private readonly workspace = inject(WorkspaceState);
   private readonly inbox = inject(InboxActions);
+  private readonly injector = inject(Injector);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly title = viewChild<ElementRef<HTMLElement>>('title');
 
   protected readonly isMobile = inject(BreakpointService).isMobile;
   protected readonly status = computed(() =>
@@ -42,11 +53,19 @@ export class SavedMessagesComponent {
   protected readonly countLabel = computed(() => savedCountLabel(this.rows().length));
 
   protected remove(row: SavedRow): void {
+    const removedIndex = this.rows().findIndex((candidate) => candidate.id === row.id);
     this.inbox.toggleSave(row.id);
+    afterNextRender(() => this.focusNear(removedIndex), { injector: this.injector });
   }
 
   protected retry(): void {
     void this.workspace.reload();
     void this.chat.reload();
+  }
+
+  private focusNear(removedIndex: number): void {
+    const removeButtons = this.host.nativeElement.querySelectorAll<HTMLElement>('[data-saved-id]');
+    const next = removeButtons.item(Math.min(removedIndex, removeButtons.length - 1));
+    (next ?? this.title()?.nativeElement)?.focus();
   }
 }

@@ -122,8 +122,9 @@ export class TaskActions {
     if (!confirmed) {
       return false;
     }
-    const removed = await this.tasks.remove(taskId);
+    const removal = this.tasks.remove(taskId);
     this.close();
+    const removed = await removal;
     if (removed) {
       this.toasts.show(`${taskId} deleted`, {
         icon: 'trash-2',

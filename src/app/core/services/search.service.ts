@@ -1,4 +1,5 @@
-import { DOCUMENT, inject, Service, signal } from '@angular/core';
+import { DOCUMENT, effect, inject, Service, signal, untracked } from '@angular/core';
+import { AuthState } from '../state/auth.state';
 
 export type SearchFilter = 'all' | 'people' | 'messages' | 'channels' | 'teams' | 'tasks' | 'files';
 
@@ -22,6 +23,15 @@ export class SearchService {
   readonly isOpen = signal(false);
   readonly filter = signal<SearchFilter>('all');
   readonly recentSearches = this.storedRecentSearches.asReadonly();
+
+  constructor() {
+    const auth = inject(AuthState);
+    effect(() => {
+      if (!auth.authenticated()) {
+        untracked(() => this.forgetSession());
+      }
+    });
+  }
 
   open(filter: SearchFilter = 'all'): void {
     this.filter.set(filter);
@@ -57,6 +67,11 @@ export class SearchService {
 
   clearRecent(): void {
     this.saveRecentSearches([]);
+  }
+
+  private forgetSession(): void {
+    this.close();
+    this.clearRecent();
   }
 
   private saveRecentSearches(searches: readonly string[]): void {

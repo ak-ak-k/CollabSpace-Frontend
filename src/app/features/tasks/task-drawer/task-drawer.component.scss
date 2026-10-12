@@ -16,13 +16,21 @@
 }
 
 .drawer__id {
+  flex: none;
   font-size: var(--font-size-13);
+  white-space: nowrap;
   font-weight: var(--font-weight-heavy);
   letter-spacing: var(--letter-spacing-label);
 }
 
-.drawer__spacer {
+.drawer__meta {
+  display: flex;
   flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  min-width: 0;
+  padding: var(--space-2) var(--space-0);
 }
 
 .drawer__delete {
