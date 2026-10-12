@@ -15,6 +15,7 @@ const FORBIDDEN_TITLE = 'Access denied · CollabSpace';
 const SERVER_ERROR_TITLE = 'Something went wrong · CollabSpace';
 
 export const routes: Routes = [
+  { path: '', pathMatch: 'full', redirectTo: 'home' },
   {
     path: 'styleguide',
     title: 'Styleguide · CollabSpace',
@@ -66,7 +67,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./layout/shell/shell.component').then((module) => module.ShellComponent),
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'home' },
       {
         path: 'home',
         title: 'Dashboard · CollabSpace',
